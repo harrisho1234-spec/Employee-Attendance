@@ -9,7 +9,12 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Allow network-first for live Google Sheets and Firebase calls
+  // Do NOT intercept external requests (Google Sheets, Firebase, CDN resources)
+  // to prevent CORS or redirect interception issues.
+  if (event.request.method !== 'GET' || !event.request.url.startsWith(self.location.origin)) {
+    return;
+  }
+
   event.respondWith(
     fetch(event.request).catch(() => caches.match(event.request))
   );
