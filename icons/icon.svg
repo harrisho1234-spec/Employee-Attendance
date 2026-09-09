@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <rect width="512" height="512" rx="100" fill="#ffffff"/>
+  <!-- Binder Rings -->
+  <rect x="110" y="60" width="30" height="70" rx="15" fill="#1e293b"/>
+  <rect x="195" y="60" width="30" height="70" rx="15" fill="#1e293b"/>
+  <rect x="280" y="60" width="30" height="70" rx="15" fill="#1e293b"/>
+  <rect x="365" y="60" width="30" height="70" rx="15" fill="#1e293b"/>
+  <!-- Calendar Body -->
+  <path d="M70 140 C70 115, 90 95, 115 95 L397 95 C422 95, 442 115, 442 140 L442 410 C442 435, 422 455, 397 455 L115 455 C90 455, 70 435, 70 410 Z" fill="#1e293b"/>
+  <!-- White Inner Calendar Page -->
+  <rect x="95" y="215" width="322" height="215" rx="16" fill="#ffffff"/>
+  <!-- Calendar Date Grids -->
+  <rect x="125" y="245" width="70" height="48" rx="10" fill="#1e293b"/>
+  <rect x="221" y="245" width="70" height="48" rx="10" fill="#1e293b"/>
+  <rect x="317" y="245" width="70" height="48" rx="10" fill="#1e293b"/>
+  <rect x="125" y="315" width="70" height="48" rx="10" fill="#1e293b"/>
+  <rect x="221" y="315" width="70" height="48" rx="10" fill="#1e293b"/>
+  <rect x="125" y="385" width="70" height="48" rx="10" fill="#1e293b"/>
+  <rect x="221" y="385" width="70" height="48" rx="10" fill="#1e293b"/>
+  <!-- Green Checkmark -->
+  <path d="M295 395 L355 455 L475 320" stroke="#10b981" stroke-width="48" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
