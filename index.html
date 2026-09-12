@@ -966,6 +966,370 @@
            ============================================================= */
         .dashboard-mobile-only { display: none; }
 
+
+        /* =============================================================
+           Shared Dashboard card UI foundation
+           Required by BOTH mobile and desktop. Size/layout differences
+           remain inside the responsive media queries below.
+           ============================================================= */
+        #dashboardMobileCards {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            width: 100%;
+        }
+        .mobile-dashboard-header {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 13px;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+            margin-bottom: 10px;
+        }
+        .mobile-dashboard-title-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .mobile-dashboard-search-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 8px;
+            margin-top: 11px;
+        }
+        .mobile-dashboard-search {
+            width: 100%;
+            height: 38px;
+            padding: 0 12px 0 34px;
+            border-radius: 10px;
+            border: 1px solid #dbe3ec;
+            background: #f8fafc;
+            color: #0f172a;
+            font-size: 13px;
+            outline: none;
+        }
+        .mobile-dashboard-search:focus {
+            background: #ffffff;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.08);
+        }
+        .mobile-dashboard-filter-button {
+            height: 38px;
+            min-width: 86px;
+            border-radius: 10px;
+            border: 1px solid #dbe3ec;
+            background: #ffffff;
+            color: #334155;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+        .mobile-dashboard-filter-count {
+            min-width: 19px;
+            height: 19px;
+            padding: 0 5px;
+            border-radius: 999px;
+            background: #2563eb;
+            color: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: 800;
+        }
+        .mobile-dashboard-filter-count.is-zero { display: none; }
+        .mobile-dashboard-chips {
+            display: flex;
+            gap: 5px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            margin-top: 8px;
+            padding-bottom: 1px;
+        }
+        .mobile-dashboard-chips::-webkit-scrollbar { display: none; }
+        .mobile-dashboard-chip {
+            flex: 0 0 auto;
+            border: 1px solid #dbeafe;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-radius: 999px;
+            padding: 4px 8px;
+            font-size: 9px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .mobile-dashboard-kpis {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .mobile-dashboard-kpi {
+            min-height: 61px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: #ffffff;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+        }
+        .mobile-dashboard-kpi-icon {
+            width: 31px;
+            height: 31px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 31px;
+            font-size: 12px;
+        }
+        .mobile-dashboard-kpi-label {
+            color: #64748b;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .3px;
+            line-height: 1.1;
+        }
+        .mobile-dashboard-kpi-value {
+            color: #0f172a;
+            font-size: 20px;
+            font-weight: 800;
+            line-height: 1;
+            margin-top: 3px;
+        }
+        .mobile-dashboard-section {
+            margin-bottom: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            background: #ffffff;
+            overflow: hidden;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+        }
+        .mobile-dashboard-section-head {
+            padding: 10px 12px;
+            border-bottom: 1px solid #eef2f7;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .mobile-dashboard-section-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: #1e293b;
+        }
+        .mobile-dashboard-section-subtitle {
+            font-size: 9px;
+            color: #94a3b8;
+            margin-top: 1px;
+        }
+        .mobile-attention-list { padding: 4px 8px 7px; }
+        .mobile-attention-row {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 4px;
+            border-bottom: 1px solid #f1f5f9;
+            cursor: pointer;
+        }
+        .mobile-attention-row:last-child { border-bottom: 0; }
+        .mobile-attention-avatar,
+        .mobile-staff-avatar {
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #dbe3ec;
+            background: #f1f5f9;
+            flex-shrink: 0;
+        }
+        .mobile-attention-avatar { width: 34px; height: 34px; }
+        .mobile-staff-avatar { width: 42px; height: 42px; }
+        .mobile-avatar-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-weight: 800;
+        }
+        .mobile-attention-reasons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 4px;
+        }
+        .mobile-attention-badge {
+            border-radius: 999px;
+            padding: 2px 6px;
+            font-size: 8px;
+            font-weight: 800;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            color: #475569;
+        }
+        .mobile-staff-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 13px;
+            padding: 11px;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+            cursor: pointer;
+        }
+        .mobile-staff-card:active { background: #f8fafc; }
+        .mobile-staff-card-top {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .mobile-staff-name {
+            color: #0f2b4a;
+            font-size: 13px;
+            line-height: 1.2;
+            font-weight: 800;
+        }
+        .mobile-staff-meta {
+            color: #64748b;
+            font-size: 9px;
+            line-height: 1.25;
+            margin-top: 3px;
+        }
+        .mobile-staff-balance-row {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 5px;
+            margin-top: 9px;
+        }
+        .mobile-staff-balance {
+            background: #f8fafc;
+            border: 1px solid #edf2f7;
+            border-radius: 8px;
+            padding: 5px 7px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 5px;
+            font-size: 9px;
+            color: #64748b;
+        }
+        .mobile-staff-balance strong { color: #0f172a; font-size: 11px; }
+        .mobile-staff-flags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 7px;
+        }
+        .mobile-staff-flag {
+            padding: 3px 6px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            font-size: 8px;
+            font-weight: 800;
+            background: #f8fafc;
+            color: #475569;
+        }
+
+        /* Shared filter-overlay foundation. Mobile uses a bottom sheet;
+           desktop overrides it to a right-side drawer. */
+        #mobileDashboardFilterBackdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 120;
+            background: rgba(15, 23, 42, 0.50);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .18s ease;
+        }
+        #mobileDashboardFilterBackdrop.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #mobileDashboardFilterPanel {
+            width: 100%;
+            max-height: 88vh;
+            background: #ffffff;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -10px 40px rgba(15, 23, 42, 0.16);
+            transform: translateY(100%);
+            transition: transform .22s ease;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        #mobileDashboardFilterBackdrop.open #mobileDashboardFilterPanel { transform: translateY(0); }
+        .mobile-filter-scroll {
+            overflow-y: auto;
+            padding: 4px 14px 18px;
+        }
+        .mobile-filter-group {
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .mobile-filter-group:last-child { border-bottom: 0; }
+        .mobile-filter-label {
+            display: block;
+            color: #64748b;
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .45px;
+            margin-bottom: 7px;
+        }
+        .mobile-filter-select,
+        .mobile-filter-input {
+            width: 100%;
+            height: 40px;
+            border: 1px solid #dbe3ec;
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 0 10px;
+            font-size: 13px;
+            color: #0f172a;
+            outline: none;
+        }
+        .mobile-filter-check-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 7px;
+        }
+        .mobile-filter-check {
+            min-height: 38px;
+            border: 1px solid #e2e8f0;
+            border-radius: 9px;
+            padding: 7px 9px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 11px;
+            color: #334155;
+            background: #ffffff;
+        }
+        .mobile-filter-footer {
+            padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+            border-top: 1px solid #e2e8f0;
+            display: grid;
+            grid-template-columns: 1fr 1.4fr;
+            gap: 8px;
+            background: #ffffff;
+        }
+        .mobile-filter-reset,
+        .mobile-filter-done {
+            height: 42px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+        .mobile-filter-reset { border: 1px solid #dbe3ec; color: #475569; background: #ffffff; }
+        .mobile-filter-done { border: 1px solid #2563eb; color: #ffffff; background: #2563eb; }
+
         @media (max-width: 700px) {
             #dashboardView { max-width: 100% !important; padding-bottom: 76px; }
             #dashboardView > .dashboard-desktop-toolbar,
@@ -1338,9 +1702,471 @@
             .mobile-filter-done { border: 1px solid #2563eb; color: #ffffff; background: #2563eb; }
         }
 
-    </style>
+
+        /* =============================================================
+           Unified card Dashboard — desktop adaptation
+           Uses the mobile card experience at every screen size while
+           keeping the original desktop controls/table hidden in the DOM
+           so existing filtering/data logic continues to work unchanged.
+           ============================================================= */
+        #dashboardView > .dashboard-desktop-toolbar,
+        #dashboardView > #kpiContainer,
+        #dashboardView > #companySummaryContainer,
+        #dashboardView > .dashboard-legacy-table {
+            display: none !important;
+        }
+
+        @media (min-width: 701px) {
+            #dashboardView {
+                max-width: 95rem !important;
+                padding-bottom: 28px;
+            }
+
+            .dashboard-mobile-only { display: block !important; }
+
+            #dashboardMobileShell {
+                width: 100%;
+            }
+
+            .mobile-dashboard-header {
+                border-radius: 16px;
+                padding: 18px 20px;
+                margin-bottom: 14px;
+                box-shadow: 0 1px 3px rgba(15, 23, 42, 0.045);
+            }
+
+            .mobile-dashboard-title-row {
+                align-items: center;
+            }
+
+            .mobile-dashboard-title-row h1 {
+                font-size: 24px !important;
+                line-height: 1.15 !important;
+                letter-spacing: -0.35px;
+            }
+
+            #mobileDashboardScope {
+                font-size: 11px !important;
+                margin-top: 5px !important;
+            }
+
+            .mobile-dashboard-title-row > div:last-child {
+                width: 44px !important;
+                height: 44px !important;
+                border-radius: 13px !important;
+            }
+
+            .mobile-dashboard-search-row {
+                grid-template-columns: minmax(280px, 520px) auto;
+                justify-content: start;
+                gap: 10px;
+                margin-top: 15px;
+            }
+
+            .mobile-dashboard-search {
+                height: 42px;
+                padding-left: 38px;
+                border-radius: 11px;
+                font-size: 13px;
+                background: #f8fafc;
+            }
+
+            .mobile-dashboard-search-row .fa-magnifying-glass {
+                left: 14px !important;
+                font-size: 12px !important;
+            }
+
+            .mobile-dashboard-filter-button {
+                min-width: 108px;
+                height: 42px;
+                border-radius: 11px;
+                font-size: 12px;
+                padding: 0 14px;
+                transition: border-color .15s ease, background-color .15s ease, color .15s ease;
+            }
+
+            .mobile-dashboard-filter-button:hover {
+                border-color: #93c5fd;
+                background: #eff6ff;
+                color: #1d4ed8;
+            }
+
+            .mobile-dashboard-chips {
+                flex-wrap: wrap;
+                overflow: visible;
+                gap: 6px;
+                margin-top: 10px;
+            }
+
+            .mobile-dashboard-chip {
+                padding: 5px 9px;
+                font-size: 10px;
+            }
+
+            .mobile-dashboard-kpis {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 12px;
+                margin-bottom: 14px;
+            }
+
+            .mobile-dashboard-kpi {
+                min-height: 82px;
+                border-radius: 14px;
+                padding: 14px 15px;
+                gap: 12px;
+                transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+            }
+
+            .mobile-dashboard-kpi:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 5px 14px rgba(15, 23, 42, 0.055);
+                border-color: #d7e0ea;
+            }
+
+            .mobile-dashboard-kpi-icon {
+                width: 40px;
+                height: 40px;
+                flex-basis: 40px;
+                border-radius: 11px;
+                font-size: 14px;
+            }
+
+            .mobile-dashboard-kpi-label {
+                font-size: 10px;
+                letter-spacing: .35px;
+            }
+
+            .mobile-dashboard-kpi-value {
+                font-size: 27px;
+                margin-top: 5px;
+            }
+
+            .mobile-dashboard-section {
+                border-radius: 15px;
+                margin-bottom: 14px;
+            }
+
+            .mobile-dashboard-section-head {
+                padding: 13px 15px;
+            }
+
+            .mobile-dashboard-section-title {
+                font-size: 13px;
+            }
+
+            .mobile-dashboard-section-subtitle {
+                font-size: 10px;
+                margin-top: 2px;
+            }
+
+            #mobileNeedsAttentionCount {
+                font-size: 10px !important;
+            }
+
+            .mobile-attention-list {
+                padding: 4px 10px 9px;
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                column-gap: 18px;
+            }
+
+            .mobile-attention-row {
+                min-height: 70px;
+                padding: 10px 6px;
+            }
+
+            .mobile-attention-row:hover {
+                background: #f8fafc;
+            }
+
+            .mobile-attention-avatar {
+                width: 40px;
+                height: 40px;
+            }
+
+            .mobile-attention-row .text-\[11px\] {
+                font-size: 12px !important;
+            }
+
+            .mobile-attention-row .text-\[8px\] {
+                font-size: 9px !important;
+            }
+
+            .mobile-attention-badge {
+                padding: 3px 7px;
+                font-size: 9px;
+            }
+
+            #dashboardMobileShell + .dashboard-desktop-toolbar + #kpiContainer + #companySummaryContainer + .dashboard-legacy-table + #dashboardMobileCards {
+                margin-top: 0;
+            }
+
+            #dashboardMobileCards {
+                display: grid !important;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 11px !important;
+                width: 100%;
+            }
+
+            .mobile-staff-card {
+                border-radius: 14px;
+                padding: 13px;
+                transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease, background-color .15s ease;
+            }
+
+            .mobile-staff-card:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 5px 14px rgba(15, 23, 42, 0.055);
+                border-color: #d7e0ea;
+                background: #ffffff;
+            }
+
+            .mobile-staff-card-top {
+                gap: 12px;
+            }
+
+            .mobile-staff-avatar {
+                width: 48px;
+                height: 48px;
+            }
+
+            .mobile-staff-name {
+                font-size: 14px;
+            }
+
+            .mobile-staff-meta {
+                font-size: 10px;
+                margin-top: 4px;
+            }
+
+            .mobile-staff-balance-row {
+                gap: 7px;
+                margin-top: 11px;
+            }
+
+            .mobile-staff-balance {
+                border-radius: 9px;
+                padding: 7px 9px;
+                font-size: 10px;
+            }
+
+            .mobile-staff-balance strong {
+                font-size: 12px;
+            }
+
+            .mobile-staff-flags {
+                gap: 5px;
+                margin-top: 8px;
+            }
+
+            .mobile-staff-flag {
+                padding: 4px 7px;
+                font-size: 9px;
+            }
+
+            #mobileStaffResultCount {
+                font-size: 10px !important;
+            }
+
+            #dashboardMobileShell + .dashboard-desktop-toolbar ~ .flex.items-center.justify-between.px-1 {
+                margin-top: 0;
+            }
+
+            /* Desktop filter: right-side drawer instead of a bottom sheet. */
+            #mobileDashboardFilterBackdrop {
+                display: flex !important;
+                align-items: stretch;
+                justify-content: flex-end;
+            }
+
+            #mobileDashboardFilterPanel {
+                width: min(430px, 92vw);
+                height: 100%;
+                max-height: none;
+                border-radius: 18px 0 0 18px;
+                transform: translateX(100%);
+                box-shadow: -12px 0 36px rgba(15, 23, 42, 0.15);
+            }
+
+            #mobileDashboardFilterBackdrop.open #mobileDashboardFilterPanel {
+                transform: translateX(0);
+            }
+
+            #mobileDashboardFilterPanel > .px-4.pt-3.pb-2 {
+                padding: 18px 18px 13px !important;
+            }
+
+            #mobileDashboardFilterPanel > .px-4.pt-3.pb-2 > .w-10.h-1 {
+                display: none;
+            }
+
+            #mobileDashboardFilterPanel h3 {
+                font-size: 17px !important;
+            }
+
+            .mobile-filter-scroll {
+                padding: 5px 18px 22px;
+            }
+
+            .mobile-filter-group {
+                padding: 14px 0;
+            }
+
+            .mobile-filter-label {
+                font-size: 10px;
+                margin-bottom: 8px;
+            }
+
+            .mobile-filter-select,
+            .mobile-filter-input {
+                height: 42px;
+                border-radius: 10px;
+            }
+
+            .mobile-filter-check-grid {
+                gap: 8px;
+            }
+
+            .mobile-filter-check {
+                min-height: 40px;
+                font-size: 12px;
+            }
+
+            .mobile-filter-footer {
+                padding: 12px 18px 16px;
+            }
+        }
+
+        @media (min-width: 1100px) {
+            #dashboardMobileCards {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+            .mobile-attention-list {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+    
+        /* Org Chart relationship editor — consistent alignment and connector visibility */
+        #orgView .org-tree { padding: 8px 18px 40px; }
+        #orgView .org-tree ul { align-items: flex-start; }
+        #orgView .org-tree li { padding-left: 7px; padding-right: 7px; min-width: 96px; }
+        #orgView .org-tree li > div { min-width: 88px; }
+        #orgView .org-tree li::before,
+        #orgView .org-tree li::after,
+        #orgView .org-tree ul ul::before { border-color: #94a3b8; }
+        #orgView .org-tree ul.vertical-stack > li::after,
+        #orgView .org-tree ul.vertical-stack::before { border-color: #94a3b8; }
+        #orgView .org-node-draggable { border-radius: 10px; }
+        #orgView .org-node-draggable:hover { box-shadow: 0 4px 14px rgba(15,23,42,.12); }
+        @media (max-width: 700px) {
+            #orgView .org-tree li { padding-left: 3px; padding-right: 3px; min-width: 76px; }
+            #orgView .org-tree li > div { min-width: 70px; }
+        }
+
+        /* Dashboard filter drawer must never occupy or overlay non-Dashboard tabs.
+           It is removed from layout until explicitly opened on Dashboard. */
+        #mobileDashboardFilterBackdrop {
+            display: none !important;
+        }
+        body[data-active-tab="dashboard"] #mobileDashboardFilterBackdrop.open {
+            display: flex !important;
+        }
+        body:not([data-active-tab="dashboard"]) #mobileDashboardFilterBackdrop {
+            display: none !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+
+
+        /* Detailed staff-card metrics: shared mobile + desktop */
+        .mobile-staff-leave-panel {
+            margin-top: 9px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #ffffff;
+        }
+        .mobile-staff-leave-head,
+        .mobile-staff-leave-row {
+            display: grid;
+            grid-template-columns: 1.25fr repeat(3, minmax(0, 1fr));
+            align-items: center;
+        }
+        .mobile-staff-leave-head {
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            color: #64748b;
+            font-size: 8px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .03em;
+        }
+        .mobile-staff-leave-head > span,
+        .mobile-staff-leave-row > span {
+            padding: 5px 6px;
+            text-align: center;
+            border-right: 1px solid #edf2f7;
+        }
+        .mobile-staff-leave-head > span:first-child,
+        .mobile-staff-leave-row > span:first-child { text-align: left; }
+        .mobile-staff-leave-head > span:last-child,
+        .mobile-staff-leave-row > span:last-child { border-right: 0; }
+        .mobile-staff-leave-row {
+            font-size: 9px;
+            color: #475569;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .mobile-staff-leave-row:last-child { border-bottom: 0; }
+        .mobile-staff-leave-row .metric-label { font-weight: 700; color: #64748b; }
+        .mobile-staff-leave-row .metric-value { font-weight: 800; color: #0f172a; }
+        .mobile-staff-leave-row.remaining .metric-value { color: #166534; }
+        .mobile-staff-leave-row.used .metric-value { color: #1d4ed8; }
+        .mobile-staff-attendance-row {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 5px;
+            margin-top: 7px;
+        }
+        .mobile-staff-attendance-metric {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 5px 6px;
+            background: #f8fafc;
+            min-width: 0;
+        }
+        .mobile-staff-attendance-metric span {
+            display: block;
+            font-size: 7px;
+            line-height: 1.05;
+            color: #64748b;
+            font-weight: 800;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .mobile-staff-attendance-metric strong {
+            display: block;
+            margin-top: 3px;
+            font-size: 11px;
+            line-height: 1;
+            color: #0f172a;
+        }
+        .mobile-staff-attendance-metric.up strong { color: #be123c; }
+        .mobile-staff-attendance-metric.absence strong { color: #b91c1c; }
+        .mobile-staff-attendance-metric.late strong { color: #a16207; }
+        .mobile-staff-attendance-metric.late30 strong { color: #c2410c; }
+        @media (min-width: 701px) {
+            .mobile-staff-leave-head { font-size: 9px; }
+            .mobile-staff-leave-row { font-size: 10px; }
+            .mobile-staff-leave-head > span,
+            .mobile-staff-leave-row > span { padding: 6px 7px; }
+            .mobile-staff-attendance-metric { padding: 6px 7px; }
+            .mobile-staff-attendance-metric span { font-size: 8px; }
+            .mobile-staff-attendance-metric strong { font-size: 12px; }
+        }
+</style>
 </head>
-<body class="text-slate-800 h-screen flex flex-col">
+<body class="text-slate-800 h-screen flex flex-col" data-active-tab="daily">
 
     <!-- Global Loading Screen -->
     <div id="globalLoader">
@@ -1373,7 +2199,7 @@
         <!-- DASHBOARD VIEW -->
         <div id="dashboardView" class="max-w-[95rem] mx-auto hidden">
 
-            <!-- Mobile-only Dashboard experience. Desktop content below is unchanged. -->
+            <!-- Unified card-based Dashboard experience for mobile and desktop. -->
             <div id="dashboardMobileShell" class="dashboard-mobile-only">
                 <div class="mobile-dashboard-header">
                     <div class="mobile-dashboard-title-row">
@@ -1491,7 +2317,7 @@
             </div>
 
             <!-- Data Table (Desktop) -->
-            <div class="hidden lg:block bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden w-full">
+            <div class="dashboard-legacy-table hidden lg:block bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden w-full">
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm text-left text-slate-600 border-collapse min-w-[1200px]">
                         <thead class="text-xs text-slate-700 uppercase bg-slate-50 border-b border-slate-200 text-center">
@@ -1542,13 +2368,13 @@
 
 
 
-            <!-- Mobile Dashboard filter bottom sheet -->
+            <!-- Dashboard filter panel: bottom sheet on mobile, right drawer on desktop -->
             <div id="mobileDashboardFilterBackdrop" class="dashboard-mobile-only" onclick="if(event.target===this) closeMobileDashboardFilters()">
                 <div id="mobileDashboardFilterPanel" onclick="event.stopPropagation()">
                     <div class="px-4 pt-3 pb-2 border-b border-slate-100">
                         <div class="w-10 h-1 rounded-full bg-slate-200 mx-auto mb-3"></div>
                         <div class="flex items-center justify-between">
-                            <div><h3 class="text-[15px] font-extrabold text-slate-900">Dashboard Filters</h3><p class="text-[9px] text-slate-400 mt-0.5">These use the same filters as desktop.</p></div>
+                            <div><h3 class="text-[15px] font-extrabold text-slate-900">Dashboard Filters</h3><p class="text-[9px] text-slate-400 mt-0.5">Choose what appears in the Dashboard.</p></div>
                             <button type="button" onclick="closeMobileDashboardFilters()" class="w-8 h-8 rounded-full bg-slate-50 text-slate-500"><i class="fa-solid fa-xmark"></i></button>
                         </div>
                     </div>
@@ -2557,14 +3383,33 @@
         }
 
         window.switchTab = function(id) {
+            // Record the active tab so Dashboard-only overlays cannot leak into other views.
+            document.body.dataset.activeTab = id;
+
+            // Always close Dashboard-only filter UI before changing tabs.
+            const dashFilterBackdrop = document.getElementById('mobileDashboardFilterBackdrop');
+            if (dashFilterBackdrop) dashFilterBackdrop.classList.remove('open');
+            document.body.classList.remove('modal-open');
+
+            // Close any open filter dropdown menus so they do not visually carry across tabs.
+            document.querySelectorAll('.filter-dropdown > div[id$="DropdownMenu"]').forEach(menu => menu.classList.add('hidden'));
+
             ['dashboard','calendar','daily','org','scan'].forEach(t => {
                 const v=document.getElementById(t+'View'), b=document.getElementById('tab-'+t);
                 if(v)v.classList.add('hidden'); if(b)b.className="tab-inactive pb-3 px-2 whitespace-nowrap text-sm sm:text-base";
             });
             const tv=document.getElementById(id+'View'), tb=document.getElementById('tab-'+id);
             if(tv)tv.classList.remove('hidden'); if(tb)tb.className="tab-active pb-3 px-2 whitespace-nowrap text-sm sm:text-base border-b-2 border-blue-600 text-blue-600";
+
+            // Every tab should begin at its own top. The Dashboard card view can be long,
+            // so carrying its scrollTop into Daily Attendance created a large blank area.
+            const mainScroll = document.getElementById('mainContainer');
+            if (mainScroll) mainScroll.scrollTop = 0;
             
-            if(id==='calendar') renderCalendar(); else if(id==='daily') renderDailyAttendance(); else if(id==='org'&&currentOrgCompany) {
+            if(id==='dashboard') {
+                // Refresh the unified card dashboard when returning to it.
+                if (typeof renderMobileDashboard === 'function') renderMobileDashboard();
+            } else if(id==='calendar') renderCalendar(); else if(id==='daily') renderDailyAttendance(); else if(id==='org'&&currentOrgCompany) {
                 if(orgPanzoom) { orgPanzoom.destroy(); orgPanzoom = null; }
                 setTimeout(() => { if(document.getElementById('orgView').classList.contains('hidden') === false) drawAndPanzoom(); }, 50);
             } else if(id==='scan') {
@@ -2644,8 +3489,8 @@
             sortFilteredData(); renderTable(); renderMobileDashboardUI();
         }
 
-        function handleSort(col) { if(currentSortColumn===col) isSortAscending=!isSortAscending; else {currentSortColumn=col; isSortAscending=true;} document.querySelectorAll('th.sortable').forEach(th => { th.classList.remove('asc','desc'); if(th.dataset.sort===col) th.classList.add(isSortAscending?'asc':'desc'); }); sortFilteredData(); renderTable(); }
-        window.resetSort=function(){currentSortColumn='id'; isSortAscending=true; document.querySelectorAll('th.sortable').forEach(th=>{th.classList.remove('asc','desc');}); sortFilteredData(); renderTable();};
+        function handleSort(col) { if(currentSortColumn===col) isSortAscending=!isSortAscending; else {currentSortColumn=col; isSortAscending=true;} document.querySelectorAll('th.sortable').forEach(th => { th.classList.remove('asc','desc'); if(th.dataset.sort===col) th.classList.add(isSortAscending?'asc':'desc'); }); sortFilteredData(); renderTable(); renderMobileDashboardUI(); }
+        window.resetSort=function(){currentSortColumn='id'; isSortAscending=true; document.querySelectorAll('th.sortable').forEach(th=>{th.classList.remove('asc','desc');}); sortFilteredData(); renderTable(); renderMobileDashboardUI();};
         function sortFilteredData() { filteredEmployees.sort((a,b)=>{ let va,vb; switch(currentSortColumn){case 'id':va=a.displayId;vb=b.displayId;break; case 'name':va=a.name;vb=b.name;break; case 'company':va=a.company;vb=b.company;break; case 'position':va=a.position;vb=b.position;break; case 'joinDate':va=a.sortableJoinDate;vb=b.sortableJoinDate;break; case 'availAL':va=a.leaves.available.AL;vb=b.leaves.available.AL;break; case 'remAL':va=a.leaves.remaining.AL;vb=b.leaves.remaining.AL;break; case 'totalUP':va=a.leaves.unpaid;vb=b.leaves.unpaid;break; case 'totalLate5m':va=a.totalLate5m;vb=b.totalLate5m;break; default:va=a.displayId;vb=b.displayId; } if(va<vb) return isSortAscending?-1:1; if(va>vb) return isSortAscending?1:-1; return 0; }); }
 
         function renderTable() {
@@ -2837,10 +3682,17 @@
                             <div class="mobile-staff-meta truncate">${e.position || 'Position not specified'}</div>
                         </div>
                     </div>
-                    <div class="mobile-staff-balance-row">
-                        <div class="mobile-staff-balance"><span>AL</span><strong>${mobileDashboardFormatNumber(e.leaves.remaining.AL)}</strong></div>
-                        <div class="mobile-staff-balance"><span>SL</span><strong>${mobileDashboardFormatNumber(e.leaves.remaining.SL)}</strong></div>
-                        <div class="mobile-staff-balance"><span>SP</span><strong>${mobileDashboardFormatNumber(e.leaves.remaining.SP)}</strong></div>
+                    <div class="mobile-staff-leave-panel">
+                        <div class="mobile-staff-leave-head"><span>Leave</span><span>AL</span><span>SL</span><span>SP</span></div>
+                        <div class="mobile-staff-leave-row"><span class="metric-label">Available</span><span class="metric-value">${mobileDashboardFormatNumber(e.leaves.available.AL)}</span><span class="metric-value">${mobileDashboardFormatNumber(e.leaves.available.SL)}</span><span class="metric-value">${mobileDashboardFormatNumber(e.leaves.available.SP)}</span></div>
+                        <div class="mobile-staff-leave-row used"><span class="metric-label">Used</span><span class="metric-value">${mobileDashboardFormatNumber(e.leaves.used.AL)}</span><span class="metric-value">${mobileDashboardFormatNumber(e.leaves.used.SL)}</span><span class="metric-value">${mobileDashboardFormatNumber(e.leaves.used.SP)}</span></div>
+                        <div class="mobile-staff-leave-row remaining"><span class="metric-label">Remaining</span><span class="metric-value">${mobileDashboardFormatNumber(e.leaves.remaining.AL)}</span><span class="metric-value">${mobileDashboardFormatNumber(e.leaves.remaining.SL)}</span><span class="metric-value">${mobileDashboardFormatNumber(e.leaves.remaining.SP)}</span></div>
+                    </div>
+                    <div class="mobile-staff-attendance-row">
+                        <div class="mobile-staff-attendance-metric up"><span>UP</span><strong>${mobileDashboardFormatNumber(ps.UP)}</strong></div>
+                        <div class="mobile-staff-attendance-metric absence"><span>Absence</span><strong>${mobileDashboardFormatNumber(ps.A)}</strong></div>
+                        <div class="mobile-staff-attendance-metric late"><span>Late</span><strong>${mobileDashboardFormatNumber(ps.Late5m)}</strong></div>
+                        <div class="mobile-staff-attendance-metric late30"><span>Late 30+</span><strong>${mobileDashboardFormatNumber(ps.Late3m)}</strong></div>
                     </div>
                     ${flags.length ? `<div class="mobile-staff-flags">${flags.join('')}</div>` : ''}
                 </article>`;
@@ -4016,25 +4868,7 @@
             
             let bgC={'ITC':'dae3f3', 'LPH':'e2efda', 'LPT':'dae3f3', 'LPL':'dae3f3', 'TTC':'ffffff'}, cnt=1, cComp='';
             let cS = selectedDailyCompanies.length === 1 ? selectedDailyCompanies[0] + "-" : "";
-            let h=`<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"><style>table{border-collapse:collapse;font-family:Arial;font-size:10pt;}th,td{border:1px solid #000;padding:4px;}
-        /* Org Chart relationship editor — consistent alignment and connector visibility */
-        #orgView .org-tree { padding: 8px 18px 40px; }
-        #orgView .org-tree ul { align-items: flex-start; }
-        #orgView .org-tree li { padding-left: 7px; padding-right: 7px; min-width: 96px; }
-        #orgView .org-tree li > div { min-width: 88px; }
-        #orgView .org-tree li::before,
-        #orgView .org-tree li::after,
-        #orgView .org-tree ul ul::before { border-color: #94a3b8; }
-        #orgView .org-tree ul.vertical-stack > li::after,
-        #orgView .org-tree ul.vertical-stack::before { border-color: #94a3b8; }
-        #orgView .org-node-draggable { border-radius: 10px; }
-        #orgView .org-node-draggable:hover { box-shadow: 0 4px 14px rgba(15,23,42,.12); }
-        @media (max-width: 700px) {
-            #orgView .org-tree li { padding-left: 3px; padding-right: 3px; min-width: 76px; }
-            #orgView .org-tree li > div { min-width: 70px; }
-        }
-
-</style></head><body><table id="exPaid" data-cols-width="5,15,30,25,12,10,10,10"><tr><td colspan="8" data-f-sz="14" data-f-color="c00000" data-f-bold="true" data-a-h="center" data-b-a-s="none">${cS}Monthly Leave Report (${titleStr})</td></tr><tr><td colspan="5" data-b-a-s="none"></td><td data-t="n" data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${tS}</td><td data-t="n" data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${tA}</td><td data-t="n" data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${tSp}</td></tr><tr><th data-fill-color="92d050" data-b-a-s="thin">No.</th><th data-fill-color="92d050" data-b-a-s="thin">Emp-ID</th><th data-fill-color="92d050" data-b-a-s="thin">Name</th><th data-fill-color="92d050" data-b-a-s="thin">Department</th><th data-fill-color="92d050" data-b-a-s="thin">Company</th><th data-fill-color="ffff00" data-f-bold="true" data-b-a-s="thin">SL</th><th data-fill-color="ffff00" data-f-bold="true" data-b-a-s="thin">AL</th><th data-fill-color="ffff00" data-f-bold="true" data-b-a-s="thin">SP</th></tr>`;
+            let h=`<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"><style>table{border-collapse:collapse;font-family:Arial;font-size:10pt;}th,td{border:1px solid #000;padding:4px;}</style></head><body><table id="exPaid" data-cols-width="5,15,30,25,12,10,10,10"><tr><td colspan="8" data-f-sz="14" data-f-color="c00000" data-f-bold="true" data-a-h="center" data-b-a-s="none">${cS}Monthly Leave Report (${titleStr})</td></tr><tr><td colspan="5" data-b-a-s="none"></td><td data-t="n" data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${tS}</td><td data-t="n" data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${tA}</td><td data-t="n" data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${tSp}</td></tr><tr><th data-fill-color="92d050" data-b-a-s="thin">No.</th><th data-fill-color="92d050" data-b-a-s="thin">Emp-ID</th><th data-fill-color="92d050" data-b-a-s="thin">Name</th><th data-fill-color="92d050" data-b-a-s="thin">Department</th><th data-fill-color="92d050" data-b-a-s="thin">Company</th><th data-fill-color="ffff00" data-f-bold="true" data-b-a-s="thin">SL</th><th data-fill-color="ffff00" data-f-bold="true" data-b-a-s="thin">AL</th><th data-fill-color="ffff00" data-f-bold="true" data-b-a-s="thin">SP</th></tr>`;
             
             eD.forEach(r=>{ 
                 let b=bgC[r.e.company] || 'ffffff'; 
