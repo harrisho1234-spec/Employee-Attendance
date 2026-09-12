@@ -4,16 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Attendance Dashboard</title>
-
-    <!-- PWA & Mobile Meta Tags -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2563eb">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Attendance">
-    <link rel="apple-touch-icon" href="icons/icon-192.png">
-    <link rel="icon" type="image/png" href="icons/icon-192.png">
-
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome -->
@@ -57,6 +47,7 @@
             signInAnonymously(auth).catch(e => console.error("Auth Error:", e));
         } catch(e) { console.error("Firebase Init Error:", e); }
     </script>
+
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         .modal-open { overflow: hidden; }
@@ -104,290 +95,307 @@
         .org-tree ul.vertical-stack > li:first-child::after { display: none; }
         .org-tree ul.vertical-stack > li:last-child::after { bottom: auto; }
 
-        /* Scan Activity View */
-        #scanActivityView {
-          --primary: #2563eb;
-          --primary-hover: #1d4ed8;
-          --bg-body: #f8fafc;
-          --card-bg: #ffffff;
-          --border-color: #e2e8f0;
-          --text-main: #1e293b;
-          --text-muted: #64748b;
-          --green: #16a34a;
-          --green-bg: #dcfce7;
-          --red: #dc2626;
-          --red-bg: #fee2e2;
-          --orange: #ea580c;
-          --orange-bg: #ffedd5;
-          --blue: #2563eb;
-          --blue-bg: #dbeafe;
-          --gray: #64748b;
-          --gray-bg: #f1f5f9;
-        }
 
-        #scanActivityView * { box-sizing: border-box; }
+        /* ===================== Scan Activity Tab (from Scan Activity source) ===================== */
 
-        #scanActivityView {
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-          margin: 0;
-          padding: 24px;
-          background-color: var(--bg-body);
-          color: var(--text-main);
-        }
+    #scanActivityView {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg-body: #f8fafc;
+      --card-bg: #ffffff;
+      --border-color: #e2e8f0;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --green: #16a34a;
+      --green-bg: #dcfce7;
+      --red: #dc2626;
+      --red-bg: #fee2e2;
+      --orange: #ea580c;
+      --orange-bg: #ffedd5;
+      --blue: #2563eb;
+      --blue-bg: #dbeafe;
+      --gray: #64748b;
+      --gray-bg: #f1f5f9;
+    }
 
-        #scanActivityView .container {
-          max-width: 1600px;
-          margin: 0 auto;
-        }
+    #scanActivityView * { box-sizing: border-box; }
 
-        #scanActivityView .dashboard-header-card {
-          background: var(--card-bg);
-          padding: 20px 24px;
-          border-radius: 12px;
-          border: 1px solid var(--border-color);
-          box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-          margin-bottom: 20px;
-          display: flex;
-          flex-wrap: wrap;
-          align-items: center;
-          justify-content: space-between;
-          gap: 16px;
-        }
+    #scanActivityView {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 24px;
+      background-color: var(--bg-body);
+      color: var(--text-main);
+    }
 
-        #scanActivityView .header-title-group h1 {
-          margin: 0;
-          font-size: 22px;
-          font-weight: 700;
-          color: var(--text-main);
-          letter-spacing: -0.3px;
-        }
+    #scanActivityView .container {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
 
-        #scanActivityView .header-title-group p {
-          margin: 4px 0 0 0;
-          font-size: 13px;
-          color: var(--text-muted);
-        }
+    #scanActivityView .dashboard-header-card {
+      background: var(--card-bg);
+      padding: 20px 24px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
 
-        #scanActivityView .header-controls {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          flex-wrap: wrap;
-        }
+    #scanActivityView .header-title-group h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: -0.3px;
+    }
 
-        #scanActivityView .control-item {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
+    #scanActivityView .header-title-group p {
+      margin: 4px 0 0 0;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
 
-        #scanActivityView .control-item label {
-          font-size: 13px;
-          font-weight: 600;
-          color: var(--text-muted);
-        }
+    #scanActivityView .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
 
-        #scanActivityView .input-style {
-          padding: 8px 12px;
-          border: 1px solid var(--border-color);
-          border-radius: 8px;
-          font-size: 13px;
-          color: var(--text-main);
-          background-color: #fff;
-          outline: none;
-          transition: border-color 0.2s;
-        }
+    #scanActivityView .control-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-        #scanActivityView .input-style:focus {
-          border-color: var(--primary);
-        }
+    #scanActivityView .control-item label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
 
-        #scanActivityView .refresh-btn {
-          background: var(--primary);
-          color: white;
-          border: none;
-          padding: 8px 18px;
-          border-radius: 8px;
-          cursor: pointer;
-          font-weight: 600;
-          font-size: 13px;
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          transition: background 0.2s;
-        }
+    #scanActivityView .input-style {
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--text-main);
+      background-color: #fff;
+      outline: none;
+      transition: border-color 0.2s;
+    }
 
-        #scanActivityView .refresh-btn:hover { background: var(--primary-hover); }
+    #scanActivityView .input-style:focus {
+      border-color: var(--primary);
+    }
 
-        #scanActivityView .summary-bar {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-          gap: 12px;
-          margin-bottom: 20px;
-        }
+    #scanActivityView .refresh-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
 
-        #scanActivityView .card {
-          background: var(--card-bg);
-          border: 1px solid var(--border-color);
-          padding: 16px;
-          border-radius: 12px;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.03);
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
+    #scanActivityView .refresh-btn:hover { background: var(--primary-hover); }
 
-        #scanActivityView .card-icon {
-          width: 40px;
-          height: 40px;
-          border-radius: 10px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 18px;
-          flex-shrink: 0;
-        }
+    #scanActivityView .summary-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
 
-        #scanActivityView .card-content .title {
-          font-size: 12px;
-          font-weight: 600;
-          color: var(--text-muted);
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-        }
+    #scanActivityView .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
 
-        #scanActivityView .card-content .val {
-          font-size: 22px;
-          font-weight: 700;
-          color: var(--text-main);
-          margin-top: 2px;
-        }
+    #scanActivityView .card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
 
-        #scanActivityView .icon-total { background: #eff6ff; color: #2563eb; }
-        #scanActivityView .icon-present { background: #dcfce7; color: #16a34a; }
-        #scanActivityView .icon-ontime { background: #f0fdf4; color: #15803d; }
-        #scanActivityView .icon-late5 { background: #ffedd5; color: #c2410c; }
-        #scanActivityView .icon-late30 { background: #fee2e2; color: #b91c1c; }
-        #scanActivityView .icon-pending { background: #f1f5f9; color: #475569; }
+    #scanActivityView .card-content .title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
 
-        .table-container {
-          background: var(--card-bg);
-          border-radius: 12px;
-          border: 1px solid var(--border-color);
-          box-shadow: 0 1px 3px rgba(0,0,0,0.03);
-          overflow: auto;
-          max-height: calc(100vh - 220px);
-        }
+    #scanActivityView .card-content .val {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-top: 2px;
+    }
 
-        #scanActivityView table {
-          width: 100%;
-          border-collapse: collapse;
-          font-size: 13px;
-        }
+    #scanActivityView .icon-total { background: #eff6ff; color: #2563eb; }
+    #scanActivityView .icon-present { background: #dcfce7; color: #16a34a; }
+    #scanActivityView .icon-ontime { background: #f0fdf4; color: #15803d; }
+    #scanActivityView .icon-late5 { background: #ffedd5; color: #c2410c; }
+    #scanActivityView .icon-late30 { background: #fee2e2; color: #b91c1c; }
+    #scanActivityView .icon-pending { background: #f1f5f9; color: #475569; }
 
-        #scanActivityView thead {
-          position: sticky;
-          top: 0;
-          z-index: 10;
-          background-color: #f8fafc;
-        }
+    #scanActivityView /* Sticky table container with vertical scrolling */
+    .table-container {
+      background: var(--card-bg);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      overflow: auto;
+      max-height: calc(100vh - 220px);
+    }
 
-        #scanActivityView th, #scanActivityView td {
-          padding: 10px 12px;
-          text-align: left;
-          border-bottom: 1px solid var(--border-color);
-          border-right: 1px solid var(--border-color);
-          vertical-align: middle;
-        }
+    #scanActivityView table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
 
-        #scanActivityView th:last-child, #scanActivityView td:last-child {
-          border-right: none;
-        }
+    #scanActivityView /* Freeze header rows when scrolling */
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background-color: #f8fafc;
+    }
 
-        #scanActivityView th {
-          background-color: #f8fafc;
-          color: #0f172a;
-          font-size: 15px;
-          font-weight: 700;
-          white-space: nowrap;
-        }
+    #scanActivityView th, #scanActivityView td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+      border-right: 1px solid var(--border-color);
+      vertical-align: middle;
+    }
 
-        #scanActivityView td:nth-child(1), #scanActivityView td:nth-child(2), #scanActivityView td:nth-child(3) {
-          font-size: 15px;
-          font-weight: 500;
-          color: var(--text-main);
-        }
+    #scanActivityView th:last-child, #scanActivityView td:last-child {
+      border-right: none;
+    }
 
-        #scanActivityView .filter-row th {
-          padding: 4px 12px 10px 12px;
-          background-color: #f8fafc;
-          font-weight: normal;
-        }
+    #scanActivityView th {
+      background-color: #f8fafc;
+      color: #0f172a;
+      font-size: 15px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
 
-        #scanActivityView .column-filter {
-          width: 100%;
-          padding: 6px 8px;
-          border: 1px solid var(--border-color);
-          border-radius: 6px;
-          font-size: 12px;
-          color: var(--text-main);
-          background: #ffffff;
-          outline: none;
-          cursor: pointer;
-          text-overflow: ellipsis;
-        }
+    #scanActivityView /* Increased font size for Staff ID, Staff Name, and Company columns */
+    td:nth-child(1), #scanActivityView td:nth-child(2), #scanActivityView td:nth-child(3) {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-main);
+    }
 
-        #scanActivityView .column-filter:focus {
-          border-color: var(--primary);
-        }
+    #scanActivityView .filter-row th {
+      padding: 4px 12px 10px 12px;
+      background-color: #f8fafc;
+      font-weight: normal;
+    }
 
-        #scanActivityView tr:hover { background-color: #f8fafc; }
+    #scanActivityView .column-filter {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 12px;
+      color: var(--text-main);
+      background: #ffffff;
+      outline: none;
+      cursor: pointer;
+      text-overflow: ellipsis;
+    }
 
-        #scanActivityView .scan-time-val {
-          font-size: 14px;
-          font-weight: 600;
-          color: var(--text-main);
-        }
+    #scanActivityView .column-filter:focus {
+      border-color: var(--primary);
+    }
 
-        #scanActivityView .status-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 5px;
-          font-weight: 600;
-          font-size: 11px;
-        }
+    #scanActivityView tr:hover { background-color: #f8fafc; }
 
-        #scanActivityView .status-badge .dot {
-          width: 6px;
-          height: 6px;
-          border-radius: 50%;
-        }
+    #scanActivityView .scan-time-val {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
 
-        #scanActivityView .status-ontime { color: var(--green); }
-        #scanActivityView .status-ontime .dot { background-color: var(--green); }
-        #scanActivityView .status-early { color: var(--blue); }
-        #scanActivityView .status-early .dot { background-color: var(--blue); }
-        #scanActivityView .status-late { color: var(--orange); }
-        #scanActivityView .status-late .dot { background-color: var(--orange); }
-        #scanActivityView .status-missing { color: var(--red); }
-        #scanActivityView .status-missing .dot { background-color: var(--red); }
-        #scanActivityView .status-pending { color: var(--gray); }
-        #scanActivityView .status-pending .dot { background-color: var(--gray); }
+    #scanActivityView .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 600;
+      font-size: 11px;
+    }
 
-        #scanActivityView .code-badge {
-          font-weight: bold;
-          padding: 2px 8px;
-          border-radius: 4px;
-          display: inline-block;
-          text-align: center;
-          min-width: 24px;
-        }
+    #scanActivityView .status-badge .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
 
-        #scanActivityView .code-P { background: var(--green-bg); color: var(--green); }
-        #scanActivityView tbody tr { cursor: pointer; }
-        #scanActivityView .code-LEAVE { background: var(--orange-bg); color: var(--orange); }
+    #scanActivityView .status-ontime { color: var(--green); }
+    #scanActivityView .status-ontime .dot { background-color: var(--green); }
 
-        /* Scan View Custom */
+    #scanActivityView .status-early { color: var(--blue); }
+    #scanActivityView .status-early .dot { background-color: var(--blue); }
+
+    #scanActivityView .status-late { color: var(--orange); }
+    #scanActivityView .status-late .dot { background-color: var(--orange); }
+
+    #scanActivityView .status-missing { color: var(--red); }
+    #scanActivityView .status-missing .dot { background-color: var(--red); }
+
+    #scanActivityView .status-pending { color: var(--gray); }
+    #scanActivityView .status-pending .dot { background-color: var(--gray); }
+
+    #scanActivityView .code-badge {
+      font-weight: bold;
+      padding: 2px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      text-align: center;
+      min-width: 24px;
+    }
+
+    #scanActivityView .code-P { background: var(--green-bg); color: var(--green); }
+  
+
+    /* --- Scan Activity tab: added so rows are clickable and blank Daily Codes can show a leave type --- */
+    #scanActivityView tbody tr { cursor: pointer; }
+    #scanActivityView .code-LEAVE { background: var(--orange-bg); color: var(--orange); }
+
+
+
+        /* =============================================================
+           Scan Activity ONLY — visual redesign to match the reference
+           (No data, event, filtering, or calculation logic changed.)
+           ============================================================= */
         #scanView {
             background: transparent !important;
             padding: 0 !important;
@@ -548,6 +556,7 @@
         #scanView .icon-pending { background: #f1f5f9; color: #475569; }
         #scanView .icon-notscanned { background: #f8fafc; color: #64748b; }
 
+        /* Group the scan-status metrics in one visual frame. */
         #scanView .scan-status-frame {
             grid-column: span 3;
             display: grid;
@@ -561,6 +570,7 @@
         #scanView .scan-status-frame .card {
             box-shadow: none;
         }
+
 
         #scanView .scan-summary-clickable { cursor:pointer; transition:transform .15s ease, box-shadow .15s ease; }
         #scanView .scan-summary-clickable:hover { transform:translateY(-2px); box-shadow:0 4px 12px rgba(15,23,42,.08); }
@@ -693,6 +703,7 @@
             box-shadow: none;
         }
 
+        /* Pale row backgrounds follow the same Daily Code colors. */
         #scanView tbody tr.scan-row-colored td {
             background-color: var(--scan-row-bg, #ffffff);
         }
@@ -769,6 +780,7 @@
             min-width: 21px;
         }
 
+        /* Leave / daily-code colors — matched to Daily Attendance */
         #scanView .code-P { background: #dcfce7; color: #16a34a; }
         #scanView .code-AL, #scanView .code-H-AL { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
         #scanView .code-SL, #scanView .code-H-SL { background: #ccfbf1; color: #115e59; border-color: #5eead4; }
@@ -784,6 +796,7 @@
         #scanView .code-LEAVE { background: #f1f5f9; color: #334155; }
         #scanView .leave-code-group { display: inline-flex; flex-wrap: wrap; gap: 5px; align-items: center; }
 
+        /* On Leave popup: use the exact same leave-type colors as the Status column. */
         #scanStatusPanel .code-AL, #scanStatusPanel .code-H-AL { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
         #scanStatusPanel .code-SL, #scanStatusPanel .code-H-SL { background: #ccfbf1; color: #115e59; border-color: #5eead4; }
         #scanStatusPanel .code-SP, #scanStatusPanel .code-H-SP { background: #ede9fe; color: #6b21a8; border-color: #c4b5fd; }
@@ -815,6 +828,7 @@
             #scanView { padding: 0 !important; }
             #scanView .container { max-width: 100% !important; padding: 0 2px; }
             #scanView .table-container { border-radius: 9px; max-height: calc(100vh - 190px); }
+            /* Mobile-only table sizing: tight content-fit columns without empty width. */
             #scanView table { min-width: max-content; table-layout: auto; }
             #scanView th, #scanView td { padding: 6px 3px; }
             #scanView .staff-photo, #scanView .staff-photo-placeholder { width: 34px; height: 34px; flex: 0 0 34px; display: block; }
@@ -823,6 +837,8 @@
             #scanView .staff-name-main { font-size: 11px; line-height: 1.1; white-space: nowrap; }
             #scanView .staff-meta-line { font-size: 8px; margin-top: 1px; white-space: nowrap; }
             #scanView .scan-cell-wrap { min-width: 0; }
+            /* Staff Name / ID / Company: about 40% tighter than the previous mobile sizing. */
+            /* Phone only: compact Staff and Status columns; no frozen columns. */
             #scanView #mainTable th:first-child,
             #scanView #mainTable td:first-child {
                 width: 138px;
@@ -836,6 +852,7 @@
                 z-index: auto !important;
                 background: inherit;
             }
+            /* Phone view: Status + the four scan columns are 50% narrower. */
             #scanView #mainTable th:nth-child(2),
             #scanView #mainTable td:nth-child(2) {
                 width: 38px;
@@ -894,12 +911,433 @@
                 flex-wrap: wrap;
             }
             #scanView .summary-bar {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 5px;
+            }
+            #scanView .scan-status-frame {
+                display: contents;
             }
             #scanView .card {
-                min-height: 64px;
+                min-height: 46px;
+                padding: 6px 4px;
+                gap: 4px;
+                border-radius: 8px;
+            }
+            #scanView .card-icon {
+                width: 24px;
+                height: 24px;
+                flex-basis: 24px;
+                border-radius: 6px;
+            }
+            #scanView .card-icon::before {
+                font-size: 10px;
+            }
+            #scanView .card-content .title {
+                font-size: 7px;
+                line-height: 1.05;
+                letter-spacing: 0;
+            }
+            #scanView .card-content .val {
+                font-size: 15px;
+                margin-top: 2px;
+            }
+            /* Phone only: keep every scan status inside its own table cell. */
+            #scanView .scan-main-line {
+                flex-direction: column;
+                align-items: flex-start;
+                justify-content: flex-start;
+                gap: 2px;
+            }
+            #scanView .scan-main-line .status-badge {
+                display: flex;
+                width: 100%;
+                max-width: 100%;
+                white-space: normal;
+                overflow-wrap: anywhere;
+                word-break: break-word;
             }
         }
+
+
+
+        /* =============================================================
+           Dashboard mobile-only experience
+           Desktop dashboard remains unchanged.
+           ============================================================= */
+        .dashboard-mobile-only { display: none; }
+
+        @media (max-width: 700px) {
+            #dashboardView { max-width: 100% !important; padding-bottom: 76px; }
+            #dashboardView > .dashboard-desktop-toolbar,
+            #dashboardView > #kpiContainer,
+            #dashboardView > #companySummaryContainer { display: none !important; }
+            .dashboard-mobile-only { display: block !important; }
+
+            #dashboardMobileCards {
+                display: flex !important;
+                flex-direction: column;
+                gap: 9px;
+                width: 100%;
+            }
+
+            .mobile-dashboard-header {
+                background: #ffffff;
+                border: 1px solid #e2e8f0;
+                border-radius: 14px;
+                padding: 13px;
+                box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+                margin-bottom: 10px;
+            }
+
+            .mobile-dashboard-title-row {
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
+                gap: 10px;
+            }
+
+            .mobile-dashboard-search-row {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) auto;
+                gap: 8px;
+                margin-top: 11px;
+            }
+
+            .mobile-dashboard-search {
+                width: 100%;
+                height: 38px;
+                padding: 0 12px 0 34px;
+                border-radius: 10px;
+                border: 1px solid #dbe3ec;
+                background: #f8fafc;
+                color: #0f172a;
+                font-size: 13px;
+                outline: none;
+            }
+            .mobile-dashboard-search:focus {
+                background: #ffffff;
+                border-color: #2563eb;
+                box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.08);
+            }
+            .mobile-dashboard-filter-button {
+                height: 38px;
+                min-width: 86px;
+                border-radius: 10px;
+                border: 1px solid #dbe3ec;
+                background: #ffffff;
+                color: #334155;
+                font-size: 12px;
+                font-weight: 700;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+            }
+            .mobile-dashboard-filter-count {
+                min-width: 19px;
+                height: 19px;
+                padding: 0 5px;
+                border-radius: 999px;
+                background: #2563eb;
+                color: #ffffff;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 9px;
+                font-weight: 800;
+            }
+            .mobile-dashboard-filter-count.is-zero { display: none; }
+
+            .mobile-dashboard-chips {
+                display: flex;
+                gap: 5px;
+                overflow-x: auto;
+                scrollbar-width: none;
+                margin-top: 8px;
+                padding-bottom: 1px;
+            }
+            .mobile-dashboard-chips::-webkit-scrollbar { display: none; }
+            .mobile-dashboard-chip {
+                flex: 0 0 auto;
+                border: 1px solid #dbeafe;
+                background: #eff6ff;
+                color: #1d4ed8;
+                border-radius: 999px;
+                padding: 4px 8px;
+                font-size: 9px;
+                font-weight: 700;
+                white-space: nowrap;
+            }
+
+            .mobile-dashboard-kpis {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 8px;
+                margin-bottom: 10px;
+            }
+            .mobile-dashboard-kpi {
+                min-height: 61px;
+                border: 1px solid #e2e8f0;
+                border-radius: 12px;
+                background: #ffffff;
+                padding: 10px;
+                display: flex;
+                align-items: center;
+                gap: 9px;
+                box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+            }
+            .mobile-dashboard-kpi-icon {
+                width: 31px;
+                height: 31px;
+                border-radius: 9px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex: 0 0 31px;
+                font-size: 12px;
+            }
+            .mobile-dashboard-kpi-label {
+                color: #64748b;
+                font-size: 9px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: .3px;
+                line-height: 1.1;
+            }
+            .mobile-dashboard-kpi-value {
+                color: #0f172a;
+                font-size: 20px;
+                font-weight: 800;
+                line-height: 1;
+                margin-top: 3px;
+            }
+
+            .mobile-dashboard-section {
+                margin-bottom: 10px;
+                border: 1px solid #e2e8f0;
+                border-radius: 14px;
+                background: #ffffff;
+                overflow: hidden;
+                box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+            }
+            .mobile-dashboard-section-head {
+                padding: 10px 12px;
+                border-bottom: 1px solid #eef2f7;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 10px;
+            }
+            .mobile-dashboard-section-title {
+                font-size: 12px;
+                font-weight: 800;
+                color: #1e293b;
+            }
+            .mobile-dashboard-section-subtitle {
+                font-size: 9px;
+                color: #94a3b8;
+                margin-top: 1px;
+            }
+
+            .mobile-attention-list { padding: 4px 8px 7px; }
+            .mobile-attention-row {
+                display: flex;
+                align-items: center;
+                gap: 9px;
+                padding: 8px 4px;
+                border-bottom: 1px solid #f1f5f9;
+                cursor: pointer;
+            }
+            .mobile-attention-row:last-child { border-bottom: 0; }
+            .mobile-attention-avatar,
+            .mobile-staff-avatar {
+                border-radius: 50%;
+                object-fit: cover;
+                border: 1px solid #dbe3ec;
+                background: #f1f5f9;
+                flex-shrink: 0;
+            }
+            .mobile-attention-avatar { width: 34px; height: 34px; }
+            .mobile-staff-avatar { width: 42px; height: 42px; }
+            .mobile-avatar-placeholder {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #64748b;
+                font-weight: 800;
+            }
+            .mobile-attention-reasons {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px;
+                margin-top: 4px;
+            }
+            .mobile-attention-badge {
+                border-radius: 999px;
+                padding: 2px 6px;
+                font-size: 8px;
+                font-weight: 800;
+                border: 1px solid #e2e8f0;
+                background: #f8fafc;
+                color: #475569;
+            }
+
+            .mobile-staff-card {
+                background: #ffffff;
+                border: 1px solid #e2e8f0;
+                border-radius: 13px;
+                padding: 11px;
+                box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+                cursor: pointer;
+            }
+            .mobile-staff-card:active { background: #f8fafc; }
+            .mobile-staff-card-top {
+                display: flex;
+                gap: 10px;
+                align-items: center;
+            }
+            .mobile-staff-name {
+                color: #0f2b4a;
+                font-size: 13px;
+                line-height: 1.2;
+                font-weight: 800;
+            }
+            .mobile-staff-meta {
+                color: #64748b;
+                font-size: 9px;
+                line-height: 1.25;
+                margin-top: 3px;
+            }
+            .mobile-staff-balance-row {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 5px;
+                margin-top: 9px;
+            }
+            .mobile-staff-balance {
+                background: #f8fafc;
+                border: 1px solid #edf2f7;
+                border-radius: 8px;
+                padding: 5px 7px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 5px;
+                font-size: 9px;
+                color: #64748b;
+            }
+            .mobile-staff-balance strong { color: #0f172a; font-size: 11px; }
+            .mobile-staff-flags {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px;
+                margin-top: 7px;
+            }
+            .mobile-staff-flag {
+                padding: 3px 6px;
+                border-radius: 6px;
+                border: 1px solid #e2e8f0;
+                font-size: 8px;
+                font-weight: 800;
+                background: #f8fafc;
+                color: #475569;
+            }
+
+            #mobileDashboardFilterBackdrop {
+                position: fixed;
+                inset: 0;
+                z-index: 120;
+                background: rgba(15, 23, 42, 0.50);
+                display: flex;
+                align-items: flex-end;
+                justify-content: center;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity .18s ease;
+            }
+            #mobileDashboardFilterBackdrop.open {
+                opacity: 1;
+                pointer-events: auto;
+            }
+            #mobileDashboardFilterPanel {
+                width: 100%;
+                max-height: 88vh;
+                background: #ffffff;
+                border-radius: 20px 20px 0 0;
+                box-shadow: 0 -10px 40px rgba(15, 23, 42, 0.16);
+                transform: translateY(100%);
+                transition: transform .22s ease;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+            #mobileDashboardFilterBackdrop.open #mobileDashboardFilterPanel { transform: translateY(0); }
+            .mobile-filter-scroll {
+                overflow-y: auto;
+                padding: 4px 14px 18px;
+            }
+            .mobile-filter-group {
+                padding: 12px 0;
+                border-bottom: 1px solid #f1f5f9;
+            }
+            .mobile-filter-group:last-child { border-bottom: 0; }
+            .mobile-filter-label {
+                display: block;
+                color: #64748b;
+                font-size: 9px;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: .45px;
+                margin-bottom: 7px;
+            }
+            .mobile-filter-select,
+            .mobile-filter-input {
+                width: 100%;
+                height: 40px;
+                border: 1px solid #dbe3ec;
+                background: #f8fafc;
+                border-radius: 10px;
+                padding: 0 10px;
+                font-size: 13px;
+                color: #0f172a;
+                outline: none;
+            }
+            .mobile-filter-check-grid {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 7px;
+            }
+            .mobile-filter-check {
+                min-height: 38px;
+                border: 1px solid #e2e8f0;
+                border-radius: 9px;
+                padding: 7px 9px;
+                display: flex;
+                align-items: center;
+                gap: 7px;
+                font-size: 11px;
+                color: #334155;
+                background: #ffffff;
+            }
+            .mobile-filter-footer {
+                padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+                border-top: 1px solid #e2e8f0;
+                display: grid;
+                grid-template-columns: 1fr 1.4fr;
+                gap: 8px;
+                background: #ffffff;
+            }
+            .mobile-filter-reset,
+            .mobile-filter-done {
+                height: 42px;
+                border-radius: 10px;
+                font-size: 12px;
+                font-weight: 800;
+            }
+            .mobile-filter-reset { border: 1px solid #dbe3ec; color: #475569; background: #ffffff; }
+            .mobile-filter-done { border: 1px solid #2563eb; color: #ffffff; background: #2563eb; }
+        }
+
     </style>
 </head>
 <body class="text-slate-800 h-screen flex flex-col">
@@ -934,7 +1372,62 @@
         
         <!-- DASHBOARD VIEW -->
         <div id="dashboardView" class="max-w-[95rem] mx-auto hidden">
-            <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-slate-200 mb-6 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+
+            <!-- Mobile-only Dashboard experience. Desktop content below is unchanged. -->
+            <div id="dashboardMobileShell" class="dashboard-mobile-only">
+                <div class="mobile-dashboard-header">
+                    <div class="mobile-dashboard-title-row">
+                        <div class="min-w-0">
+                            <h1 class="text-[18px] leading-tight font-extrabold text-slate-900">Attendance Dashboard</h1>
+                            <p id="mobileDashboardScope" class="text-[10px] text-slate-500 mt-1 truncate">All Companies • YTD</p>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-chart-line text-sm"></i></div>
+                    </div>
+                    <div class="mobile-dashboard-search-row">
+                        <div class="relative min-w-0">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[11px]"></i>
+                            <input id="mobileDashboardSearch" type="search" class="mobile-dashboard-search" placeholder="Search staff name or ID..." autocomplete="off">
+                        </div>
+                        <button type="button" class="mobile-dashboard-filter-button" onclick="openMobileDashboardFilters()">
+                            <i class="fa-solid fa-sliders"></i><span>Filters</span><span id="mobileDashboardFilterCount" class="mobile-dashboard-filter-count is-zero">0</span>
+                        </button>
+                    </div>
+                    <div id="mobileDashboardFilterChips" class="mobile-dashboard-chips"></div>
+                </div>
+
+                <div class="mobile-dashboard-kpis">
+                    <div class="mobile-dashboard-kpi">
+                        <div class="mobile-dashboard-kpi-icon bg-emerald-50 text-emerald-600"><i class="fa-solid fa-user-check"></i></div>
+                        <div><div class="mobile-dashboard-kpi-label">Active</div><div id="mobileKpiActive" class="mobile-dashboard-kpi-value">0</div></div>
+                    </div>
+                    <div class="mobile-dashboard-kpi">
+                        <div class="mobile-dashboard-kpi-icon bg-blue-50 text-blue-600"><i class="fa-solid fa-calendar-day"></i></div>
+                        <div><div class="mobile-dashboard-kpi-label">Leave</div><div id="mobileKpiLeave" class="mobile-dashboard-kpi-value">0</div></div>
+                    </div>
+                    <div class="mobile-dashboard-kpi">
+                        <div class="mobile-dashboard-kpi-icon bg-amber-50 text-amber-600"><i class="fa-solid fa-clock"></i></div>
+                        <div><div class="mobile-dashboard-kpi-label">Late</div><div id="mobileKpiLate" class="mobile-dashboard-kpi-value">0</div></div>
+                    </div>
+                    <div class="mobile-dashboard-kpi">
+                        <div class="mobile-dashboard-kpi-icon bg-rose-50 text-rose-600"><i class="fa-solid fa-user-xmark"></i></div>
+                        <div><div class="mobile-dashboard-kpi-label">Absence</div><div id="mobileKpiAbsence" class="mobile-dashboard-kpi-value">0</div></div>
+                    </div>
+                </div>
+
+                <section id="mobileNeedsAttentionSection" class="mobile-dashboard-section">
+                    <div class="mobile-dashboard-section-head">
+                        <div><div class="mobile-dashboard-section-title"><i class="fa-solid fa-triangle-exclamation text-amber-500 mr-1"></i> Needs Attention</div><div class="mobile-dashboard-section-subtitle">Priority attendance and leave signals</div></div>
+                        <span id="mobileNeedsAttentionCount" class="text-[9px] font-bold text-slate-400">0 staff</span>
+                    </div>
+                    <div id="mobileNeedsAttentionList" class="mobile-attention-list"></div>
+                </section>
+
+                <div class="flex items-center justify-between px-1 mb-2 mt-1">
+                    <div><h3 class="text-[12px] font-extrabold text-slate-800">Staff</h3><p id="mobileStaffResultCount" class="text-[9px] text-slate-400 mt-0.5">0 results</p></div>
+                    <button type="button" onclick="resetSort()" class="text-[9px] font-bold text-slate-500 bg-white border border-slate-200 rounded-lg px-2.5 py-1.5"><i class="fa-solid fa-arrow-down-a-z mr-1"></i> ID Sort</button>
+                </div>
+            </div>
+            <div class="dashboard-desktop-toolbar bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-slate-200 mb-6 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
                 <div>
                     <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Attendance Dashboard</h1>
                     <p class="text-xs sm:text-sm text-slate-500 mt-1">Live data feed from Google Sheets</p>
@@ -1047,8 +1540,55 @@
             <div id="noDataMessage" class="hidden p-8 text-center text-slate-500 bg-white rounded-xl border border-slate-200 shadow-sm mt-4"><i class="fa-solid fa-folder-open text-3xl mb-3 text-slate-300 block"></i> No employees found.</div>
         </div>
 
-        <!-- CALENDAR VIEW -->
-        <div id="calendarView" class="hidden max-w-[75rem] mx-auto h-auto min-h-full flex flex-col md:flex-row gap-4 sm:gap-6 pb-8">
+
+
+            <!-- Mobile Dashboard filter bottom sheet -->
+            <div id="mobileDashboardFilterBackdrop" class="dashboard-mobile-only" onclick="if(event.target===this) closeMobileDashboardFilters()">
+                <div id="mobileDashboardFilterPanel" onclick="event.stopPropagation()">
+                    <div class="px-4 pt-3 pb-2 border-b border-slate-100">
+                        <div class="w-10 h-1 rounded-full bg-slate-200 mx-auto mb-3"></div>
+                        <div class="flex items-center justify-between">
+                            <div><h3 class="text-[15px] font-extrabold text-slate-900">Dashboard Filters</h3><p class="text-[9px] text-slate-400 mt-0.5">These use the same filters as desktop.</p></div>
+                            <button type="button" onclick="closeMobileDashboardFilters()" class="w-8 h-8 rounded-full bg-slate-50 text-slate-500"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                    </div>
+                    <div class="mobile-filter-scroll">
+                        <div class="mobile-filter-group">
+                            <div class="flex items-center justify-between mb-2"><span class="mobile-filter-label !mb-0">Company</span><label class="text-[10px] font-semibold text-blue-600 flex items-center gap-1.5"><input id="mobileDashAllCompanies" type="checkbox" class="rounded" onchange="mobileDashboardSelectAllCompanies(this.checked)"> All</label></div>
+                            <div id="mobileDashboardCompanyChecks" class="mobile-filter-check-grid"></div>
+                        </div>
+                        <div class="mobile-filter-group">
+                            <label class="mobile-filter-label" for="mobileDashboardDepartment">Department</label>
+                            <select id="mobileDashboardDepartment" class="mobile-filter-select" onchange="mobileDashboardSetDepartment(this.value)"></select>
+                        </div>
+                        <div class="mobile-filter-group">
+                            <span class="mobile-filter-label">Status</span>
+                            <div class="mobile-filter-check-grid">
+                                <label class="mobile-filter-check"><input type="checkbox" value="Active" class="mobile-dashboard-status rounded" onchange="mobileDashboardSetStatuses()"><span>Active</span></label>
+                                <label class="mobile-filter-check"><input type="checkbox" value="Resigned" class="mobile-dashboard-status rounded" onchange="mobileDashboardSetStatuses()"><span>Resigned</span></label>
+                                <label class="mobile-filter-check"><input type="checkbox" value="Terminated" class="mobile-dashboard-status rounded" onchange="mobileDashboardSetStatuses()"><span>Terminated</span></label>
+                            </div>
+                        </div>
+                        <div class="mobile-filter-group grid grid-cols-2 gap-2">
+                            <div><label class="mobile-filter-label" for="mobileDashboardMonth">Month</label><select id="mobileDashboardMonth" class="mobile-filter-select" onchange="mobileDashboardSetMonth(this.value)"></select></div>
+                            <div><label class="mobile-filter-label" for="mobileDashboardLeaveType">Leave Type</label><select id="mobileDashboardLeaveType" class="mobile-filter-select" onchange="mobileDashboardSetLeaveType(this.value)"></select></div>
+                        </div>
+                        <div class="mobile-filter-group">
+                            <label class="mobile-filter-label" for="mobileDashboardFilterSearch">Search</label>
+                            <input id="mobileDashboardFilterSearch" type="search" class="mobile-filter-input" placeholder="Name or staff ID" oninput="mobileDashboardSetSearch(this.value)">
+                        </div>
+                    </div>
+                    <div class="mobile-filter-footer">
+                        <button type="button" class="mobile-filter-reset" onclick="resetMobileDashboardFilters()"><i class="fa-solid fa-rotate-left mr-1"></i> Reset</button>
+                        <button type="button" class="mobile-filter-done" onclick="closeMobileDashboardFilters()">Show Results</button>
+                    </div>
+                </div>
+            </div>
+
+
+                <!-- CALENDAR VIEW -->
+        <div id="calendarView" class="hidden max-w-[75rem] mx-auto h-auto min-h-full flex flex-col gap-5 sm:gap-6 pb-8">
+            <div class="flex flex-col md:flex-row gap-4 sm:gap-6 w-full">
             <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col h-auto z-10 w-full md:w-[60%] lg:w-[65%]">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3 sm:gap-0">
                     <div class="flex items-center gap-2">
@@ -1084,6 +1624,71 @@
                 </div>
                 <div class="overflow-y-auto p-3 sm:p-4 flex-grow bg-slate-50/50 h-64 md:h-auto" id="calendarSummaryList"></div>
             </div>
+            </div>
+
+            <!-- Calendar monthly row / matrix view -->
+            <section id="calendarAgendaSection" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden w-full">
+                <div class="p-3 sm:p-4 border-b border-slate-100 flex flex-col xl:flex-row xl:items-center justify-between gap-3 bg-white">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center"><i class="fa-solid fa-table-list"></i></div>
+                            <div>
+                                <h3 class="text-base sm:text-lg font-bold text-slate-900">Monthly Attendance Rows</h3>
+                                <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Row-style monthly attendance view like the sheet, with its own separate company filter.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row sm:items-end gap-2 sm:gap-3">
+                        <div class="w-full sm:w-auto">
+                            <label class="block text-[9px] uppercase tracking-wider font-bold text-slate-400 mb-1">Company</label>
+                            <div class="relative filter-dropdown w-full sm:w-auto">
+                                <button id="calRowCompanyDropdownBtn" class="w-full sm:w-auto bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm rounded-md p-2 min-w-[150px] flex justify-between items-center cursor-pointer shadow-sm font-semibold">
+                                    <span id="calRowCompanyDropdownLabel" class="truncate max-w-[115px]">ITC</span><i class="fa-solid fa-chevron-down text-[10px] ml-2 text-slate-400"></i>
+                                </button>
+                                <div id="calRowCompanyDropdownMenu" class="hidden absolute right-0 z-30 w-56 mt-1 bg-white border rounded-lg shadow-lg max-h-64 overflow-y-auto p-1.5"></div>
+                            </div>
+                        </div>
+                        <div class="w-full sm:w-auto">
+                            <label class="block text-[9px] uppercase tracking-wider font-bold text-slate-400 mb-1">Departments</label>
+                            <div class="relative filter-dropdown w-full sm:w-auto">
+                                <button id="calRowDepartmentDropdownBtn" class="w-full sm:w-auto bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm rounded-md p-2 min-w-[155px] flex justify-between items-center cursor-pointer shadow-sm font-semibold">
+                                    <span id="calRowDepartmentDropdownLabel" class="truncate max-w-[120px]">All Departments</span><i class="fa-solid fa-chevron-down text-[10px] ml-2 text-slate-400"></i>
+                                </button>
+                                <div id="calRowDepartmentDropdownMenu" class="hidden absolute right-0 z-30 w-64 mt-1 bg-white border rounded-lg shadow-lg max-h-72 flex flex-col overflow-hidden">
+                                    <div class="p-2 border-b bg-white shrink-0">
+                                        <label class="flex items-center gap-2 cursor-pointer p-1.5 rounded hover:bg-slate-50">
+                                            <input type="checkbox" id="calRowSelectAllDepartments" class="rounded text-blue-600 focus:ring-blue-500" checked onchange="handleCalendarRowDepartmentSelectAll(this.checked)">
+                                            <span class="text-xs font-semibold text-slate-700">All Departments</span>
+                                        </label>
+                                    </div>
+                                    <div id="calRowDepartmentCheckboxList" class="p-2 flex flex-col gap-0.5 overflow-y-auto"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="w-full sm:w-auto">
+                            <label for="calRowMonthFilter" class="block text-[9px] uppercase tracking-wider font-bold text-slate-400 mb-1">Month</label>
+                            <select id="calRowMonthFilter" onchange="setCalendarRowPeriod()" class="w-full sm:w-[125px] h-[34px] bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm rounded-md px-2 shadow-sm font-semibold cursor-pointer"></select>
+                        </div>
+                        <div class="w-full sm:w-auto">
+                            <label for="calRowYearFilter" class="block text-[9px] uppercase tracking-wider font-bold text-slate-400 mb-1">Year</label>
+                            <select id="calRowYearFilter" onchange="setCalendarRowPeriod()" class="w-full sm:w-[92px] h-[34px] bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm rounded-md px-2 shadow-sm font-semibold cursor-pointer"></select>
+                        </div>
+                        <span id="calendarAgendaMonth" class="hidden"></span>
+                    </div>
+                </div>
+                <div id="calendarAgendaStats" class="grid grid-cols-2 lg:grid-cols-4 gap-2 p-3 sm:p-4 bg-slate-50/60 border-b border-slate-100"></div>
+                <div class="px-3 sm:px-4 py-2 border-b bg-slate-50/70 text-[10px] text-slate-500 font-medium flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <span><i class="fa-solid fa-circle-info text-blue-500 mr-1"></i>Scroll sideways to see all dates and monthly totals.</span>
+                    <span class="text-slate-400">Codes include P, H-AL, H-SL, H-SP, H-UP, L, L', D, OT, and combined codes such as L/H-UP.</span>
+                </div>
+                <div id="calendarAgendaList" class="overflow-auto bg-white custom-scrollbar">
+                    <table id="calendarRowMatrixTable" class="min-w-max w-full border-collapse text-[9px] sm:text-[10px] leading-tight">
+                        <thead id="calendarRowMatrixHead"></thead>
+                        <tbody id="calendarRowMatrixBody"></tbody>
+                    </table>
+                </div>
+                <div id="calendarRowMatrixEmpty" class="hidden p-8 text-center text-slate-400 bg-slate-50/40 border-t"></div>
+            </section>
         </div>
 
         <!-- DAILY ATTENDANCE VIEW -->
@@ -1148,6 +1753,9 @@
                         </div>
                         <button onclick="shiftDailyDates(1)" class="w-7 h-7 sm:w-8 sm:h-8 rounded bg-white border border-slate-200 text-slate-600 shadow-sm hover:bg-slate-100 flex items-center justify-center shrink-0" title="Next Day/Range"><i class="fa-solid fa-chevron-right text-xs"></i></button>
                     </div>
+                    <button onclick="refreshDailyAttendance()" class="w-full sm:w-auto mt-2 sm:mt-0 bg-blue-600 hover:bg-blue-700 border border-blue-600 text-white text-sm font-bold rounded-lg p-2 sm:px-4 shadow-sm flex items-center justify-center gap-1.5 transition-colors" title="Refresh Daily Attendance">
+                        <i class="fa-solid fa-rotate"></i> Refresh
+                    </button>
                     <div class="relative filter-dropdown w-full sm:w-auto mt-2 sm:mt-0 ml-0 sm:ml-1">
                         <button id="dailyTabExportBtn" class="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 border border-emerald-600 text-white text-sm font-bold rounded-lg p-2 sm:px-4 shadow-sm flex items-center justify-center gap-1.5 transition-colors"><i class="fa-solid fa-file-excel"></i> Export <i class="fa-solid fa-chevron-down text-[10px] ml-1 opacity-80"></i></button>
                         <div id="dailyTabExportMenu" class="hidden absolute left-0 sm:left-auto sm:right-0 z-40 w-full sm:w-64 mt-1 bg-white border border-slate-200 rounded-xl shadow-xl flex flex-col overflow-hidden">
@@ -1192,6 +1800,7 @@
                     <button id="orgEditToggleBtn" onclick="toggleOrgEditMode()" class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 text-sm rounded-lg px-3 sm:px-4 py-2 font-bold shadow-sm flex items-center gap-2"><i class="fa-solid fa-pen-to-square"></i> <span class="hidden sm:inline">Edit Structure</span><span class="sm:hidden">Edit</span></button>
                     <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg p-1 shadow-inner">
                         <button onclick="undoOrgChange()" title="Undo Last Change (Ctrl+Z)" class="bg-white border border-slate-200 text-slate-600 hover:bg-blue-50 text-sm rounded px-2.5 py-1.5 shadow-sm"><i class="fa-solid fa-reply"></i></button>
+                        <button onclick="autoAlignOrgChart()" title="Auto Align & Reconnect Lines" class="bg-white border border-slate-200 text-indigo-600 hover:bg-indigo-50 text-sm rounded px-2.5 py-1.5 shadow-sm"><i class="fa-solid fa-diagram-project"></i></button>
                         <div class="w-px h-5 bg-slate-300 mx-0.5"></div>
                         <button onclick="exportOrgStructure()" title="Backup Structure" class="bg-white border border-slate-200 text-blue-600 hover:bg-blue-50 text-sm rounded px-2.5 py-1.5 shadow-sm"><i class="fa-solid fa-download"></i></button>
                         <button onclick="document.getElementById('importOrgInput').click()" title="Load Structure" class="bg-white border border-slate-200 text-emerald-600 hover:bg-emerald-50 text-sm rounded px-2.5 py-1.5 shadow-sm"><i class="fa-solid fa-upload"></i></button>
@@ -1209,7 +1818,7 @@
             </div>
 
             <div id="orgChartWrapper" class="bg-slate-50/50 rounded-xl border border-slate-200 shadow-inner overflow-hidden relative h-[calc(100vh-180px)] min-h-[600px] cursor-grab active:cursor-grabbing w-full block">
-                <div id="orgEditHint" class="hidden absolute top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-5 py-2.5 rounded-full shadow-lg z-30 text-xs sm:text-sm font-bold flex items-center gap-2 pointer-events-none transition-opacity"><i class="fa-solid fa-arrows-up-down-left-right"></i> Drag and drop nodes onto each other to restructure. Use Undo if you make a mistake.</div>
+                <div id="orgEditHint" class="hidden absolute top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-5 py-2.5 rounded-full shadow-lg z-30 text-xs sm:text-sm font-bold flex items-center gap-2 pointer-events-none transition-opacity"><i class="fa-solid fa-link"></i> Drag a node onto its manager, or use the chain icon / Reports To field to connect it. Changes save automatically.</div>
                 <div class="absolute left-4 top-4 inline-flex flex-col gap-2 bg-white/90 backdrop-blur p-3 rounded-xl border border-slate-200 shadow-sm z-20 pointer-events-none">
                     <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Legend</div>
                     <div class="flex items-center gap-2 text-xs font-semibold text-slate-700"><div class="w-3 h-3 rounded-full border-2 border-slate-300 bg-white"></div> Group</div>
@@ -1315,7 +1924,7 @@
     <table id="mainTable">
       <thead>
         <tr>
-          <th>Staff Name / ID / Company</th>
+          <th>Staff Info</th>
           <th>Status</th>
           <th>Morning In</th>
           <th>Lunch Out</th>
@@ -1423,19 +2032,33 @@
 
     <!-- Org Node Edit Modal -->
     <div id="orgNodeEditModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-[70] flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
-        <div class="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden transform scale-95 transition-transform duration-300">
-            <div class="p-4 border-b flex justify-between items-center relative"><div class="absolute top-0 left-0 w-full h-1 bg-blue-500"></div><h3 class="font-bold text-slate-800 text-lg flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-blue-500"></i> Edit Node</h3><button onclick="closeOrgNodeModal()" class="text-slate-400 hover:bg-slate-100 w-8 h-8 rounded-full"><i class="fa-solid fa-xmark"></i></button></div>
-            <div class="p-5 flex flex-col gap-4">
-                <input type="hidden" id="editNodeId">
-                <div><label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase">Display Name</label><input type="text" id="editNodeName" class="w-full border rounded-lg p-2 text-sm font-semibold"></div>
-                <div><label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase">Position/Role</label><input type="text" id="editNodeRole" class="w-full border rounded-lg p-2 text-sm font-semibold"></div>
-                <div><label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase">Level Style</label><select id="editNodeLevel" class="w-full border rounded-lg p-2 text-sm font-semibold"><option value="management">Management (Green Node)</option><option value="middle">Middle Management (Blue Node)</option><option value="staff">Staff / Technician (Orange Node)</option><option value="missing">Missing (Red Border)</option></select></div>
-                <div><label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase">Child Layout Style</label><select id="editNodeChildLayout" class="w-full border rounded-lg p-2 text-sm font-semibold"><option value="horizontal">Horizontal Spread (Default)</option><option value="vertical">Vertical Stack (Compact)</option></select></div>
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden transform scale-95 transition-transform duration-300">
+            <div class="p-4 border-b flex justify-between items-center relative">
+                <div class="absolute top-0 left-0 w-full h-1 bg-blue-500"></div>
+                <div>
+                    <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-blue-500"></i> Edit Org Position</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">Edit the box and choose exactly who this position reports to.</p>
+                </div>
+                <button onclick="closeOrgNodeModal()" class="text-slate-400 hover:bg-slate-100 w-8 h-8 rounded-full"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div class="p-4 border-t flex justify-end gap-3 bg-slate-50"><button onclick="closeOrgNodeModal()" class="px-4 py-2 text-sm font-bold text-slate-600 bg-white border rounded-lg">Cancel</button><button onclick="saveOrgNodeEdit()" class="px-5 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg">Save Details</button></div>
+            <div class="p-5 flex flex-col gap-4 max-h-[70vh] overflow-y-auto">
+                <input type="hidden" id="editNodeId">
+                <div><label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase">Display Name</label><input type="text" id="editNodeName" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm font-semibold focus:border-blue-500 outline-none"></div>
+                <div><label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase">Position / Role</label><input type="text" id="editNodeRole" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm font-semibold focus:border-blue-500 outline-none"></div>
+                <div class="bg-blue-50/70 border border-blue-200 rounded-xl p-3">
+                    <label class="block text-xs font-bold text-blue-700 mb-1.5 uppercase"><i class="fa-solid fa-link mr-1"></i> Reports To / Connected Parent</label>
+                    <select id="editNodeParent" class="w-full border border-blue-200 bg-white rounded-lg p-2.5 text-sm font-semibold text-slate-700 focus:border-blue-500 outline-none"></select>
+                    <p id="editNodeParentHelp" class="text-[11px] text-slate-500 mt-2">Changing this moves the box under the selected manager and redraws the connecting line.</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div><label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase">Level Style</label><select id="editNodeLevel" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm font-semibold"><option value="management">Management</option><option value="middle">Middle Management</option><option value="staff">Staff / Technician</option><option value="missing">Vacant / Missing</option></select></div>
+                    <div><label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase">Team Layout</label><select id="editNodeChildLayout" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm font-semibold"><option value="horizontal">Horizontal</option><option value="vertical">Vertical Stack</option></select></div>
+                </div>
+            </div>
+            <div class="p-4 border-t flex justify-end gap-3 bg-slate-50"><button onclick="closeOrgNodeModal()" class="px-4 py-2 text-sm font-bold text-slate-600 bg-white border rounded-lg">Cancel</button><button onclick="saveOrgNodeEdit()" class="px-5 py-2 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg"><i class="fa-solid fa-floppy-disk mr-1.5"></i> Save & Connect</button></div>
         </div>
     </div>
-    
+
     <!-- Edit Note Modal -->
     <div id="noteEditModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-[80] flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
         <div class="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden transform scale-95 transition-transform duration-300">
@@ -1458,6 +2081,7 @@
             <div class="p-4 border-t flex justify-end gap-3 bg-slate-50"><button onclick="closeNoteEdit()" class="px-4 py-2 text-sm font-bold text-slate-600 bg-white border rounded-lg">Cancel</button><button onclick="saveNoteEdit()" class="px-5 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg">Save Note</button></div>
         </div>
     </div>
+
     <script>
         // Data Sources
         const csvInfoUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR8o8p12U_gWwt-uSmSRBgm1mq1Ouks6qP_38xv5szrDpiPmDTotqrL88nop0l-kbV14aPMpHWv6sH3/pub?gid=0&single=true&output=csv';
@@ -1472,7 +2096,7 @@
         // Global State
         let allEmployees = []; let filteredEmployees = []; 
         let companies = new Set(); let departments = new Set();
-        let selectedCompanies = []; let selectedCalendarCompanies = []; let selectedDailyCompanies = [];
+        let selectedCompanies = []; let selectedCalendarCompanies = []; let selectedDailyCompanies = []; let selectedCalendarRowCompany = 'ITC'; let selectedCalendarRowDepartments = null; let selectedCalendarRowMonth = new Date().getMonth(); let selectedCalendarRowYear = new Date().getFullYear(); const attendanceDataYear = new Date().getFullYear();
         let selectedDepartments = 'All'; let selectedStatuses = ['Active']; let selectedDashboardMonth = 'All'; let searchQuery = ''; let dailySearchQuery = '';
         let currentSortColumn = 'id'; let isSortAscending = true;
         let leaveHistoryByEmployee = {}; let dailyLeaveRecords = []; let currentDailyGroupedData = {}; 
@@ -1485,6 +2109,7 @@
 
         window.isExcludedPosition = function(pos) {
             let p = (pos || '').trim().toLowerCase();
+            // Explicitly allow "Housekeeper (S)" to be included in reports
             if (p === 'housekeeper (s)') return false; 
             return p.includes('security') || p.includes('house keeper') || p.includes('housekeeper');
         };
@@ -1608,9 +2233,12 @@
             }
             closeNoteEdit();
         };
+
         document.addEventListener('DOMContentLoaded', () => {
             const mainBtn = document.getElementById('companyDropdownBtn'); const mainMenu = document.getElementById('companyDropdownMenu');
             const calBtn = document.getElementById('calCompanyDropdownBtn'); const calMenu = document.getElementById('calCompanyDropdownMenu');
+            const calRowBtn = document.getElementById('calRowCompanyDropdownBtn'); const calRowMenu = document.getElementById('calRowCompanyDropdownMenu');
+            const calRowDeptBtn = document.getElementById('calRowDepartmentDropdownBtn'); const calRowDeptMenu = document.getElementById('calRowDepartmentDropdownMenu');
             const dailyBtn = document.getElementById('dailyCompanyDropdownBtn'); const dailyMenu = document.getElementById('dailyCompanyDropdownMenu');
             const monthBtn = document.getElementById('monthDropdownBtn'); const monthMenu = document.getElementById('monthDropdownMenu');
             const dailyTabExportBtn = document.getElementById('dailyTabExportBtn'); const dailyTabExportMenu = document.getElementById('dailyTabExportMenu');
@@ -1620,17 +2248,19 @@
             orgLabel = document.getElementById('orgCompanyDropdownLabel'); orgList = document.getElementById('orgCompanyList');
 
             const setupDropdown = (btn, menu, others) => { if(btn) btn.addEventListener('click', (e) => { e.stopPropagation(); menu.classList.toggle('hidden'); others.forEach(m => { if(m) m.classList.add('hidden'); }); }); };
-            setupDropdown(mainBtn, mainMenu, [calMenu, dailyMenu, monthMenu, dailyTabExportMenu, orgMenu, statusMenu, dailyLeaveMenu]);
-            setupDropdown(calBtn, calMenu, [mainMenu, dailyMenu, monthMenu, dailyTabExportMenu, orgMenu, statusMenu, dailyLeaveMenu]);
-            setupDropdown(dailyBtn, dailyMenu, [mainMenu, calMenu, monthMenu, dailyTabExportMenu, orgMenu, statusMenu, dailyLeaveMenu]);
-            setupDropdown(monthBtn, monthMenu, [mainMenu, calMenu, dailyMenu, dailyTabExportMenu, orgMenu, statusMenu, dailyLeaveMenu]);
-            setupDropdown(dailyTabExportBtn, dailyTabExportMenu, [mainMenu, calMenu, dailyMenu, monthMenu, orgMenu, statusMenu, dailyLeaveMenu]);
-            setupDropdown(orgBtn, orgMenu, [mainMenu, calMenu, dailyMenu, monthMenu, dailyTabExportMenu, statusMenu, dailyLeaveMenu]);
-            setupDropdown(statusBtn, statusMenu, [mainMenu, calMenu, dailyMenu, monthMenu, dailyTabExportMenu, orgMenu, dailyLeaveMenu]);
-            setupDropdown(dailyLeaveBtn, dailyLeaveMenu, [mainMenu, calMenu, dailyMenu, monthMenu, dailyTabExportMenu, orgMenu, statusMenu]);
+            setupDropdown(mainBtn, mainMenu, [calMenu, calRowMenu, calRowDeptMenu, dailyMenu, monthMenu, dailyTabExportMenu, orgMenu, statusMenu, dailyLeaveMenu]);
+            setupDropdown(calBtn, calMenu, [mainMenu, calRowMenu, calRowDeptMenu, dailyMenu, monthMenu, dailyTabExportMenu, orgMenu, statusMenu, dailyLeaveMenu]);
+            setupDropdown(calRowBtn, calRowMenu, [mainMenu, calMenu, calRowDeptMenu, dailyMenu, monthMenu, dailyTabExportMenu, orgMenu, statusMenu, dailyLeaveMenu]);
+            setupDropdown(calRowDeptBtn, calRowDeptMenu, [mainMenu, calMenu, calRowMenu, dailyMenu, monthMenu, dailyTabExportMenu, orgMenu, statusMenu, dailyLeaveMenu]);
+            setupDropdown(dailyBtn, dailyMenu, [mainMenu, calMenu, calRowMenu, calRowDeptMenu, monthMenu, dailyTabExportMenu, orgMenu, statusMenu, dailyLeaveMenu]);
+            setupDropdown(monthBtn, monthMenu, [mainMenu, calMenu, calRowMenu, calRowDeptMenu, dailyMenu, dailyTabExportMenu, orgMenu, statusMenu, dailyLeaveMenu]);
+            setupDropdown(dailyTabExportBtn, dailyTabExportMenu, [mainMenu, calMenu, calRowMenu, calRowDeptMenu, dailyMenu, monthMenu, orgMenu, statusMenu, dailyLeaveMenu]);
+            setupDropdown(orgBtn, orgMenu, [mainMenu, calMenu, calRowMenu, calRowDeptMenu, dailyMenu, monthMenu, dailyTabExportMenu, statusMenu, dailyLeaveMenu]);
+            setupDropdown(statusBtn, statusMenu, [mainMenu, calMenu, calRowMenu, calRowDeptMenu, dailyMenu, monthMenu, dailyTabExportMenu, orgMenu, dailyLeaveMenu]);
+            setupDropdown(dailyLeaveBtn, dailyLeaveMenu, [mainMenu, calMenu, calRowMenu, calRowDeptMenu, dailyMenu, monthMenu, dailyTabExportMenu, orgMenu, statusMenu]);
 
             document.addEventListener('click', (e) => {
-                if (!e.target.closest('.filter-dropdown')) { [mainMenu, calMenu, dailyMenu, monthMenu, dailyTabExportMenu, orgMenu, statusMenu, dailyLeaveMenu].forEach(m => { if(m) m.classList.add('hidden'); }); }
+                if (!e.target.closest('.filter-dropdown')) { [mainMenu, calMenu, calRowMenu, calRowDeptMenu, dailyMenu, monthMenu, dailyTabExportMenu, orgMenu, statusMenu, dailyLeaveMenu].forEach(m => { if(m) m.classList.add('hidden'); }); }
             });
             document.querySelectorAll('.filter-dropdown').forEach(d => d.addEventListener('click', e => { if(e.target.closest('[id$="Menu"]')) e.stopPropagation(); }));
 
@@ -1732,6 +2362,10 @@
             window.fpTo.setDate(d2);
             document.getElementById('dailyRangePreset').value = 'custom';
             renderDailyAttendance();
+        };
+
+        window.refreshDailyAttendance = function() {
+            fetchData();
         };
 
         window.setDailyDateRange = function() {
@@ -1851,7 +2485,16 @@
                                 cVal.split(/[+&,\n]/).forEach(p=>{
                                     if(p.includes('/')) {
                                         p.split('/').forEach(sp=>{
-                                            let cs=sp.replace(/[^A-Z]/g,''); if(cs==='AL')al+=0.5;else if(cs==='SL')sl+=0.5;else if(cs==='SP')sp+=0.5;else if(cs==='UP')up+=0.5;else if(cs==='A')a+=0.5;else if(cs==='D'||cs==='DAYOFF'){d+=0.5;isRawD=true;}else if(cs==='OT')ot+=0.5;else if(cs==='H'||cs==='HOLIDAY'){h+=0.5;isRawH=true;}else if(cs==='P'||cs==='PRESENT')pres=true;
+                                            // Preserve lateness when it is combined with a half-day code,
+                                            // e.g. L/H-UP or L'/H-AL. Previously the slash branch
+                                            // only parsed leave codes and silently dropped L / L'.
+                                            const rawPart = String(sp || '').trim().toUpperCase();
+                                            if(rawPart === 'L') { l5 += 1; return; }
+                                            if(rawPart === "L'") { l3 += 1; return; }
+                                            if(rawPart === 'P' || rawPart === 'PRESENT') { pres = true; return; }
+
+                                            let cs=rawPart.replace(/[^A-Z]/g,'').replace(/^H(?=(?:AL|SL|SP|UP|A|D|DAYOFF|OT|HOLIDAY)$)/,'');
+                                            if(cs==='AL')al+=0.5;else if(cs==='SL')sl+=0.5;else if(cs==='SP')sp+=0.5;else if(cs==='UP')up+=0.5;else if(cs==='A')a+=0.5;else if(cs==='D'||cs==='DAYOFF'){d+=0.5;isRawD=true;}else if(cs==='OT')ot+=0.5;else if(cs==='H'||cs==='HOLIDAY'){h+=0.5;isRawH=true;}
                                         }); return;
                                     }
                                     let tp=p.trim(); if(tp==="P"||tp==="PRESENT")pres=true;else if(tp==="L")l5+=1;else if(tp==="L'")l3+=1;
@@ -1860,7 +2503,7 @@
                                     }
                                 });
                                 if(al>0||sl>0||sp>0||up>0||a>0||d>0||h>0||l5>0||l3>0||ot>0||pres) {
-                                    dailyLeaveRecords.push({month:mg.month, day:parseInt(day), staffId:id, isPresent:pres, isRawD:isRawD, isRawH:isRawH, leaves:{AL:al,SL:sl,SP:sp,UP:up,A:a,Late5m:l5,Late3m:l3,OT:ot,D:d,H:h}, note:tNote});
+                                    dailyLeaveRecords.push({year:attendanceDataYear, month:mg.month, day:parseInt(day), staffId:id, isPresent:pres, isRawD:isRawD, isRawH:isRawH, leaves:{AL:al,SL:sl,SP:sp,UP:up,A:a,Late5m:l5,Late3m:l3,OT:ot,D:d,H:h}, note:tNote});
                                     if(!leaveHistoryByEmployee[id]) leaveHistoryByEmployee[id]={}; if(!leaveHistoryByEmployee[id][mg.month]) leaveHistoryByEmployee[id][mg.month]={AL:0,SL:0,SP:0,UP:0,A:0,Late5m:0,Late3m:0,OT:0,D:0,H:0};
                                     let mh=leaveHistoryByEmployee[id][mg.month]; mh.AL+=al; mh.SL+=sl; mh.SP+=sp; mh.UP+=up; mh.A+=a; mh.D+=d; mh.H+=h; mh.Late5m+=l5; mh.Late3m+=l3; mh.OT+=ot;
                                 }
@@ -1870,26 +2513,49 @@
                 });
             });
 
-            const cArr=Array.from(companies).sort(); let mList=document.getElementById('companyCheckboxList'), cList=document.getElementById('calCompanyCheckboxList'), dList=document.getElementById('dailyCompanyCheckboxList');
-            if(mList)mList.innerHTML=''; if(cList)cList.innerHTML=''; if(dList)dList.innerHTML=''; if(orgList)orgList.innerHTML='';
+            const cArr=Array.from(companies).sort(); let mList=document.getElementById('companyCheckboxList'), cList=document.getElementById('calCompanyCheckboxList'), dList=document.getElementById('dailyCompanyCheckboxList'), rowList=document.getElementById('calRowCompanyDropdownMenu');
+            if(mList)mList.innerHTML=''; if(cList)cList.innerHTML=''; if(dList)dList.innerHTML=''; if(rowList)rowList.innerHTML=''; if(orgList)orgList.innerHTML='';
             let oC=new Set();
             cArr.forEach(c => {
-                let sc=c.replace(/'/g,"\x27"), lb=`<span class="text-sm flex items-center">${getCompanyLogo(c)} ${c}</span>`;
+                let sc=c.replace(/'/g,"\\'"), lb=`<span class="text-sm flex items-center">${getCompanyLogo(c)} ${c}</span>`;
                 if(mList)mList.innerHTML+=`<label class="flex items-center space-x-2 p-1.5 hover:bg-slate-50"><input type="checkbox" value="${c.replace(/"/g,'&quot;')}" class="rounded" checked onchange="handleCompanyCheck('${sc}',this.checked,'main')">${lb}</label>`;
-                if(cList)cList.innerHTML+=`<label class="flex items-center space-x-2 p-1 hover:bg-slate-50"><input type="checkbox" value="${c.replace(/"/g,'&quot;')}" class="rounded" checked onchange="handleCompanyCheck('${sc}',this.checked,'cal')">${lb}</label>`;
+                if(cList)cList.innerHTML+=`<label class="flex items-center space-x-2 p-1 hover:bg-slate-50"><input type="checkbox" value="${c.replace(/"/g,'&quot;')}" class="rounded" ${c==='ITC'?'checked':''} onchange="handleCompanyCheck('${sc}',this.checked,'cal')">${lb}</label>`;
                 if(dList)dList.innerHTML+=`<label class="flex items-center space-x-2 p-1.5 hover:bg-slate-50"><input type="checkbox" value="${c.replace(/"/g,'&quot;')}" class="rounded" checked onchange="handleCompanyCheck('${sc}',this.checked,'daily')">${lb}</label>`;
                 if(c==='LPH'||c==='LPL') oC.add('LPH & LPL'); else oC.add(c);
             });
             if(orgList) Array.from(oC).sort().forEach(c => {
-                let sc=c.replace(/'/g,"\x27"), logo=(c==='LPH & LPL')?getCompanyLogo('LPH')+getCompanyLogo('LPL'):getCompanyLogo(c);
+                let sc=c.replace(/'/g,"\\'"), logo=(c==='LPH & LPL')?getCompanyLogo('LPH')+getCompanyLogo('LPL'):getCompanyLogo(c);
                 orgList.innerHTML+=`<button onclick="window.renderOrgChart('${sc}')" class="w-full text-left px-3 py-2 text-sm hover:bg-blue-50 rounded flex items-center gap-2">${logo} ${c}</button>`;
             });
-            selectedCompanies=[...cArr]; selectedCalendarCompanies=[...cArr]; selectedDailyCompanies=[...cArr];
+            if(rowList) {
+                rowList.innerHTML += `<button type="button" onclick="setCalendarRowCompany('__ALL__')" class="calendar-row-company-option w-full text-left px-3 py-2 text-sm rounded-md hover:bg-blue-50" data-company="__ALL__"><span class="font-semibold text-slate-700">All Companies</span></button>`;
+                cArr.forEach(c => {
+                    let sc = c.replace(/'/g, "\\'");
+                    rowList.innerHTML += `<button type="button" onclick="setCalendarRowCompany('${sc}')" class="calendar-row-company-option w-full text-left px-3 py-2 text-sm rounded-md hover:bg-blue-50 flex items-center gap-2" data-company="${c.replace(/"/g,'&quot;')}">${getCompanyLogo(c)} <span>${c}</span></button>`;
+                });
+            }
+            selectedCompanies=[...cArr];
+            selectedCalendarCompanies=cArr.includes('ITC')?['ITC']:[...cArr];
+            selectedDailyCompanies=[...cArr];
+            selectedCalendarRowCompany = cArr.includes('ITC') ? 'ITC' : (cArr[0] || '__ALL__');
+            selectedCalendarRowMonth = new Date().getMonth();
+            selectedCalendarRowYear = attendanceDataYear;
+            initializeCalendarRowPeriodFilters();
+            initializeCalendarRowDepartmentFilter(true);
+            updateCalendarRowCompanyLabel();
+            const calAll=document.getElementById('calSelectAllCompanies');
+            if(calAll){
+                calAll.checked=selectedCalendarCompanies.length===cArr.length;
+                calAll.indeterminate=selectedCalendarCompanies.length>0&&selectedCalendarCompanies.length<cArr.length;
+            }
+            const calLabel=document.getElementById('calCompanyDropdownLabel');
+            if(calLabel) calLabel.innerText=selectedCalendarCompanies.length===cArr.length?'All Companies':(selectedCalendarCompanies.length===1?selectedCalendarCompanies[0]:`${selectedCalendarCompanies.length} Companies`);
             const dF=document.getElementById('departmentFilter'); if(dF){dF.innerHTML='<option value="All">All Departments</option>'; Array.from(departments).sort().forEach(d=>{let o=document.createElement('option'); o.value=d; o.textContent=d; dF.appendChild(o);});}
 
             switchTab('daily'); applyFilters(); renderCalendarSummary(monthNames[currentCalendarDate.getMonth()]); renderDailyAttendance();
             if(oC.size>0) window.renderOrgChart(Array.from(oC).sort()[0]);
         }
+
         window.switchTab = function(id) {
             ['dashboard','calendar','daily','org','scan'].forEach(t => {
                 const v=document.getElementById(t+'View'), b=document.getElementById('tab-'+t);
@@ -1914,7 +2580,7 @@
             if(arr.length===companies.size){sa.checked=true;sa.indeterminate=false;}else if(arr.length===0){sa.checked=false;sa.indeterminate=false;}else{sa.checked=false;sa.indeterminate=true;}
             let lb=document.getElementById(type==='main'?'companyDropdownLabel':(type==='cal'?'calCompanyDropdownLabel':'dailyCompanyDropdownLabel'));
             if(lb) lb.innerText = arr.length===companies.size?"All Companies":(arr.length===0?"Select Company":(arr.length===1?arr[0]:`${arr.length} Companies`));
-            if(type==='main') applyFilters(); else if(type==='cal') renderCalendarSummary(monthNames[currentCalendarDate.getMonth()]); else renderDailyAttendance();
+            if(type==='main') applyFilters(); else if(type==='cal') renderCalendar(); else renderDailyAttendance();
         };
 
         window.handleSelectAll=function(chk,type) {
@@ -1928,7 +2594,7 @@
             let lb=document.getElementById(type==='main'?'companyDropdownLabel':(type==='cal'?'calCompanyDropdownLabel':'dailyCompanyDropdownLabel'));
             if(lb) lb.innerText = chk?"All Companies":"Select Company";
             
-            if(type==='main') applyFilters(); else if(type==='cal') renderCalendarSummary(monthNames[currentCalendarDate.getMonth()]); else renderDailyAttendance();
+            if(type==='main') applyFilters(); else if(type==='cal') renderCalendar(); else renderDailyAttendance();
         };
 
         window.toggleDeptDropdown = function(e, cId, dept) { e.stopPropagation(); document.querySelectorAll('[id^="dept-dropdown-"]').forEach(el=>el.classList.add('hidden')); openDeptModal(cId.replace(/-/g,' '), dept); };
@@ -1970,12 +2636,12 @@
                     csC.classList.remove('hidden'); let cH='';
                     Object.keys(cS).sort().forEach(c=>{
                         let sCId=c.replace(/[^a-zA-Z0-9]/g,'-'), s=cS[c], dH='';
-                        Object.keys(s.d).sort((a,b)=>s.d[b]-s.d[a]).forEach(d=>{ dH+=`<div onclick="toggleDeptDropdown(event,'${sCId}','${d.replace(/'/g,"\\x27")}')" class="flex justify-between items-center py-2 border-b hover:bg-slate-50 px-3 rounded cursor-pointer group"><span class="text-[11px] truncate mr-3 group-hover:text-blue-600">${d}</span><span class="text-[11px] font-bold bg-slate-100 px-1.5 py-0.5 rounded border">${s.d[d]}</span></div>`;});
+                        Object.keys(s.d).sort((a,b)=>s.d[b]-s.d[a]).forEach(d=>{ dH+=`<div onclick="toggleDeptDropdown(event,'${sCId}','${d.replace(/'/g,"\\'")}')" class="flex justify-between items-center py-2 border-b hover:bg-slate-50 px-3 rounded cursor-pointer group"><span class="text-[11px] truncate mr-3 group-hover:text-blue-600">${d}</span><span class="text-[11px] font-bold bg-slate-100 px-1.5 py-0.5 rounded border">${s.d[d]}</span></div>`;});
                         cH+=`<div class="relative inline-block w-full sm:w-auto mb-2 sm:mb-0"><button type="button" onclick="document.getElementById('dept-dropdown-${sCId}').classList.toggle('hidden');" class="w-full sm:w-auto bg-white border px-3 py-1.5 rounded-lg flex items-center justify-between sm:justify-start gap-2 text-sm font-bold shadow-sm z-10 relative cursor-pointer"><div class="flex items-center gap-2">${getCompanyLogo(c)} ${c}</div><div class="flex items-center"><span class="bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded text-xs ml-0.5 shadow-sm">${s.t}</span><i class="fa-solid fa-chevron-down text-[10px] text-slate-400 ml-1.5"></i></div></button><div id="dept-dropdown-${sCId}" class="hidden absolute left-0 z-50 mt-1 w-full sm:w-64 rounded-xl bg-white shadow-xl border"><div class="bg-slate-50 px-3 py-2 border-b flex justify-between"><h4 class="text-[10px] font-bold uppercase text-slate-500">${c} Depts</h4><span class="text-[10px] font-bold text-blue-600">${s.t} Staff</span></div><div class="p-1 max-h-60 overflow-y-auto">${dH}</div></div></div>`;
                     }); csL.innerHTML=cH;
                 } else csC.classList.add('hidden');
             }
-            sortFilteredData(); renderTable();
+            sortFilteredData(); renderTable(); renderMobileDashboardUI();
         }
 
         function handleSort(col) { if(currentSortColumn===col) isSortAscending=!isSortAscending; else {currentSortColumn=col; isSortAscending=true;} document.querySelectorAll('th.sortable').forEach(th => { th.classList.remove('asc','desc'); if(th.dataset.sort===col) th.classList.add(isSortAscending?'asc':'desc'); }); sortFilteredData(); renderTable(); }
@@ -2000,6 +2666,237 @@
                 tr.innerHTML=`<td class="px-4 py-3 text-left border-r">${e.displayId}</td><td class="px-4 py-3 font-semibold text-left border-r">${e.name} ${nameBadge}</td><td class="px-4 py-3 text-left border-r">${cB}</td><td class="px-4 py-3 text-xs border-r text-left">${e.position}</td><td class="px-4 py-3 text-xs border-r text-left">${e.joinDate}</td><td class="px-3 py-3 border-r bg-green-50/20">${e.leaves.available.AL}</td><td class="px-3 py-3 border-r bg-yellow-50/20">${e.leaves.available.SL}</td><td class="px-3 py-3 border-r bg-purple-50/20">${e.leaves.available.SP}</td><td class="px-3 py-3 border-r font-bold bg-green-50/20 ${rA}">${e.leaves.remaining.AL}</td><td class="px-3 py-3 border-r bg-yellow-50/20">${e.leaves.remaining.SL}</td><td class="px-3 py-3 border-r bg-purple-50/20">${e.leaves.remaining.SP}</td><td class="px-3 py-3 border-r font-bold ${uC}">${e.leaves.unpaid>0?e.leaves.unpaid:'-'}</td><td class="px-3 py-3 border-r font-bold ${l5C}">${e.totalLate5m>0?e.totalLate5m:'-'}</td><td class="px-3 py-3 font-bold ${l3C}">${e.totalLate3m>0?e.totalLate3m:'-'}</td>`; tb.appendChild(tr);
             });
         }
+
+
+
+        /* ===================== Mobile Dashboard helpers ===================== */
+        function mobileDashboardFormatNumber(v) {
+            const n = Number(v || 0);
+            if (Math.abs(n - Math.round(n)) < 0.001) return String(Math.round(n));
+            return n.toFixed(1).replace(/\.0$/, '');
+        }
+
+        function getMobileDashboardPeriodStats(emp) {
+            const out = {AL:0, SL:0, SP:0, UP:0, A:0, Late5m:0, Late3m:0, OT:0, D:0, H:0};
+            const hist = leaveHistoryByEmployee[emp.id] || {};
+            const rows = selectedDashboardMonth === 'All'
+                ? Object.values(hist)
+                : [hist[selectedDashboardMonth]].filter(Boolean);
+            rows.forEach(h => {
+                Object.keys(out).forEach(k => out[k] += Number(h?.[k] || 0));
+            });
+            return out;
+        }
+
+        function getMobileDashboardPhoto(emp, sizeClass) {
+            const initial = String(emp.name || '?').trim().charAt(0).toUpperCase();
+            if (emp.photoUrl) return `<img src="${emp.photoUrl}" alt="" class="${sizeClass}">`;
+            return `<div class="${sizeClass} mobile-avatar-placeholder">${initial}</div>`;
+        }
+
+        function syncDesktopDashboardControlsFromState() {
+            const mainChecks = document.querySelectorAll('#companyCheckboxList input[type="checkbox"]');
+            mainChecks.forEach(cb => cb.checked = selectedCompanies.includes(cb.value.replace(/&quot;/g, '"')));
+            const all = document.getElementById('selectAllCompanies');
+            if (all) {
+                all.checked = selectedCompanies.length === companies.size;
+                all.indeterminate = selectedCompanies.length > 0 && selectedCompanies.length < companies.size;
+            }
+            const cl = document.getElementById('companyDropdownLabel');
+            if (cl) cl.innerText = selectedCompanies.length === companies.size ? 'All Companies' : (selectedCompanies.length === 0 ? 'Select Company' : (selectedCompanies.length === 1 ? selectedCompanies[0] : `${selectedCompanies.length} Companies`));
+            const df = document.getElementById('departmentFilter'); if (df) df.value = selectedDepartments;
+            const mf = document.getElementById('dashboardMonthFilter'); if (mf) mf.value = selectedDashboardMonth;
+            const sf = document.getElementById('searchInput'); if (sf) sf.value = searchQuery;
+            document.querySelectorAll('.status-checkbox').forEach(cb => cb.checked = selectedStatuses.includes(cb.value));
+            const sl = document.getElementById('statusDropdownLabel');
+            if (sl) sl.innerText = selectedStatuses.length === 3 ? 'All Statuses' : (selectedStatuses.length === 0 ? 'None' : selectedStatuses.join(', '));
+        }
+
+        function syncMobileDashboardFilterUI() {
+            const companyWrap = document.getElementById('mobileDashboardCompanyChecks');
+            if (companyWrap) {
+                const arr = Array.from(companies).sort();
+                companyWrap.innerHTML = arr.map(c => {
+                    const safe = c.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+                    const checked = selectedCompanies.includes(c) ? 'checked' : '';
+                    return `<label class="mobile-filter-check"><input type="checkbox" data-company="${safe}" ${checked} onchange="mobileDashboardToggleCompany(this.dataset.company,this.checked)" class="rounded"><span class="truncate">${getCompanyLogo(c)} ${safe}</span></label>`;
+                }).join('');
+            }
+            const all = document.getElementById('mobileDashAllCompanies');
+            if (all) { all.checked = selectedCompanies.length === companies.size; all.indeterminate = selectedCompanies.length > 0 && selectedCompanies.length < companies.size; }
+
+            const dept = document.getElementById('mobileDashboardDepartment');
+            if (dept) {
+                dept.innerHTML = '<option value="All">All Departments</option>' + Array.from(departments).sort().map(d => `<option value="${d.replace(/"/g,'&quot;')}">${d}</option>`).join('');
+                dept.value = selectedDepartments;
+            }
+            document.querySelectorAll('.mobile-dashboard-status').forEach(cb => cb.checked = selectedStatuses.includes(cb.value));
+
+            const month = document.getElementById('mobileDashboardMonth');
+            if (month) {
+                month.innerHTML = '<option value="All">YTD</option>' + monthNames.map(m => `<option value="${m}">${m}</option>`).join('');
+                month.value = selectedDashboardMonth;
+            }
+            const lt = document.getElementById('mobileDashboardLeaveType');
+            const deskLt = document.getElementById('dashboardLeaveTypeFilter');
+            if (lt && deskLt) {
+                lt.innerHTML = Array.from(deskLt.options).map(o => `<option value="${o.value}">${o.text}</option>`).join('');
+                lt.value = deskLt.value;
+            }
+            const searchA = document.getElementById('mobileDashboardSearch');
+            const searchB = document.getElementById('mobileDashboardFilterSearch');
+            if (searchA && searchA.value !== searchQuery) searchA.value = searchQuery;
+            if (searchB && searchB.value !== searchQuery) searchB.value = searchQuery;
+        }
+
+        function renderMobileDashboardUI() {
+            const shell = document.getElementById('dashboardMobileShell');
+            const cards = document.getElementById('dashboardMobileCards');
+            if (!shell || !cards) return;
+
+            let active = 0, leave = 0, late = 0, absence = 0;
+            const attention = [];
+            filteredEmployees.forEach(e => {
+                const ps = getMobileDashboardPeriodStats(e);
+                if (e.status === 'Active') active++;
+                leave += ps.AL + ps.SL + ps.SP + ps.UP;
+                late += ps.Late5m + ps.Late3m;
+                absence += ps.A;
+
+                if (e.status === 'Active') {
+                    const reasons = [];
+                    let score = 0;
+                    if (ps.A > 0) { reasons.push(`A ${mobileDashboardFormatNumber(ps.A)}`); score += 6 + ps.A; }
+                    if (ps.Late3m > 0) { reasons.push(`L30+ ${mobileDashboardFormatNumber(ps.Late3m)}`); score += 5 + ps.Late3m; }
+                    if (ps.UP > 0) { reasons.push(`UP ${mobileDashboardFormatNumber(ps.UP)}`); score += 4 + ps.UP; }
+                    if (ps.Late5m >= 2) { reasons.push(`Late ${mobileDashboardFormatNumber(ps.Late5m)}`); score += 2 + ps.Late5m; }
+                    if (Number(e.leaves.available.AL || 0) > 0 && Number(e.leaves.remaining.AL || 0) <= 2) { reasons.push(`AL left ${mobileDashboardFormatNumber(e.leaves.remaining.AL)}`); score += 2; }
+                    if (reasons.length) attention.push({e, reasons, score});
+                }
+            });
+
+            const put = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=mobileDashboardFormatNumber(v); };
+            put('mobileKpiActive', active); put('mobileKpiLeave', leave); put('mobileKpiLate', late); put('mobileKpiAbsence', absence);
+
+            const period = selectedDashboardMonth === 'All' ? 'YTD' : selectedDashboardMonth;
+            const companyText = selectedCompanies.length === companies.size ? 'All Companies' : (selectedCompanies.length === 1 ? selectedCompanies[0] : `${selectedCompanies.length} Companies`);
+            const scope = document.getElementById('mobileDashboardScope');
+            if (scope) scope.textContent = `${companyText} • ${selectedDepartments === 'All' ? 'All Departments' : selectedDepartments} • ${period}`;
+
+            const chips = [];
+            if (selectedCompanies.length !== companies.size) chips.push(companyText);
+            if (selectedDepartments !== 'All') chips.push(selectedDepartments);
+            if (!(selectedStatuses.length === 1 && selectedStatuses[0] === 'Active')) chips.push(selectedStatuses.length ? selectedStatuses.join(' + ') : 'No Status');
+            if (selectedDashboardMonth !== 'All') chips.push(selectedDashboardMonth);
+            const leaveType = document.getElementById('dashboardLeaveTypeFilter')?.value || 'All';
+            if (leaveType !== 'All') chips.push(leaveType === 'Late' ? 'Late only' : `${leaveType} only`);
+            if (searchQuery) chips.push(`Search: ${searchQuery}`);
+            const chipWrap = document.getElementById('mobileDashboardFilterChips');
+            if (chipWrap) chipWrap.innerHTML = chips.map(c => `<span class="mobile-dashboard-chip">${c}</span>`).join('');
+            const fc = document.getElementById('mobileDashboardFilterCount');
+            if (fc) { fc.textContent = chips.length; fc.classList.toggle('is-zero', chips.length === 0); }
+
+            attention.sort((a,b)=>b.score-a.score);
+            const attList = document.getElementById('mobileNeedsAttentionList');
+            const attCount = document.getElementById('mobileNeedsAttentionCount');
+            if (attCount) attCount.textContent = `${attention.length} staff`;
+            if (attList) {
+                if (!attention.length) {
+                    attList.innerHTML = '<div class="py-5 text-center text-[10px] text-slate-400"><i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i>No priority issues in this filter.</div>';
+                } else {
+                    attList.innerHTML = attention.slice(0,5).map(({e,reasons}) => `
+                        <div class="mobile-attention-row" onclick="openModalById('${String(e.id).replace(/'/g,"\\'")}')">
+                            ${getMobileDashboardPhoto(e,'mobile-attention-avatar')}
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-center justify-between gap-2"><div class="text-[11px] font-extrabold text-slate-800 truncate">${e.name}</div><i class="fa-solid fa-chevron-right text-[9px] text-slate-300"></i></div>
+                                <div class="text-[8px] text-slate-400 mt-0.5 truncate">${e.displayId} • ${e.department || 'Unspecified'}</div>
+                                <div class="mobile-attention-reasons">${reasons.map(r=>`<span class="mobile-attention-badge">${r}</span>`).join('')}</div>
+                            </div>
+                        </div>`).join('');
+                }
+            }
+
+            const result = document.getElementById('mobileStaffResultCount');
+            if (result) result.textContent = `${filteredEmployees.length} result${filteredEmployees.length===1?'':'s'}`;
+
+            cards.innerHTML = filteredEmployees.map(e => {
+                const ps = getMobileDashboardPeriodStats(e);
+                const flags = [];
+                if (ps.UP>0) flags.push(`<span class="mobile-staff-flag text-rose-700 bg-rose-50 border-rose-100">UP ${mobileDashboardFormatNumber(ps.UP)}</span>`);
+                if (ps.A>0) flags.push(`<span class="mobile-staff-flag text-red-700 bg-red-50 border-red-100">A ${mobileDashboardFormatNumber(ps.A)}</span>`);
+                if (ps.Late5m>0) flags.push(`<span class="mobile-staff-flag text-amber-700 bg-amber-50 border-amber-100">L ${mobileDashboardFormatNumber(ps.Late5m)}</span>`);
+                if (ps.Late3m>0) flags.push(`<span class="mobile-staff-flag text-orange-700 bg-orange-50 border-orange-100">L30+ ${mobileDashboardFormatNumber(ps.Late3m)}</span>`);
+                if (e.status !== 'Active') flags.push(`<span class="mobile-staff-flag">${e.status}</span>`);
+                else if (e.isProbation) flags.push('<span class="mobile-staff-flag text-indigo-700 bg-indigo-50 border-indigo-100">Probation</span>');
+                return `<article class="mobile-staff-card" onclick="openModalById('${String(e.id).replace(/'/g,"\\'")}')">
+                    <div class="mobile-staff-card-top">
+                        ${getMobileDashboardPhoto(e,'mobile-staff-avatar')}
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center justify-between gap-2"><div class="mobile-staff-name truncate">${e.name}</div><i class="fa-solid fa-chevron-right text-[10px] text-slate-300"></i></div>
+                            <div class="mobile-staff-meta truncate">${e.displayId} • ${e.company} • ${e.department || 'Unspecified'}</div>
+                            <div class="mobile-staff-meta truncate">${e.position || 'Position not specified'}</div>
+                        </div>
+                    </div>
+                    <div class="mobile-staff-balance-row">
+                        <div class="mobile-staff-balance"><span>AL</span><strong>${mobileDashboardFormatNumber(e.leaves.remaining.AL)}</strong></div>
+                        <div class="mobile-staff-balance"><span>SL</span><strong>${mobileDashboardFormatNumber(e.leaves.remaining.SL)}</strong></div>
+                        <div class="mobile-staff-balance"><span>SP</span><strong>${mobileDashboardFormatNumber(e.leaves.remaining.SP)}</strong></div>
+                    </div>
+                    ${flags.length ? `<div class="mobile-staff-flags">${flags.join('')}</div>` : ''}
+                </article>`;
+            }).join('');
+
+            syncMobileDashboardFilterUI();
+        }
+
+        window.openMobileDashboardFilters = function() {
+            syncMobileDashboardFilterUI();
+            const b = document.getElementById('mobileDashboardFilterBackdrop');
+            if (!b) return;
+            b.classList.add('open');
+            document.body.classList.add('modal-open');
+        };
+        window.closeMobileDashboardFilters = function() {
+            const b = document.getElementById('mobileDashboardFilterBackdrop');
+            if (b) b.classList.remove('open');
+            document.body.classList.remove('modal-open');
+        };
+        window.mobileDashboardToggleCompany = function(company, checked) {
+            if (checked) { if (!selectedCompanies.includes(company)) selectedCompanies.push(company); }
+            else selectedCompanies = selectedCompanies.filter(c => c !== company);
+            syncDesktopDashboardControlsFromState(); applyFilters();
+        };
+        window.mobileDashboardSelectAllCompanies = function(checked) {
+            selectedCompanies = checked ? Array.from(companies).sort() : [];
+            syncDesktopDashboardControlsFromState(); applyFilters();
+        };
+        window.mobileDashboardSetDepartment = function(v) { selectedDepartments = v; syncDesktopDashboardControlsFromState(); applyFilters(); };
+        window.mobileDashboardSetStatuses = function() {
+            selectedStatuses = Array.from(document.querySelectorAll('.mobile-dashboard-status:checked')).map(cb=>cb.value);
+            syncDesktopDashboardControlsFromState(); applyFilters();
+        };
+        window.mobileDashboardSetMonth = function(v) { selectedDashboardMonth = v; syncDesktopDashboardControlsFromState(); applyFilters(); };
+        window.mobileDashboardSetLeaveType = function(v) { const d=document.getElementById('dashboardLeaveTypeFilter'); if(d)d.value=v; applyFilters(); };
+        window.mobileDashboardSetSearch = function(v) {
+            searchQuery = String(v || '').toLowerCase();
+            const d=document.getElementById('searchInput'); if(d)d.value=v;
+            const a=document.getElementById('mobileDashboardSearch'); if(a&&a.value!==v)a.value=v;
+            const b=document.getElementById('mobileDashboardFilterSearch'); if(b&&b.value!==v)b.value=v;
+            applyFilters();
+        };
+        window.resetMobileDashboardFilters = function() {
+            selectedCompanies = Array.from(companies).sort();
+            selectedDepartments = 'All';
+            selectedStatuses = ['Active'];
+            selectedDashboardMonth = 'All';
+            searchQuery = '';
+            const lt=document.getElementById('dashboardLeaveTypeFilter'); if(lt)lt.value='All';
+            syncDesktopDashboardControlsFromState(); applyFilters();
+        };
+
+        document.getElementById('mobileDashboardSearch')?.addEventListener('input', e => mobileDashboardSetSearch(e.target.value));
+
+
         window.changeMonth=function(o){currentCalendarDate.setMonth(currentCalendarDate.getMonth()+o); selectedCalendarDate=null; activeLeaveFilter=null; renderCalendar();};
         window.jumpToMonth=function(i){currentCalendarDate.setMonth(i); selectedCalendarDate=null; activeLeaveFilter=null; document.getElementById('monthDropdownMenu').classList.add('hidden'); renderCalendar();};
         window.selectDate=function(d){selectedCalendarDate=(selectedCalendarDate===d)?null:d; activeLeaveFilter=null; renderCalendar();};
@@ -2041,7 +2938,7 @@
                     let max=(window.innerWidth<640?3:4); for(let i=0;i<Math.min(dC.length,max);i++) iHtml+=`<div class="w-1.5 h-1.5 rounded-full ${dC[i]} shadow-sm"></div>`; if(dC.length>max) iHtml+=`<div class="w-1.5 h-1.5 rounded-full bg-slate-400 shadow-sm"></div>`; iHtml+=`</div>`;
                 }
                 grid.innerHTML+=`<div class="${bc}" onclick="selectDate(${d})"><span class="absolute top-[35%] left-1/2 transform -translate-x-1/2 -translate-y-1/2">${d}</span>${iHtml}</div>`;
-            } renderCalendarSummary(mName);
+            } renderCalendarSummary(mName); renderCalendarAgenda();
         }
 
         function renderCalendarSummary(mName) {
@@ -2107,6 +3004,333 @@
             } list.innerHTML=hC;
         }
 
+
+        window.initializeCalendarRowPeriodFilters = function() {
+            const monthSelect = document.getElementById('calRowMonthFilter');
+            const yearSelect = document.getElementById('calRowYearFilter');
+            if (monthSelect) {
+                monthSelect.innerHTML = monthNames.map((m, i) => `<option value="${i}" ${i === selectedCalendarRowMonth ? 'selected' : ''}>${m}</option>`).join('');
+            }
+            if (yearSelect) {
+                const currentYear = new Date().getFullYear();
+                const years = [];
+                for (let y = Math.max(2024, currentYear - 2); y <= currentYear + 2; y++) years.push(y);
+                if (!years.includes(attendanceDataYear)) years.push(attendanceDataYear);
+                years.sort((a,b) => a-b);
+                yearSelect.innerHTML = years.map(y => `<option value="${y}" ${y === selectedCalendarRowYear ? 'selected' : ''}>${y}</option>`).join('');
+            }
+        };
+
+        window.setCalendarRowPeriod = function() {
+            const monthSelect = document.getElementById('calRowMonthFilter');
+            const yearSelect = document.getElementById('calRowYearFilter');
+            if (monthSelect) selectedCalendarRowMonth = parseInt(monthSelect.value, 10);
+            if (yearSelect) selectedCalendarRowYear = parseInt(yearSelect.value, 10);
+            renderCalendarAgenda();
+        };
+
+        function getCalendarRowAvailableDepartments() {
+            return [...new Set(allEmployees
+                .filter(e => e && e.status === 'Active')
+                .filter(e => selectedCalendarRowCompany === '__ALL__' || e.company === selectedCalendarRowCompany)
+                .filter(e => !(typeof window.isExcludedPosition === 'function' && window.isExcludedPosition(e.position)))
+                .map(e => String(e.department || '').trim())
+                .filter(Boolean))].sort((a, b) => a.localeCompare(b));
+        }
+
+        window.initializeCalendarRowDepartmentFilter = function(resetToAll = false) {
+            const list = document.getElementById('calRowDepartmentCheckboxList');
+            const allBox = document.getElementById('calRowSelectAllDepartments');
+            const available = getCalendarRowAvailableDepartments();
+
+            if (resetToAll) selectedCalendarRowDepartments = null;
+            if (Array.isArray(selectedCalendarRowDepartments)) {
+                selectedCalendarRowDepartments = selectedCalendarRowDepartments.filter(d => available.includes(d));
+            }
+
+            if (list) {
+                list.innerHTML = '';
+                available.forEach(dept => {
+                    const label = document.createElement('label');
+                    label.className = 'flex items-center gap-2 p-1.5 rounded hover:bg-slate-50 cursor-pointer';
+
+                    const input = document.createElement('input');
+                    input.type = 'checkbox';
+                    input.className = 'calendar-row-department-checkbox rounded text-blue-600 focus:ring-blue-500';
+                    input.value = dept;
+                    input.checked = selectedCalendarRowDepartments === null || selectedCalendarRowDepartments.includes(dept);
+                    input.addEventListener('change', () => toggleCalendarRowDepartment(dept, input.checked));
+
+                    const span = document.createElement('span');
+                    span.className = 'text-xs text-slate-700 truncate';
+                    span.textContent = dept;
+
+                    label.appendChild(input);
+                    label.appendChild(span);
+                    list.appendChild(label);
+                });
+
+                if (!available.length) {
+                    list.innerHTML = '<div class="px-2 py-3 text-xs text-slate-400 text-center">No departments found</div>';
+                }
+            }
+
+            if (allBox) {
+                const selectedCount = selectedCalendarRowDepartments === null ? available.length : selectedCalendarRowDepartments.length;
+                allBox.checked = available.length > 0 && selectedCount === available.length;
+                allBox.indeterminate = selectedCount > 0 && selectedCount < available.length;
+                allBox.disabled = available.length === 0;
+            }
+            updateCalendarRowDepartmentLabel();
+        };
+
+        window.updateCalendarRowDepartmentLabel = function() {
+            const label = document.getElementById('calRowDepartmentDropdownLabel');
+            if (!label) return;
+            const available = getCalendarRowAvailableDepartments();
+            const selected = selectedCalendarRowDepartments;
+            if (!available.length) label.textContent = 'No Departments';
+            else if (selected === null || selected.length === available.length) label.textContent = 'All Departments';
+            else if (selected.length === 0) label.textContent = 'No Departments';
+            else if (selected.length === 1) label.textContent = selected[0];
+            else label.textContent = `${selected.length} Departments`;
+        };
+
+        window.handleCalendarRowDepartmentSelectAll = function(checked) {
+            selectedCalendarRowDepartments = checked ? null : [];
+            initializeCalendarRowDepartmentFilter(false);
+            renderCalendarAgenda();
+        };
+
+        window.toggleCalendarRowDepartment = function(dept, checked) {
+            const available = getCalendarRowAvailableDepartments();
+            let selected = selectedCalendarRowDepartments === null ? [...available] : [...selectedCalendarRowDepartments];
+            if (checked) {
+                if (!selected.includes(dept)) selected.push(dept);
+            } else {
+                selected = selected.filter(d => d !== dept);
+            }
+            selectedCalendarRowDepartments = selected.length === available.length ? null : selected;
+            initializeCalendarRowDepartmentFilter(false);
+            renderCalendarAgenda();
+        };
+
+        window.updateCalendarRowCompanyLabel = function() {
+            const label = document.getElementById('calRowCompanyDropdownLabel');
+            if (label) label.textContent = selectedCalendarRowCompany === '__ALL__' ? 'All Companies' : (selectedCalendarRowCompany || 'Select Company');
+            document.querySelectorAll('.calendar-row-company-option').forEach(btn => {
+                const company = btn.getAttribute('data-company');
+                const isSelected = company === (selectedCalendarRowCompany || '');
+                btn.classList.toggle('bg-blue-50', isSelected);
+                btn.classList.toggle('text-blue-700', isSelected);
+                btn.classList.toggle('font-semibold', isSelected);
+            });
+        };
+
+        window.setCalendarRowCompany = function(company) {
+            selectedCalendarRowCompany = company || '__ALL__';
+            updateCalendarRowCompanyLabel();
+            initializeCalendarRowDepartmentFilter(true);
+            const menu = document.getElementById('calRowCompanyDropdownMenu');
+            if (menu) menu.classList.add('hidden');
+            renderCalendarAgenda();
+        };
+
+        function renderCalendarAgenda() {
+            const monthLabel = document.getElementById('calendarAgendaMonth');
+            const stats = document.getElementById('calendarAgendaStats');
+            const head = document.getElementById('calendarRowMatrixHead');
+            const body = document.getElementById('calendarRowMatrixBody');
+            const empty = document.getElementById('calendarRowMatrixEmpty');
+            if (!stats || !head || !body || !empty) return;
+
+            const monthIndex = Number.isInteger(selectedCalendarRowMonth) ? selectedCalendarRowMonth : new Date().getMonth();
+            const monthName = monthNames[monthIndex];
+            const year = Number.isInteger(selectedCalendarRowYear) ? selectedCalendarRowYear : attendanceDataYear;
+            const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+            const companyText = selectedCalendarRowCompany === '__ALL__' ? 'All Companies' : (selectedCalendarRowCompany || 'Select Company');
+            if (monthLabel) monthLabel.textContent = `${monthName} ${year}`;
+            updateCalendarRowCompanyLabel();
+
+            const matchesMonth = r => Number(r.year || attendanceDataYear) === year && String(r.month || '').toLowerCase().startsWith(monthName.substring(0,3).toLowerCase());
+            // Bottom monthly row view only: hide Housekeeper / House Keeper and Security
+            // positions, except the explicit Housekeeper (s) role. Reuse the same
+            // exclusion helper already used elsewhere in the dashboard.
+            const employeeMatches = e => e &&
+                e.status === 'Active' &&
+                (selectedCalendarRowCompany === '__ALL__' || e.company === selectedCalendarRowCompany) &&
+                (selectedCalendarRowDepartments === null || selectedCalendarRowDepartments.includes(String(e.department || '').trim())) &&
+                !(typeof window.isExcludedPosition === 'function' && window.isExcludedPosition(e.position));
+            const employees = allEmployees.filter(employeeMatches);
+            const monthRecords = dailyLeaveRecords.filter(r => {
+                if (!matchesMonth(r)) return false;
+                const emp = allEmployees.find(x => x.id === r.staffId);
+                return employeeMatches(emp);
+            });
+
+            const recordMap = {};
+            monthRecords.forEach(r => {
+                recordMap[`${r.staffId}_${Number(r.day)}`] = r;
+            });
+
+            const formatVal = v => {
+                const num = Number(v || 0);
+                if (!num) return '0';
+                return Number.isInteger(num) ? String(num) : String(num.toFixed(1)).replace(/\.0$/, '');
+            };
+
+            const getDisplayCode = rec => {
+                if (!rec) return '';
+                const h = rec.leaves || {};
+                const codes = [];
+                if ((h.Late5m || 0) > 0) codes.push('L');
+                if ((h.Late3m || 0) > 0) codes.push("L'");
+                if ((h.AL || 0) > 0) codes.push((h.AL || 0) >= 1 ? 'AL' : 'H-AL');
+                if ((h.SL || 0) > 0) codes.push((h.SL || 0) >= 1 ? 'SL' : 'H-SL');
+                if ((h.SP || 0) > 0) codes.push((h.SP || 0) >= 1 ? 'SP' : 'H-SP');
+                if ((h.UP || 0) > 0) codes.push((h.UP || 0) >= 1 ? 'UP' : 'H-UP');
+                if ((h.A || 0) > 0) codes.push((h.A || 0) >= 1 ? 'A' : 'H-A');
+                if ((h.OT || 0) > 0) codes.push((h.OT || 0) >= 1 ? 'OT' : 'H-OT');
+                if ((h.D || 0) > 0) codes.push((h.D || 0) >= 1 ? 'D' : 'H-D');
+                if ((h.H || 0) > 0) codes.push((h.H || 0) >= 1 ? 'H' : 'H-Hol');
+                if (!codes.length && rec.isPresent) return 'P';
+                return codes.join('/');
+            };
+
+            const cellClass = code => {
+                if (!code) return 'bg-slate-50 text-slate-300';
+                if (code === 'P') return 'bg-white text-slate-700';
+                if (code.includes("L'")) return 'bg-red-500/90 text-white font-bold';
+                if (/(^|\/)L(\/|$)/.test(code)) return 'bg-sky-100 text-sky-800 font-semibold';
+                if (code.includes('UP')) return 'bg-cyan-200 text-cyan-900 font-semibold';
+                if (code.includes('SL')) return 'bg-yellow-200 text-yellow-900 font-semibold';
+                if (code.includes('AL')) return 'bg-lime-100 text-lime-900 font-semibold';
+                if (code.includes('SP')) return 'bg-purple-200 text-purple-900 font-semibold';
+                if (code.includes('OT')) return 'bg-pink-100 text-pink-900 font-semibold';
+                if (/(^|\/)A(\/|$)|H-A/.test(code)) return 'bg-red-100 text-red-800 font-semibold';
+                if (code.includes('/D') || code === 'D' || code === 'H-D') return 'bg-amber-50 text-red-500 font-semibold';
+                if (code.includes('H')) return 'bg-rose-100 text-rose-800 font-semibold';
+                return 'bg-slate-100 text-slate-700';
+            };
+
+            const summaryHeaderClass = key => ({
+                D: 'bg-slate-100 text-slate-700',
+                UP: 'bg-cyan-50 text-cyan-700',
+                A: 'bg-rose-50 text-rose-700',
+                L: 'bg-amber-50 text-amber-700',
+                L30: 'bg-orange-50 text-orange-700',
+                SL: 'bg-teal-50 text-teal-700',
+                AL: 'bg-blue-50 text-blue-700',
+                OT: 'bg-indigo-50 text-indigo-700',
+                SP: 'bg-violet-50 text-violet-700'
+            }[key] || 'bg-slate-50 text-slate-700');
+
+            let totalPresent = 0, totalLeave = 0, totalLate = 0, totalOff = 0;
+            monthRecords.forEach(r => {
+                const h = r.leaves || {};
+                if (r.isPresent && (h.AL||0)===0 && (h.SL||0)===0 && (h.SP||0)===0 && (h.UP||0)===0 && (h.A||0)===0 && (h.Late5m||0)===0 && (h.Late3m||0)===0 && (h.D||0)===0 && (h.OT||0)===0 && (h.H||0)===0) totalPresent++;
+                if ((h.AL||0)>0 || (h.SL||0)>0 || (h.SP||0)>0 || (h.UP||0)>0 || (h.A||0)>0) totalLeave += (h.AL||0)+(h.SL||0)+(h.SP||0)+(h.UP||0)+(h.A||0);
+                if ((h.Late5m||0)>0 || (h.Late3m||0)>0) totalLate += (h.Late5m||0)+(h.Late3m||0);
+                if ((h.D||0)>0 || (h.H||0)>0) totalOff += (h.D||0)+(h.H||0);
+            });
+
+            const statCard=(icon,label,value,sub,cls)=>`<div class="bg-white rounded-xl border border-slate-200 p-3 sm:p-4 flex items-center gap-3 shadow-sm"><div class="w-9 h-9 rounded-lg flex items-center justify-center ${cls}"><i class="fa-solid ${icon}"></i></div><div><div class="text-lg sm:text-xl font-bold text-slate-900">${value}</div><div class="text-[10px] sm:text-xs font-semibold text-slate-500 uppercase tracking-wide">${label}</div>${sub?`<div class="text-[9px] text-slate-400 mt-0.5">${sub}</div>`:''}</div></div>`;
+            stats.innerHTML =
+                statCard('fa-building','Company',companyText,`${employees.length} active staff • ${selectedCalendarRowDepartments === null ? 'All departments' : (selectedCalendarRowDepartments.length === 1 ? selectedCalendarRowDepartments[0] : selectedCalendarRowDepartments.length + ' departments')}`,'bg-blue-50 text-blue-600')+
+                statCard('fa-user-check','Present',formatVal(totalPresent),'P records this month','bg-emerald-50 text-emerald-600')+
+                statCard('fa-calendar-minus','Leave',formatVal(totalLeave),'AL / SL / SP / UP / A','bg-purple-50 text-purple-600')+
+                statCard('fa-clock','Late / Off',`${formatVal(totalLate)} / ${formatVal(totalOff)}`,'Late cases / D & H','bg-orange-50 text-orange-600');
+
+            const availableYears = [...new Set(dailyLeaveRecords.map(r => Number(r.year || attendanceDataYear)).filter(Boolean))].sort((a,b)=>a-b);
+            if (!availableYears.includes(year)) {
+                head.innerHTML = '';
+                body.innerHTML = '';
+                empty.classList.remove('hidden');
+                empty.innerHTML = `<div class="max-w-lg mx-auto"><i class="fa-regular fa-calendar-xmark text-3xl mb-3 text-slate-300"></i><p class="font-semibold text-sm text-slate-600">No attendance source loaded for ${year}.</p><p class="text-xs text-slate-400 mt-1">This dashboard currently has attendance data for ${availableYears.join(', ') || attendanceDataYear}. The year filter will work automatically once year-specific attendance data is connected.</p></div>`;
+                return;
+            }
+            if (!employees.length) {
+                head.innerHTML = '';
+                body.innerHTML = '';
+                empty.classList.remove('hidden');
+                empty.innerHTML = `<i class="fa-solid fa-building-circle-xmark text-3xl mb-3"></i><p class="font-semibold text-sm">No active staff match the selected company and departments.</p>`;
+                return;
+            }
+            empty.classList.add('hidden');
+            empty.innerHTML = '';
+
+            const dayHeaders = Array.from({length: daysInMonth}, (_, idx) => {
+                const day = idx + 1;
+                return `<th class="px-1 py-1.5 border border-slate-200 bg-slate-100 font-bold min-w-[30px] w-[30px] text-slate-700">${day}</th>`;
+            }).join('');
+            const weekHeaders = Array.from({length: daysInMonth}, (_, idx) => {
+                const day = idx + 1;
+                const wk = new Date(year, monthIndex, day).toLocaleDateString('en-US', { weekday: 'short' }).substring(0,3);
+                const sunday = new Date(year, monthIndex, day).getDay() === 0;
+                return `<th class="px-1 py-1 border border-slate-200 text-[8px] sm:text-[9px] ${sunday ? 'bg-rose-50 text-rose-600' : 'bg-white text-slate-500'} min-w-[30px] w-[30px]">${wk}</th>`;
+            }).join('');
+            head.innerHTML = `
+                <tr class="text-center uppercase tracking-wide text-[10px] text-slate-700">
+                    <th rowspan="2" class="border border-slate-200 bg-white font-bold sticky z-30 px-1" style="left:0; min-width:36px; width:36px;">No</th>
+                    <th rowspan="2" class="border border-slate-200 bg-white font-bold sticky z-30 px-1" style="left:36px; min-width:72px; width:72px;">ID</th>
+                    <th rowspan="2" class="border border-slate-200 bg-white font-bold sticky z-30 text-left px-2" style="left:108px; min-width:160px; width:160px;">Staff Name</th>
+                    ${dayHeaders}
+                    <th rowspan="2" class="px-1 py-1.5 border border-slate-200 font-semibold min-w-[36px] w-[36px] ${summaryHeaderClass('D')}">D</th>
+                    <th rowspan="2" class="px-1 py-1.5 border border-slate-200 font-semibold min-w-[36px] w-[36px] ${summaryHeaderClass('UP')}">UP</th>
+                    <th rowspan="2" class="px-1 py-1.5 border border-slate-200 font-semibold min-w-[36px] w-[36px] ${summaryHeaderClass('A')}">A</th>
+                    <th rowspan="2" class="px-1 py-1.5 border border-slate-200 font-semibold min-w-[36px] w-[36px] ${summaryHeaderClass('L')}">L</th>
+                    <th rowspan="2" class="px-1 py-1.5 border border-slate-200 font-semibold min-w-[48px] w-[48px] ${summaryHeaderClass('L30')}">L30+</th>
+                    <th rowspan="2" class="px-1 py-1.5 border border-slate-200 font-semibold min-w-[36px] w-[36px] ${summaryHeaderClass('SL')}">SL</th>
+                    <th rowspan="2" class="px-1 py-1.5 border border-slate-200 font-semibold min-w-[36px] w-[36px] ${summaryHeaderClass('AL')}">AL</th>
+                    <th rowspan="2" class="px-1 py-1.5 border border-slate-200 font-semibold min-w-[36px] w-[36px] ${summaryHeaderClass('OT')}">OT</th>
+                    <th rowspan="2" class="px-1 py-1.5 border border-slate-200 font-semibold min-w-[36px] w-[36px] ${summaryHeaderClass('SP')}">SP</th>
+                </tr>
+                <tr class="text-center">${weekHeaders}</tr>`;
+
+            body.innerHTML = employees.map((e, idx) => {
+                const empRecords = monthRecords.filter(r => r.staffId === e.id);
+                const totals = empRecords.reduce((acc, r) => {
+                    const h = r.leaves || {};
+                    acc.D += Number(h.D || 0) + Number(h.H || 0);
+                    acc.UP += Number(h.UP || 0);
+                    acc.A += Number(h.A || 0);
+                    acc.L += Number(h.Late5m || 0);
+                    acc.L30 += Number(h.Late3m || 0);
+                    acc.SL += Number(h.SL || 0);
+                    acc.AL += Number(h.AL || 0);
+                    acc.OT += Number(h.OT || 0);
+                    acc.SP += Number(h.SP || 0);
+                    return acc;
+                }, {D:0, UP:0, A:0, L:0, L30:0, SL:0, AL:0, OT:0, SP:0});
+
+                const dayTds = Array.from({length: daysInMonth}, (_, dIdx) => {
+                    const day = dIdx + 1;
+                    const rec = recordMap[`${e.id}_${day}`];
+                    const code = getDisplayCode(rec);
+                    const codeSize = code && code.length > 4 ? 'text-[7px] sm:text-[8px] tracking-tight' : '';
+                    return `<td title="${code || ''}" class="border border-slate-200 text-center px-0.5 py-1 min-w-[30px] w-[30px] whitespace-nowrap ${codeSize} ${cellClass(code)}">${code || ''}</td>`;
+                }).join('');
+
+                const stickyBg = idx % 2 === 0 ? 'bg-white' : 'bg-slate-50';
+                return `
+                    <tr class="${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/60'} hover:bg-blue-50/40 cursor-pointer" onclick="openModalById('${e.id}')">
+                        <td class="border border-slate-200 text-center font-medium sticky z-20 ${stickyBg} px-1" style="left:0; min-width:36px; width:36px;">${idx + 1}</td>
+                        <td class="border border-slate-200 text-center font-medium sticky z-20 ${stickyBg} px-1" style="left:36px; min-width:72px; width:72px;">${e.displayId || e.id}</td>
+                        <td class="border border-slate-200 px-2 py-1 sticky z-20 ${stickyBg}" style="left:108px; min-width:160px; width:160px;"><div class="font-semibold text-[10px] sm:text-[11px] text-slate-800 truncate">${e.name}</div><div class="text-[8px] sm:text-[9px] text-slate-400 truncate mt-0.5">${e.position || '-'}${selectedCalendarRowCompany === '__ALL__' ? ` • ${e.company}` : ''}</div></td>
+                        ${dayTds}
+                        <td class="border border-slate-200 text-center font-semibold px-1 py-1 min-w-[36px] ${summaryHeaderClass('D')}">${formatVal(totals.D)}</td>
+                        <td class="border border-slate-200 text-center font-semibold px-1 py-1 min-w-[36px] ${summaryHeaderClass('UP')}">${formatVal(totals.UP)}</td>
+                        <td class="border border-slate-200 text-center font-semibold px-1 py-1 min-w-[36px] ${summaryHeaderClass('A')}">${formatVal(totals.A)}</td>
+                        <td class="border border-slate-200 text-center font-semibold px-1 py-1 min-w-[36px] ${summaryHeaderClass('L')}">${formatVal(totals.L)}</td>
+                        <td class="border border-slate-200 text-center font-semibold px-1 py-1 min-w-[48px] ${summaryHeaderClass('L30')}">${formatVal(totals.L30)}</td>
+                        <td class="border border-slate-200 text-center font-semibold px-1 py-1 min-w-[36px] ${summaryHeaderClass('SL')}">${formatVal(totals.SL)}</td>
+                        <td class="border border-slate-200 text-center font-semibold px-1 py-1 min-w-[36px] ${summaryHeaderClass('AL')}">${formatVal(totals.AL)}</td>
+                        <td class="border border-slate-200 text-center font-semibold px-1 py-1 min-w-[36px] ${summaryHeaderClass('OT')}">${formatVal(totals.OT)}</td>
+                        <td class="border border-slate-200 text-center font-semibold px-1 py-1 min-w-[36px] ${summaryHeaderClass('SP')}">${formatVal(totals.SP)}</td>
+                    </tr>`;
+            }).join('');
+        }
+
         function renderDailyAttendance() {
             const tb=document.getElementById('dailyTableBody'), mc=document.getElementById('dailyMobileCards'), nd=document.getElementById('dailyNoDataMessage'), fI=document.getElementById('dailyFilterFrom'), tI=document.getElementById('dailyFilterTo');
             if(!tb||!nd||!fI||!tI||!fI.value||!tI.value)return; tb.innerHTML=''; if(mc)mc.innerHTML='';
@@ -2137,6 +3361,7 @@
                     let key = `${e.id}_${r.month}_${r.day}_${yr}`;
                     let tNote = customNotes[key] || r.note;
                     
+                    // Determine leave types for this specific day to show in the Note prefix
                     let tArr = [];
                     if(l.AL>0) tArr.push(window.getLeaveText(l.AL, 'AL', 'H-AL', 'text-blue-600'));
                     if(l.SL>0) tArr.push(window.getLeaveText(l.SL, 'SL', 'H-SL', 'text-teal-600'));
@@ -2162,7 +3387,7 @@
                 let sH=`<div class="bg-gradient-to-r from-slate-50 to-white rounded-xl border shadow-sm p-4 mb-5 flex flex-col xl:flex-row gap-4"><div class="text-[11px] font-bold text-slate-500 uppercase xl:border-r pr-4"><i class="fa-solid fa-chart-pie text-blue-500"></i> Daily Overview</div><div class="flex flex-wrap gap-2.5 w-full">`;
                 let dC=selectedDailyCompanies.length>0?selectedDailyCompanies:Array.from(companies);
                 
-                let allTot=0, allL=0, allO=0, allLa=0, allH=0, allG=0;
+                let allTot=0, allL=0, allO=0, allLa=0, allG=0, allH=0;
                 dC.forEach(c => { let tot=allEmployees.filter(e=>e.company===c&&e.status==='Active').length; allTot+=tot; let g=grp[c]||[]; allG+=g.length; g.forEach(i=>{allL+=(i.leaves.AL+i.leaves.SL+i.leaves.SP+i.leaves.UP+i.leaves.A); allO+=i.leaves.D; allLa+=(i.leaves.Late5m+i.leaves.Late3m); allH+=i.leaves.H;}); });
                 let aSp=[]; if(allL>0)aSp.push(`<span class="bg-red-50 text-red-700 px-2 py-1 rounded border border-red-100">${allL} Leave</span>`); if(allO>0)aSp.push(`<span class="bg-slate-700 text-white px-2 py-1 rounded border border-slate-800">${allO} Off</span>`); if(allLa>0)aSp.push(`<span class="bg-orange-50 text-orange-700 px-2 py-1 rounded border">${allLa} Late</span>`); if(allH>0)aSp.push(`<span class="bg-rose-50 text-rose-700 px-2 py-1 rounded border">${allH} Hol</span>`);
                 sH+=`<div class="flex items-center text-xs border border-blue-200 bg-blue-50/50 shadow-sm rounded-lg p-3 pr-4 mr-2"><div class="flex items-center gap-2 border-r border-blue-200 pr-4"><span class="font-bold text-blue-800">All Selected</span><span class="text-blue-500 text-[10px]">${allG}/${allTot} Staff</span></div><div class="pl-4 flex gap-1.5">${aSp.length>0?aSp.join(''):'<span class="bg-emerald-50 text-emerald-700 px-2 py-1 rounded border border-emerald-200 shadow-sm">All Present</span>'}</div></div>`;
@@ -2171,7 +3396,7 @@
                     let tot=allEmployees.filter(e=>e.company===c&&e.status==='Active').length, g=grp[c]||[], oL=0,oD=0,oLa=0, oH=0;
                     g.forEach(i=>{oL+=(i.leaves.AL+i.leaves.SL+i.leaves.SP+i.leaves.UP+i.leaves.A); oD+=i.leaves.D; oLa+=(i.leaves.Late5m+i.leaves.Late3m); oH+=i.leaves.H;});
                     let sp=[]; if(oL>0)sp.push(`<span class="bg-red-50 text-red-700 px-2 py-1 rounded border border-red-100">${oL} Leave</span>`); if(oD>0)sp.push(`<span class="bg-slate-700 text-white px-2 py-1 rounded border border-slate-800">${oD} Off</span>`); if(oLa>0)sp.push(`<span class="bg-orange-50 text-orange-700 px-2 py-1 rounded border">${oLa} Late</span>`); if(oH>0)sp.push(`<span class="bg-rose-50 text-rose-700 px-2 py-1 rounded border">${oH} Hol</span>`);
-                    sH+=`<div ${g.length>0?`onclick="openDailyCompanyModal('${c.replace(/'/g,"\\x27")}')" class="flex items-center text-xs border bg-white shadow-sm hover:border-blue-400 cursor-pointer rounded-lg p-3 group relative pr-8"`:`class="flex items-center text-xs border bg-slate-50 opacity-60 rounded-lg p-3 pr-3"`}><div class="flex items-center gap-2 border-r pr-4"><span class="font-bold">${getCompanyLogo(c)} ${c}</span><span class="text-slate-400 text-[10px]">${g.length}/${tot} Staff</span></div><div class="pl-4 flex gap-1.5">${sp.length>0?sp.join(''):'<span class="bg-emerald-50 text-emerald-700 px-2 py-1 rounded border">All Present</span>'}</div>${g.length>0?'<i class="fa-solid fa-chevron-right absolute right-3 text-slate-300 group-hover:text-blue-500"></i>':''}</div>`;
+                    sH+=`<div ${g.length>0?`onclick="openDailyCompanyModal('${c.replace(/'/g,"\\'")}')" class="flex items-center text-xs border bg-white shadow-sm hover:border-blue-400 cursor-pointer rounded-lg p-3 group relative pr-8"`:`class="flex items-center text-xs border bg-slate-50 opacity-60 rounded-lg p-3 pr-3"`}><div class="flex items-center gap-2 border-r pr-4"><span class="font-bold">${getCompanyLogo(c)} ${c}</span><span class="text-slate-400 text-[10px]">${g.length}/${tot} Staff</span></div><div class="pl-4 flex gap-1.5">${sp.length>0?sp.join(''):'<span class="bg-emerald-50 text-emerald-700 px-2 py-1 rounded border">All Present</span>'}</div>${g.length>0?'<i class="fa-solid fa-chevron-right absolute right-3 text-slate-300 group-hover:text-blue-500"></i>':''}</div>`;
                 }); sC.innerHTML=sH+`</div></div>`;
             }
 
@@ -2195,7 +3420,7 @@
                     
                     let nStr = i.notes.map(n => {
                         let disp = n.text ? `${n.prefix}${n.text}` : `${n.prefix}Add Note`; let isPlaceholder = !n.text;
-                        return `<div class="flex items-center h-[34px] mb-1"><span class="bg-slate-50 px-2.5 py-1.5 rounded-md border inline-flex items-center gap-1.5 group text-[11px] shadow-sm hover:border-blue-300 hover:bg-blue-50 cursor-text transition-all w-max max-w-full" onclick="openNoteEdit(event, '${n.id}', '${(n.text||'').replace(/'/g, "\\x27")}')"><i class="fa-regular fa-clock text-slate-400 shrink-0"></i> <span class="truncate ${isPlaceholder?'text-slate-400 italic':'text-slate-800 font-semibold'}">${disp}</span> <i class="fa-solid fa-pencil text-slate-300 group-hover:text-blue-600 text-[10px] ml-1 shrink-0"></i></span></div>`;
+                        return `<div class="flex items-center h-[34px] mb-1"><span class="bg-slate-50 px-2.5 py-1.5 rounded-md border inline-flex items-center gap-1.5 group text-[11px] shadow-sm hover:border-blue-300 hover:bg-blue-50 cursor-text transition-all w-max max-w-full" onclick="openNoteEdit(event, '${n.id}', '${(n.text||'').replace(/'/g, "\\'")}')"><i class="fa-regular fa-clock text-slate-400 shrink-0"></i> <span class="truncate ${isPlaceholder?'text-slate-400 italic':'text-slate-800 font-semibold'}">${disp}</span> <i class="fa-solid fa-pencil text-slate-300 group-hover:text-blue-600 text-[10px] ml-1 shrink-0"></i></span></div>`;
                     }).join('');
 
                     let reasonInputs = i.dKeys.map(k => {
@@ -2210,6 +3435,7 @@
                 });
             });
         }
+
         window.openModalById=id=>{let e=allEmployees.find(x=>x.id===id); if(e)openModal(e);};
         function openModal(e) {
             let avatarContent = e.photoUrl ? `<img src="${e.photoUrl}" class="w-full h-full object-cover" alt="Avatar">` : e.name[0];
@@ -2224,10 +3450,12 @@
                 let mk=Object.keys(h).find(k=>k.toLowerCase().startsWith(m.substring(0,3).toLowerCase()));
                 if(mk) {
                     let hm=h[mk]; 
+                    // Hide Hol from modal history: checking if other leaves exist
                     if(hm.AL>0||hm.SL>0||hm.SP>0||hm.Late5m>0||hm.Late3m>0||hm.UP>0||hm.A>0||hm.OT>0||hm.D>0) {
                         let sH=''; 
                         if(hm.AL>0)sH+=`<div class="flex justify-between text-xs"><span>AL:</span><b>${hm.AL}</b></div>`; if(hm.SL>0)sH+=`<div class="flex justify-between text-xs"><span>SL:</span><b>${hm.SL}</b></div>`; if(hm.SP>0)sH+=`<div class="flex justify-between text-xs"><span>SP:</span><b>${hm.SP}</b></div>`; if(hm.Late5m>0)sH+=`<div class="flex justify-between text-xs text-yellow-700"><span>L:</span><b>${hm.Late5m}</b></div>`; if(hm.Late3m>0)sH+=`<div class="flex justify-between text-xs text-orange-600"><span>L':</span><b>${hm.Late3m}</b></div>`; if(hm.UP>0)sH+=`<div class="flex justify-between text-xs text-red-500"><span>UP:</span><b>${hm.UP}</b></div>`; if(hm.A>0)sH+=`<div class="flex justify-between text-xs text-red-500"><span>A:</span><b>${hm.A}</b></div>`; if(hm.OT>0)sH+=`<div class="flex justify-between text-xs text-orange-500"><span>OT:</span><b>${hm.OT}</b></div>`; if(hm.D>0)sH+=`<div class="flex justify-between text-xs text-slate-600"><span>Off:</span><b>${hm.D}</b></div>`;
                         
+                        // Hide Hol from modal history details: filtering out pure holiday records
                         let dM = dailyLeaveRecords.filter(r=>r.staffId===e.id&&r.month.toLowerCase().startsWith(m.substring(0,3).toLowerCase())&&(r.leaves.AL>0||r.leaves.SL>0||r.leaves.SP>0||r.leaves.UP>0||r.leaves.A>0||r.leaves.Late5m>0||r.leaves.Late3m>0||r.leaves.OT>0||r.leaves.D>0));
                         let dH='';
                         if(dM.length>0) {
@@ -2291,7 +3519,7 @@
                 let nStr = i.notes.map(n => { 
                     let disp = n.text ? `${n.prefix}${n.text}` : `${n.prefix}Add Note`; 
                     let isPlaceholder = !n.text; 
-                    return `<div class="bg-slate-50 px-3 py-2 rounded-lg border flex items-center justify-between group hover:border-blue-300 hover:bg-blue-50 cursor-text transition-all shadow-sm w-full mt-2" onclick="openNoteEdit(event, '${n.id}', '${(n.text||'').replace(/'/g, "\\x27")}')">
+                    return `<div class="bg-slate-50 px-3 py-2 rounded-lg border flex items-center justify-between group hover:border-blue-300 hover:bg-blue-50 cursor-text transition-all shadow-sm w-full mt-2" onclick="openNoteEdit(event, '${n.id}', '${(n.text||'').replace(/'/g, "\\'")}')">
                                 <div class="flex items-center gap-2 overflow-hidden">
                                     <i class="fa-regular fa-clock text-slate-400 shrink-0"></i> 
                                     <span class="truncate text-xs ${isPlaceholder?'text-slate-400 italic':'text-slate-800 font-semibold'}">${disp}</span>
@@ -2327,6 +3555,7 @@
             if(document.getElementById('deptModal').classList.contains('hidden')&&document.getElementById('employeeModal').classList.contains('hidden'))document.body.classList.remove('modal-open'); 
             setTimeout(()=>md.classList.add('hidden'),300);
         };
+
         window.renderOrgChart = async function(companyName, bypassCache = false) {
             currentOrgCompany = companyName; if(!bypassCache) currentOrgTree = null;
             if(orgMenu) orgMenu.classList.add('hidden');
@@ -2372,7 +3601,7 @@
                 if (isOrgEditMode) {
                     nodeClass = 'cursor-move hover:ring-2 hover:ring-blue-400 bg-slate-50 org-node-draggable transition-all';
                     dAttrs = `draggable="true" ondragstart="handleOrgDragStart(event, '${node.nodeId}')" ondragover="handleOrgDragOver(event)" ondragleave="handleOrgDragLeave(event)" ondrop="handleOrgDrop(event, '${node.nodeId}')"`;
-                    eCtrls = `<div class="absolute -top-6 left-1/2 transform -translate-x-1/2 flex gap-0.5 bg-slate-800 p-1 rounded z-50 opacity-0 group-hover:opacity-100 transition-opacity"><button onclick="openOrgNodeEdit('${node.nodeId}')" class="w-5 h-5 text-white hover:text-blue-300 text-[10px]"><i class="fa-solid fa-pencil"></i></button><button onclick="addOrgChild('${node.nodeId}')" class="w-5 h-5 text-white hover:text-emerald-300 text-[10px]"><i class="fa-solid fa-plus"></i></button><button onclick="moveOrgNodeLeft('${node.nodeId}')" class="w-5 h-5 text-white hover:text-yellow-300 text-[10px]"><i class="fa-solid fa-arrow-left"></i></button><button onclick="moveOrgNodeRight('${node.nodeId}')" class="w-5 h-5 text-white hover:text-yellow-300 text-[10px]"><i class="fa-solid fa-arrow-right"></i></button><button onclick="deleteOrgNode('${node.nodeId}')" class="w-5 h-5 text-white hover:text-red-400 text-[10px]"><i class="fa-solid fa-trash"></i></button></div>`;
+                    eCtrls = `<div class="absolute -top-7 left-1/2 transform -translate-x-1/2 flex gap-0.5 bg-slate-800 p-1 rounded z-50 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"><button onclick="event.stopPropagation(); openOrgNodeEdit('${node.nodeId}')" title="Edit box" class="w-6 h-5 text-white hover:text-blue-300 text-[10px]"><i class="fa-solid fa-pencil"></i></button><button onclick="event.stopPropagation(); openOrgConnectEditor('${node.nodeId}')" title="Connect / Reports To" class="w-6 h-5 text-white hover:text-cyan-300 text-[10px]"><i class="fa-solid fa-link"></i></button><button onclick="event.stopPropagation(); addOrgChild('${node.nodeId}')" title="Add direct report" class="w-6 h-5 text-white hover:text-emerald-300 text-[10px]"><i class="fa-solid fa-plus"></i></button><button onclick="event.stopPropagation(); moveOrgNodeLeft('${node.nodeId}')" title="Move left" class="w-6 h-5 text-white hover:text-yellow-300 text-[10px]"><i class="fa-solid fa-arrow-left"></i></button><button onclick="event.stopPropagation(); moveOrgNodeRight('${node.nodeId}')" title="Move right" class="w-6 h-5 text-white hover:text-yellow-300 text-[10px]"><i class="fa-solid fa-arrow-right"></i></button><button onclick="event.stopPropagation(); deleteOrgNode('${node.nodeId}')" title="Delete" class="w-6 h-5 text-white hover:text-red-400 text-[10px]"><i class="fa-solid fa-trash"></i></button></div>`;
                 }
 
                 let html = `<li data-node="${node.nodeId}"><div class="relative flex flex-col items-center mx-0.5 sm:mx-1 z-10 group" ${!isOrgEditMode?click:''} title="${empMatch?empMatch.displayId:''}"><div class="${nodeClass} relative flex flex-col items-center p-1 rounded-lg" ${dAttrs}>${eCtrls}<div class="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 ${rC} shadow-sm flex items-center justify-center bg-white z-10 font-bold text-slate-500 text-[10px] sm:text-xs pointer-events-none">${avatarContent}</div><div class="mt-1 px-1 py-1 rounded ${bC} shadow-sm border text-[7px] sm:text-[8px] w-14 sm:w-20 flex flex-col justify-center min-h-[28px] pointer-events-none"><span class="font-bold ${nC} leading-tight truncate px-0.5">${empMatch ? empMatch.name : node.name}</span><span class="text-[6px] sm:text-[7px] font-medium opacity-80 mt-0.5 leading-[1.1] truncate px-0.5">${empMatch ? empMatch.position : node.role}</span></div></div></div>`;
@@ -2401,6 +3630,7 @@
 
             if (!currentOrgTree) {
                 let rootNode = null;
+                // Default Org Chart Templates
                 if (companyName.includes('ITC')) {
                     rootNode = { name: "Mol Pisal", role: "General Manager", level: "management", children: [ { name: "Long Chansovanney", role: "Accounting Manager", level: "management", children: [ { name: "Heng Chandara", role: "Sr. Accounting Officer", level: "middle", children: [{ name: "Chhom Sovannut", role: "Accounting Assistant", level: "staff" }] }, { name: "Tha Vuthea", role: "Senior Accountant", level: "middle", children: [ { name: "Som Chhunkunthida", role: "Accountant (A/P)", level: "staff" }, { name: "Mey Sotyna", role: "Accountant (A/R)", level: "staff", children: [ { name: "Hong Thanak", role: "Payment Collector", level: "staff" }, { name: "Seng Ahnisa", role: "Tax Accountant", level: "staff" } ] } ] } ] }, { name: "Plong Sovanny", role: "Finance and Tax Manager", level: "management" }, { name: "Srun povpisal", role: "Head Dept. of Product", level: "management", children: [ { name: "Porm Raksmey", role: "Senior Product Officer", level: "staff", children: [{ name: "Ra Lina", role: "Product Admin", level: "staff" }] }, { name: "Keo Sovannaroth", role: "Product Manager", level: "middle", children: [{ name: "Tang Eang", role: "Senior Product Officer", level: "staff" }] } ] }, { name: "Dyna Yaneth", role: "Assistant CEO", level: "management", children: [ { name: "Pum Savra", role: "Sup. HR & Admin", level: "middle", children: [{ name: "Mom Viwath", role: "HR & Admin", level: "staff" }] } ] }, { name: "N/A", role: "MKT Manager", level: "missing", children: [ { name: "N/A", role: "Sr. Marketing Communication", level: "missing", children: [ { name: "N/A", role: "Designer", level: "missing" }, { name: "N/A", role: "Designer", level: "missing" } ] } ] }, { name: "N/A", role: "Sales Manager", level: "missing", children: [ { name: "Din Sokheoun", role: "Senior Sales Executive", level: "middle", children: [ { name: "Oy Sovannel", role: "Sales Executive", level: "staff" }, { name: "Mey Sideth", role: "Sales Executive", level: "staff" }, { name: "Choun Chhenguon", role: "Sales Executive", level: "staff" }, { name: "Sot Radong", role: "Sales Executive", level: "staff" } ] } ] }, { name: "Han Sonyta", role: "Stock Manager", level: "management", children: [ { name: "Pen Sokha", role: "Sr. Stock Officer", level: "staff" }, { name: "Nheb Chanthoeun", role: "Stock & Delivery", level: "staff" }, { name: "Phal Phidet", role: "Stock Assistant", level: "staff" }, { name: "Tem Vanthen", role: "Delivery", level: "staff" }, { name: "Tour Monghout", role: "Delivery", level: "staff" }, { name: "Chheng Sokry", role: "Delivery", level: "staff" }, { name: "Ret Darin", role: "Delivery", level: "staff" }, { name: "N/A", role: "Delivery", level: "missing" }, { name: "N/A", role: "Delivery", level: "missing" }, { name: "N/A", role: "Delivery", level: "missing" }, { name: "N/A", role: "Delivery", level: "missing" } ] } ] };
                 } else if (companyName === 'LPT') {
@@ -2410,6 +3640,7 @@
                 } else if (companyName === 'TTC') {
                     rootNode = { name: "Lim Sathya", role: "Top Tech Manager", level: "management", children: [ { name: "N/A", role: "Showroom Supervisor", level: "missing", children: [ { name: "Leam Vanny", role: "Stock Controller and Cashier", level: "staff" }, { name: "Chhom Sovannut", role: "Accounting Officer", level: "staff" }, { name: "Ten Kimsrieng", role: "Sr. Sales Showroom", level: "staff", children: [ { name: "Mey Solyta", role: "Sales Showroom", level: "staff" }, { name: "Lysan Gechteang", role: "Sales Showroom (Part Time)", level: "staff" }, { name: "N/A", role: "Sales Showroom", level: "missing" }, { name: "Rith Darina", role: "Sales Showroom", level: "staff" }, { name: "Srun Povpisey", role: "Designer", level: "staff" } ] } ] }, { name: "Sao Sovanndy", role: "Sr. Sale Online", level: "middle", children: [ { name: "Sun Pisey", role: "Designer", level: "staff" } ] }, { name: "N/A", role: "Sr. Customer Services", level: "missing", children: [ { name: "Phan Panha", role: "Customer Service Officer", level: "staff" }, { name: "Sam Ratha", role: "Customer Service Officer", level: "staff" }, { name: "Phorn Sopheak", role: "Software Officer", level: "staff" }, { name: "Tan Sokheang", role: "Software Officer", level: "staff" }, { name: "Neth Punlork", role: "Software Officer", level: "staff" }, { name: "Vuthy Theara", role: "Hardware Officer", level: "staff" }, { name: "Saem Channy", role: "Hardware Officer", level: "staff" } ] }, { name: "An Kimthai", role: "Service Supervisor", level: "middle", children: [ { name: "Norng Sovanmony", role: "Sr. Software", level: "middle", children: [ { name: "Nguon Teav", role: "Receptionist", level: "staff" }, { name: "Yong Len", role: "Receptionist", level: "staff" }, { name: "Sarary David", role: "Software Officer", level: "staff" }, { name: "Khun Layheng", role: "Technical Support (Part Time)", level: "staff" }, { name: "Sorn Sovanara", role: "Software Officer", level: "staff" }, { name: "Lach Brohors", role: "Software Officer", level: "staff" }, { name: "Chin Daraseth", role: "Network Technician", level: "staff" } ] }, { name: "Seak Kimheng", role: "Sr. Hardware", level: "staff" } ] } ] };
                 } else {
+                    // Generic Auto-Generate Fallback
                     let tls = [], dMap = {}; staff.forEach(e => { let p = e.position.toLowerCase(); if (p.includes('ceo')||p.includes('general manager')||p.includes('managing director')||p.includes('operation lead')||(p.includes('manager')&&e.department==='Management')) tls.push(e); else { let d = e.department||'General'; if(!dMap[d]) dMap[d]={m:[],s:[]}; if(p.includes('manager')||p.includes('head')||p.includes('supervisor')||p.includes('lead')) dMap[d].m.push(e); else dMap[d].s.push(e); } });
                     if (tls.length===0) { let fm = staff.find(e=>e.position.toLowerCase().includes('manager')); if(fm){tls.push(fm); if(dMap[fm.department||'General']){ dMap[fm.department||'General'].m = dMap[fm.department||'General'].m.filter(x=>x.id!==fm.id); dMap[fm.department||'General'].s = dMap[fm.department||'General'].s.filter(x=>x.id!==fm.id); } } }
                     if (tls.length>0) {
@@ -2439,6 +3670,7 @@
                 let zoom = Math.min(wb.width / baseW, wb.height / baseH) * 0.88;
                 zoom = Math.max(0.1, Math.min(zoom, 1.2));
 
+                // Reset zoom first, then center the actual rendered chart in the wrapper.
                 orgPanzoom.zoom(zoom, { animate: false });
                 const centerNow = () => {
                     const wb2 = wrapper.getBoundingClientRect();
@@ -2455,6 +3687,7 @@
                 };
                 requestAnimationFrame(() => {
                     centerNow();
+                    // A second pass fixes centering when the selected company/chart changes size after layout.
                     requestAnimationFrame(centerNow);
                 });
             };
@@ -2473,7 +3706,7 @@
 
         window.toggleOrgEditMode = function() {
             isOrgEditMode = !isOrgEditMode; const btn = document.getElementById('orgEditToggleBtn'); const hint = document.getElementById('orgEditHint');
-            if(isOrgEditMode) { orgHistory = []; btn.classList.replace('bg-white', 'bg-blue-600'); btn.classList.replace('text-slate-700', 'text-white'); btn.innerHTML = `<i class="fa-solid fa-check"></i> <span class="hidden sm:inline">Done Editing</span>`; if(orgPanzoom) orgPanzoom.setOptions({ disablePan: true }); if(hint) hint.classList.remove('hidden'); showAppToast("Edit Mode Active. Drag & drop nodes.", "info"); } 
+            if(isOrgEditMode) { orgHistory = []; btn.classList.replace('bg-white', 'bg-blue-600'); btn.classList.replace('text-slate-700', 'text-white'); btn.innerHTML = `<i class="fa-solid fa-check"></i> <span class="hidden sm:inline">Done Editing</span>`; if(orgPanzoom) orgPanzoom.setOptions({ disablePan: true }); if(hint) hint.classList.remove('hidden'); showAppToast("Edit Mode Active. Drag/drop or use the chain icon to connect reporting lines.", "info"); } 
             else { btn.classList.replace('bg-blue-600', 'bg-white'); btn.classList.replace('text-white', 'text-slate-700'); btn.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> <span class="hidden sm:inline">Edit Structure</span>`; if(orgPanzoom) orgPanzoom.setOptions({ disablePan: false }); if(hint) hint.classList.add('hidden'); }
             renderOrgChart(currentOrgCompany, true);
         };
@@ -2490,11 +3723,71 @@
             }
         };
         
-        const findOrgNodeById = (node, id) => { if (node.nodeId === id) return node; if (node.children) { for (let c of node.children) { let res = findOrgNodeById(c, id); if (res) return res; } } return null; };
-        
-        window.openOrgNodeEdit = function(id) { let n = findOrgNodeById(currentOrgTree, id); if(!n) return; document.getElementById('editNodeId').value = id; document.getElementById('editNodeName').value = n.name !== 'N/A' ? n.name : ''; document.getElementById('editNodeRole').value = n.role !== 'N/A' ? n.role : ''; document.getElementById('editNodeLevel').value = n.level || 'staff'; document.getElementById('editNodeChildLayout').value = n.childLayout || 'horizontal'; const m = document.getElementById('orgNodeEditModal'); m.classList.remove('hidden'); setTimeout(() => { m.classList.remove('opacity-0', 'scale-95'); document.body.classList.add('modal-open'); }, 10); };
+        const findOrgNodeById = (node, id) => { if (!node) return null; if (node.nodeId === id) return node; if (node.children) { for (let c of node.children) { let res = findOrgNodeById(c, id); if (res) return res; } } return null; };
+        const findOrgParentById = (node, id, parent = null) => { if (!node) return null; if (node.nodeId === id) return parent; if (node.children) { for (let c of node.children) { const res = findOrgParentById(c, id, node); if (res) return res; } } return null; };
+        const collectOrgNodes = (node, out = []) => { if (!node) return out; out.push(node); (node.children || []).forEach(c => collectOrgNodes(c, out)); return out; };
+        const collectOrgDescendantIds = (node, out = new Set()) => { (node?.children || []).forEach(c => { out.add(c.nodeId); collectOrgDescendantIds(c, out); }); return out; };
+        const removeOrgNodeById = (node, id) => { if (!node?.children) return null; const idx = node.children.findIndex(c => c.nodeId === id); if (idx !== -1) return node.children.splice(idx, 1)[0]; for (let c of node.children) { const found = removeOrgNodeById(c, id); if (found) return found; } return null; };
+
+        window.openOrgNodeEdit = function(id, focusParent = false) {
+            const n = findOrgNodeById(currentOrgTree, id); if(!n) return;
+            document.getElementById('editNodeId').value = id;
+            document.getElementById('editNodeName').value = n.name !== 'N/A' ? n.name : '';
+            document.getElementById('editNodeRole').value = n.role !== 'N/A' ? n.role : '';
+            document.getElementById('editNodeLevel').value = n.level || 'staff';
+            document.getElementById('editNodeChildLayout').value = n.childLayout || 'horizontal';
+            const parentSelect = document.getElementById('editNodeParent');
+            const parentHelp = document.getElementById('editNodeParentHelp');
+            const currentParent = findOrgParentById(currentOrgTree, id);
+            const invalidIds = collectOrgDescendantIds(n); invalidIds.add(id);
+            const candidates = collectOrgNodes(currentOrgTree).filter(x => !invalidIds.has(x.nodeId));
+            parentSelect.innerHTML = '';
+            if (n === currentOrgTree) {
+                const opt = document.createElement('option'); opt.value = ''; opt.textContent = 'Root of chart (no parent)'; opt.selected = true; parentSelect.appendChild(opt);
+                parentSelect.disabled = true; parentHelp.textContent = 'The root position cannot report to another box.';
+            } else {
+                parentSelect.disabled = false;
+                candidates.forEach(p => {
+                    const opt = document.createElement('option'); opt.value = p.nodeId;
+                    const pname = p.name && p.name !== 'N/A' ? p.name : 'Vacant';
+                    opt.textContent = `${pname} — ${p.role || 'No role'}`;
+                    if (currentParent && p.nodeId === currentParent.nodeId) opt.selected = true;
+                    parentSelect.appendChild(opt);
+                });
+                parentHelp.textContent = 'Changing this moves the box under the selected manager and redraws the connecting line.';
+            }
+            const m = document.getElementById('orgNodeEditModal'); m.classList.remove('hidden');
+            setTimeout(() => {
+                m.classList.remove('opacity-0', 'scale-95'); document.body.classList.add('modal-open');
+                if (focusParent && !parentSelect.disabled) { parentSelect.focus(); parentSelect.classList.add('ring-2','ring-blue-400'); setTimeout(() => parentSelect.classList.remove('ring-2','ring-blue-400'), 1200); }
+            }, 10);
+        };
+        window.openOrgConnectEditor = function(id) { openOrgNodeEdit(id, true); };
         window.closeOrgNodeModal = function() { const m = document.getElementById('orgNodeEditModal'); m.classList.add('opacity-0', 'scale-95'); document.body.classList.remove('modal-open'); setTimeout(() => m.classList.add('hidden'), 300); };
-        window.saveOrgNodeEdit = function() { pushOrgHistory(); let n = findOrgNodeById(currentOrgTree, document.getElementById('editNodeId').value); if(n) { n.name = document.getElementById('editNodeName').value || 'N/A'; n.role = document.getElementById('editNodeRole').value || 'N/A'; n.level = document.getElementById('editNodeLevel').value; n.childLayout = document.getElementById('editNodeChildLayout').value; saveOrgTreeData(); renderOrgChart(currentOrgCompany, true); } closeOrgNodeModal(); };
+        window.saveOrgNodeEdit = function() {
+            const id = document.getElementById('editNodeId').value;
+            let n = findOrgNodeById(currentOrgTree, id); if(!n) { closeOrgNodeModal(); return; }
+            const oldParent = findOrgParentById(currentOrgTree, id);
+            const newParentId = document.getElementById('editNodeParent').value;
+            pushOrgHistory();
+            n.name = document.getElementById('editNodeName').value || 'N/A';
+            n.role = document.getElementById('editNodeRole').value || 'N/A';
+            n.level = document.getElementById('editNodeLevel').value;
+            n.childLayout = document.getElementById('editNodeChildLayout').value;
+            if (n !== currentOrgTree && newParentId && (!oldParent || oldParent.nodeId !== newParentId)) {
+                const moved = removeOrgNodeById(currentOrgTree, id);
+                const newParent = findOrgNodeById(currentOrgTree, newParentId);
+                if (moved && newParent) { if (!newParent.children) newParent.children = []; newParent.children.push(moved); }
+                else { orgHistory.pop(); showAppToast("Could not reconnect this position.", "error"); closeOrgNodeModal(); return; }
+            }
+            saveOrgTreeData(); renderOrgChart(currentOrgCompany, true); showAppToast("Organization structure saved.", "info"); closeOrgNodeModal();
+        };
+        window.autoAlignOrgChart = function() {
+            if (!currentOrgTree) return; pushOrgHistory();
+            const normalize = (n) => { n.childLayout = 'horizontal'; (n.children || []).forEach(normalize); };
+            normalize(currentOrgTree); saveOrgTreeData(); renderOrgChart(currentOrgCompany, true); showAppToast("Chart aligned and connector lines refreshed.", "info");
+        };
+
         window.addOrgChild = function(pid) { pushOrgHistory(); let p = findOrgNodeById(currentOrgTree, pid); if (p) { if (!p.children) p.children = []; p.children.push({ nodeId: 'node_' + Math.random().toString(36).substr(2, 9), name: 'N/A', role: 'New Role', level: 'staff', childLayout: 'horizontal', children: [] }); saveOrgTreeData(); renderOrgChart(currentOrgCompany, true); } };
         window.deleteOrgNode = function(id) { if (currentOrgTree.nodeId === id) { showAppToast("Cannot delete root node.", "error"); return; } pushOrgHistory(); const rem = (n) => { if (n.children) { const i = n.children.findIndex(c => c.nodeId === id); if (i !== -1) { n.children.splice(i, 1); return true; } for (let c of n.children) { if (rem(c)) return true; } } return false; }; rem(currentOrgTree); saveOrgTreeData(); renderOrgChart(currentOrgCompany, true); };
         
@@ -2518,6 +3811,7 @@
         const getDates = (f, t) => { let arr=[], c=new Date(f); while(c<=t){arr.push(new Date(c)); c.setDate(c.getDate()+1);} return arr; };
         const gBg=(v)=>{let b='ffffff',c='000000'; if(v==='UP'||v==='H-UP')b='00ffff';else if(v==='A'||v==='H-A'){b='ff0000';c='ffffff';}else if(v==='L')b='bdd7ee';else if(v==="L'"){b='c00000';c='ffffff';}else if(v==='SL'||v==='H-SL')b='ffff00';else if(v==='AL'||v==='H-AL')b='c5e0b4';else if(v==='OT'){b='f4cccc';c='c00000';}else if(v==='SP'||v==='H-SP')b='ccc0da';else if(v==='D'||v==='H-D'){b='fce4d6';c='ff0000';}else if(v==='P')c='595959';else if(v==='SB')b='b4c6e7';else if(v==='H'){b='fce4d6';c='ff0000';}else if(v&&v.includes('/'))b='f8f9fa'; return `data-fill-color="${b}" data-f-color="${c}"`; };
         const dL=(cd,ds,b,c)=>`<td data-b-a-s="none"></td><td data-fill-color="${b}" data-f-color="${c}" data-f-bold="true" data-b-a-s="thin" data-a-h="center">${cd}</td><td colspan="3" data-b-a-s="none" data-f-sz="9">${ds}</td>`;
+
         window.downloadDailyTimesheetExcel=function(){
             const fV=document.getElementById('dailyFilterFrom')?.value, tV=document.getElementById('dailyFilterTo')?.value; if(!fV||!tV)return;
             let fD=new Date(fV); fD.setHours(0,0,0,0); let tD=new Date(tV); tD.setHours(23,59,59,999); if(fD>tD){let t=fD;fD=tD;tD=t;}
@@ -2554,13 +3848,15 @@
             if(!selectedCalendarDate){showAppToast("Select a date on calendar first.","error");return;}
             let mName=monthNames[currentCalendarDate.getMonth()], yr=currentCalendarDate.getFullYear(), dS=`${selectedCalendarDate}/${mName}/${yr}`, gD={}, cN=[];
             
+            // Loop through all employees to find ONLY those on leave
             allEmployees.forEach(e => {
                 if (e.status !== 'Active' || (selectedCalendarCompanies.length > 0 && !selectedCalendarCompanies.includes(e.company)) || window.isExcludedPosition(e.position)) return;
 
                 let r = dailyLeaveRecords.find(rec => rec.staffId === e.id && rec.month.toLowerCase().startsWith(mName.substring(0,3).toLowerCase()) && rec.day === selectedCalendarDate);
-                if (!r) return;
+                if (!r) return; // Completely present / no record
                 
                 let h = r.leaves;
+                // Skip if they only have OT (or are fully present) because they are functionally 'present' for reports
                 if(h.AL===0 && h.SL===0 && h.SP===0 && h.UP===0 && h.A===0 && h.Late5m===0 && h.Late3m===0 && h.D===0 && h.H===0 && !r.isRawD && !r.isRawH) return;
                 
                 if(activeLeaveFilter && h[activeLeaveFilter] <= 0) return;
@@ -2570,9 +3866,11 @@
                 gD[e.company].push({emp: e, h: h, n: cNote});
             });
 
+            // Ensure all selected companies are processed, even if they have 0 leaves (like LPT)
             cN = selectedCalendarCompanies.length > 0 ? [...selectedCalendarCompanies].sort() : Array.from(companies).sort();
             if(cN.length === 0){showAppToast("No companies to export.");return;}
             
+            // Group LPH and LPL together
             let reportGroups = {};
             cN.forEach(c => {
                 let gName = (c === 'LPH' || c === 'LPL') ? 'LPH & LPL' : c;
@@ -2588,7 +3886,7 @@
                 let groupComps = reportGroups[gName];
                 let compEntities = [...new Set(allEmployees.filter(e => groupComps.includes(e.company) && e.status === 'Active' && !window.isExcludedPosition(e.position)).map(e => e.entity))].sort();
 
-                if (compEntities.length === 0) return;
+                if (compEntities.length === 0) return; // Skip if group has no active valid entities
 
                 if (!isFirstCompany) h += `<tr><td colspan="5" data-b-a-s="none"></td></tr>`;
                 isFirstCompany = false;
@@ -2618,6 +3916,7 @@
                             h += `<td data-t="s" data-b-a-s="thin" data-a-h="left">${i.emp.name}</td><td data-t="s" data-a-h="center" data-b-a-s="thin">${typeStr}</td><td data-t="s" data-a-h="center" data-b-a-s="thin">${noteStr}</td></tr>`;
                         });
                     } else {
+                        // Output a completely blank placeholder row for entity with 0 leaves
                         h += `<tr><td data-t="s" data-a-h="center" data-b-a-s="thin"></td><td data-t="s" data-a-h="center" data-a-v="middle" data-b-a-s="thin">${ent}</td><td data-t="s" data-b-a-s="thin" data-a-h="left"></td><td data-t="s" data-a-h="center" data-b-a-s="thin"></td><td data-t="s" data-a-h="center" data-b-a-s="thin"></td></tr>`;
                     }
                 });
@@ -2639,7 +3938,7 @@
                     if(h.AL===0 && h.SL===0 && h.SP===0 && h.UP===0 && h.A===0 && h.Late5m===0 && h.Late3m===0 && h.D===0 && !r.isRawD) return;
                     if(h.AL===0.5)t.push(isM?'AL':'H-AL');else if(h.AL>0)t.push('AL'); if(h.SL===0.5)t.push(isM?'SL':'H-SL');else if(h.SL>0)t.push('SL'); if(h.SP===0.5)t.push(isM?'SP':'H-SP');else if(h.SP>0)t.push('SP'); if(h.UP===0.5)t.push(isM?'UP':'H-UP');else if(h.UP>0)t.push('UP'); if(h.A===0.5)t.push(isM?'A':'H-A');else if(h.A>0)t.push('A'); if(h.Late5m>0)t.push('L(>5m)'); if(h.Late3m>0)t.push("L'(>30m)"); if(h.D===0.5)t.push(isM?'D':'H-D');else if(h.D>0)t.push('D'); if(t.length===0)return; 
                     let cNote = customNotes[`${e.id}_${r.month}_${r.day}_${yr}`] || r.note;
-                    eD.push({e:e, d:rd.toLocaleDateString('en-GB'), t:t.join(', '), n:cNote||''});}
+                    eD.push({e:e, d:rd.toLocaleDateString('en-GB'), t:t.join(', '), n:cNote||""});}
             }); if(eD.length===0){showAppToast("No data for range.","error");return;}
             eD.sort((a,b)=>{if(a.e.company!==b.e.company)return a.e.company.localeCompare(b.e.company);return a.e.name.localeCompare(b.e.name);});
             eD.forEach(x=>cS+=`"${x.e.company}",${x.e.displayId},"${x.e.name.replace(/"/g,'""')}","${x.e.department}","${x.e.position}",${x.d},"${x.t}","${x.n.replace(/"/g,'""')}"\n`);
@@ -2717,7 +4016,25 @@
             
             let bgC={'ITC':'dae3f3', 'LPH':'e2efda', 'LPT':'dae3f3', 'LPL':'dae3f3', 'TTC':'ffffff'}, cnt=1, cComp='';
             let cS = selectedDailyCompanies.length === 1 ? selectedDailyCompanies[0] + "-" : "";
-            let h=`<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"><style>table{border-collapse:collapse;font-family:Arial;font-size:10pt;}th,td{border:1px solid #000;padding:4px;}</style></head><body><table id="exPaid" data-cols-width="5,15,30,25,12,10,10,10"><tr><td colspan="8" data-f-sz="14" data-f-color="c00000" data-f-bold="true" data-a-h="center" data-b-a-s="none">${cS}Monthly Leave Report (${titleStr})</td></tr><tr><td colspan="5" data-b-a-s="none"></td><td data-t="n" data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${tS}</td><td data-t="n" data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${tA}</td><td data-t="n" data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${tSp}</td></tr><tr><th data-fill-color="92d050" data-b-a-s="thin">No.</th><th data-fill-color="92d050" data-b-a-s="thin">Emp-ID</th><th data-fill-color="92d050" data-b-a-s="thin">Name</th><th data-fill-color="92d050" data-b-a-s="thin">Department</th><th data-fill-color="92d050" data-b-a-s="thin">Company</th><th data-fill-color="ffff00" data-f-bold="true" data-b-a-s="thin">SL</th><th data-fill-color="ffff00" data-f-bold="true" data-b-a-s="thin">AL</th><th data-fill-color="ffff00" data-f-bold="true" data-b-a-s="thin">SP</th></tr>`;
+            let h=`<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"><style>table{border-collapse:collapse;font-family:Arial;font-size:10pt;}th,td{border:1px solid #000;padding:4px;}
+        /* Org Chart relationship editor — consistent alignment and connector visibility */
+        #orgView .org-tree { padding: 8px 18px 40px; }
+        #orgView .org-tree ul { align-items: flex-start; }
+        #orgView .org-tree li { padding-left: 7px; padding-right: 7px; min-width: 96px; }
+        #orgView .org-tree li > div { min-width: 88px; }
+        #orgView .org-tree li::before,
+        #orgView .org-tree li::after,
+        #orgView .org-tree ul ul::before { border-color: #94a3b8; }
+        #orgView .org-tree ul.vertical-stack > li::after,
+        #orgView .org-tree ul.vertical-stack::before { border-color: #94a3b8; }
+        #orgView .org-node-draggable { border-radius: 10px; }
+        #orgView .org-node-draggable:hover { box-shadow: 0 4px 14px rgba(15,23,42,.12); }
+        @media (max-width: 700px) {
+            #orgView .org-tree li { padding-left: 3px; padding-right: 3px; min-width: 76px; }
+            #orgView .org-tree li > div { min-width: 70px; }
+        }
+
+</style></head><body><table id="exPaid" data-cols-width="5,15,30,25,12,10,10,10"><tr><td colspan="8" data-f-sz="14" data-f-color="c00000" data-f-bold="true" data-a-h="center" data-b-a-s="none">${cS}Monthly Leave Report (${titleStr})</td></tr><tr><td colspan="5" data-b-a-s="none"></td><td data-t="n" data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${tS}</td><td data-t="n" data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${tA}</td><td data-t="n" data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${tSp}</td></tr><tr><th data-fill-color="92d050" data-b-a-s="thin">No.</th><th data-fill-color="92d050" data-b-a-s="thin">Emp-ID</th><th data-fill-color="92d050" data-b-a-s="thin">Name</th><th data-fill-color="92d050" data-b-a-s="thin">Department</th><th data-fill-color="92d050" data-b-a-s="thin">Company</th><th data-fill-color="ffff00" data-f-bold="true" data-b-a-s="thin">SL</th><th data-fill-color="ffff00" data-f-bold="true" data-b-a-s="thin">AL</th><th data-fill-color="ffff00" data-f-bold="true" data-b-a-s="thin">SP</th></tr>`;
             
             eD.forEach(r=>{ 
                 let b=bgC[r.e.company] || 'ffffff'; 
@@ -2735,12 +4052,14 @@
             
             let allRecs = {};
             
+            // Loop to populate ALL active employees for exact ID matching
             allEmployees.forEach(e => {
                 if(e.status !== 'Active' || window.isExcludedPosition(e.position)) return;
                 if(selectedDailyCompanies.length > 0 && !selectedDailyCompanies.includes(e.company)) return;
                 allRecs[e.displayId.toUpperCase()] = { e: e, al: 0, sl: 0, sp: 0, up: 0, a: 0, l5: 0, l3: 0, ot: 0, d: 0 };
             });
 
+            // Aggregate Leaves for the selected date range
             dailyLeaveRecords.forEach(r => {
                 let rd = new Date(`${r.month} ${r.day}, ${fD.getFullYear()}`); rd.setHours(12, 0, 0, 0);
                 if (rd >= fD && rd <= tD) {
@@ -2760,16 +4079,27 @@
                 }
             });
 
+            // Exact custom groups based on user's reference image
             const blocksDef = [
+                // Group 1
                 [ { id: "ITC-030", bg: "e2efda" }, { id: "ITC-004", bg: "e2efda" }, { id: "ITC-037", bg: "e2efda" }, { id: "ITC-044", bg: "e2efda" } ],
+                // Group 2
                 [ { id: "LPT-001", bg: "8ea9db" }, { id: "LPT-002", bg: "8ea9db" }, { id: "LPT-003", bg: "8ea9db" }, { id: "LPT-004", bg: "8ea9db" }, { id: "LPT-005", bg: "8ea9db" } ],
+                // Group 3
                 [ { id: "ITC-032", bg: "e2efda" }, { id: "ITC-018", bg: "e2efda" }, { id: "ITC-006", bg: "e2efda" }, { id: "ITC-020", bg: "e2efda" }, { id: "ITC-026", bg: "e2efda" }, { id: "ITC-003", bg: "e2efda" }, { id: "ITC-036", bg: "e2efda" }, { id: "ITC-046", bg: "e2efda" } ],
+                // Group 4
                 [ { id: "ITC-010", bg: "f4cccc" }, { id: "ITC-019", bg: "f4cccc" }, { id: "ITC-011", bg: "f4cccc" }, { id: "ITC-014", bg: "f4cccc" }, { id: "ITC-029", bg: "f4cccc" } ],
+                // Group 5
                 [ { id: "ITC-012", bg: "fce4d6" }, { id: "ITC-007", bg: "fce4d6" }, { id: "ITC-008", bg: "fce4d6" }, { id: "ITC-021", bg: "fce4d6" }, { id: "ITC-025", bg: "fce4d6" } ],
+                // Group 6
                 [ { id: "ITC-001", bg: "fff2cc" }, { id: "ITC-016", bg: "fff2cc" }, { id: "ITC-017", bg: "fff2cc" }, { id: "ITC-005", bg: "fff2cc" }, { id: "ITC-009", bg: "fff2cc" }, { id: "ITC-013", bg: "fff2cc" }, { id: "ITC-024", bg: "fff2cc" }, { id: "ITC-028", bg: "fff2cc" }, { id: "ITC-034", bg: "fff2cc" } ],
+                // Group 7
                 [ { id: "LPH-007", bg: "e2efda" }, { id: "LPH-031", bg: "e2efda" }, { id: "LPH-038", bg: "e2efda" }, { id: "LPH-012", bg: "e2efda" }, { id: "LPH-008", bg: "e2efda" }, { id: "LPH-014", bg: "e2efda" }, { id: "LPH-004", bg: "e2efda" }, { id: "LPH-023", bg: "e2efda" }, { id: "LPH-010", bg: "ffe699" }, { id: "LPH-019", bg: "ffe699" }, { id: "LPH-021", bg: "ffe699" }, { id: "LPH-003", bg: "d9e1f2" }, { id: "LPH-009", bg: "d9e1f2" }, { id: "LPH-020", bg: "d9e1f2" } ],
+                // Group 8
                 [ { id: "LPH-006", bg: "d9e1f2" }, { id: "LPH-022", bg: "ffe699" }, { id: "LPH-028", bg: "ffe699" }, { id: "LPH-005", bg: "d9e1f2" }, { id: "LPH-024", bg: "d9e1f2" }, { id: "LPH-025", bg: "d9e1f2" }, { id: "LPH-002", bg: "d9e1f2" }, { id: "LPH-013", bg: "d9e1f2" }, { id: "LPH-015", bg: "d9e1f2" }, { id: "LPH-016", bg: "d9e1f2" }, { id: "LPH-030", bg: "d9e1f2" }, { id: "LPH-026", bg: "d9e1f2" }, { id: "LPH-032", bg: "d9e1f2" }, { id: "LPH-035", bg: "d9e1f2" } ],
+                // Group 9
                 [ { id: "TTC-007", bg: "e2efda" }, { id: "TTC-011", bg: "e2efda" }, { id: "TTC-003", bg: "e2efda" }, { id: "TTC-010", bg: "e2efda" }, { id: "TTC-006", bg: "e2efda" }, { id: "TTC-008", bg: "e2efda" }, { id: "TTC-009", bg: "e2efda" }, { id: "TTC-012", bg: "e2efda" }, { id: "TTC-017", bg: "e2efda" }, { id: "TTC-018", bg: "e2efda" }, { id: "TTC-019", bg: "e2efda" }, { id: "TTC-020", bg: "e2efda" }, { id: "TTC-022", bg: "e2efda" }, { id: "TTC-023", bg: "e2efda" }, { id: "TTC-026", bg: "e2efda" }, { id: "TTC-027", bg: "e2efda" }, { id: "TTC-028", bg: "e2efda" }, { id: "TTC-032", bg: "e2efda" }, { id: "TTC-015", bg: "e2efda" }, { id: "TTC-021", bg: "e2efda" }, { id: "TTC-024", bg: "e2efda" } ],
+                // Group 10
                 [ { id: "TTC-001", bg: "c5e0b4" }, { id: "TTC-004", bg: "c5e0b4" }, { id: "TTC-016", bg: "c5e0b4" }, { id: "TTC-029", bg: "c5e0b4" }, { id: "TTC-002", bg: "c5e0b4" }, { id: "TTC-033", bg: "c5e0b4" } ]
             ];
 
@@ -2803,6 +4133,7 @@
 
             if (orderedBlocks.length === 0) { showAppToast("No payroll data for selected companies.", "error"); return; }
 
+            // Core Table Generator Function dynamically handling sheet layout
             const generateTableHTML = (blocksOfRows, tableId, sheetType) => {
                 let tUP=0, tA=0, tL=0, tL30=0, tSL=0, tAL=0, tOT=0, tSP=0;
                 let flatOTRows = [];
@@ -2958,6 +4289,8 @@
             let tmpDiv = document.createElement('div');
             tmpDiv.style.display = 'none';
             
+            // To exactly match the provided screenshot, we use the unfiltered orderedBlocks for all tabs.
+            // This maintains perfect row parity and grouping IDs across Master, Unpaid, and OT tabs.
             tmpDiv.innerHTML = generateTableHTML(orderedBlocks, "masterTable", "master") + 
                                generateTableHTML(orderedBlocks, "unpaidTable", "unpaid") + 
                                generateTableHTML(orderedBlocks, "otTable", "ot");
@@ -2981,6 +4314,7 @@
             }
         };
     </script>
+
     <!-- Scan Activity Tab script -->
     <script>
   const SPREADSHEET_ID = '1fKqAOUV7RRliQ7FtWJGqq6JZ1FlK-TTH7sVM_pJm3-4';
@@ -3149,6 +4483,7 @@
       let sundayIsRotatingD = false;
       daysMap.forEach(d => {
         const cellVal = row[d.colIdx] || '';
+        // "Rotating D" on Sunday follows the employee's weekday working hours.
         if (d.dayNum === 0 && /^rotating\s*d\b/i.test(String(cellVal).trim())) {
           sundayIsRotatingD = true;
         }
@@ -3174,10 +4509,12 @@
         position: (row[positionIdx] || '').trim(),
         shiftType: shiftType,
         dailySchedule: dailySchedule,
+        // Master_Employee column O (15th column) is the Scan Policy.
         scanPolicy: (row[14] || '').trim()
       });
     }
 
+    // Attach staff photos from the same photo source used by the other dashboard tabs.
     if (photoRows && photoRows.length) {
       const normalizePhotoName = (v) => String(v || '').replace(/(Mr\.|Ms\.|Mrs\.)\s*/gi, '').replace(/\s+/g, '').toLowerCase();
       const photoRecords = [];
@@ -3230,22 +4567,30 @@
       return { morningIn, lunchOut, lunchIn, eveningOut };
     }
 
-    const LUNCH_WINDOW_START = 600;
-    const LUNCH_WINDOW_END = 840;
+    const LUNCH_WINDOW_START = 600; // 10:00 AM
+    const LUNCH_WINDOW_END = 840;   // 2:00 PM
 
+    // Keep only the earliest scan in the morning window (< 10:00 AM) and ignore any subsequent morning scans
     const morningScans = sorted.filter(s => s.mins < LUNCH_WINDOW_START);
     const postMorningScans = sorted.filter(s => s.mins >= LUNCH_WINDOW_START);
 
     let filteredScans = [];
     if (morningScans.length > 0) {
-      morningIn = morningScans[0].original;
-      filteredScans = [morningScans[0], ...postMorningScans];
+      morningIn = morningScans[0].original; // Take only the earliest morning scan
+      filteredScans = [morningScans[0], ...postMorningScans]; // Ignore rest of morning scans
     } else {
       filteredScans = [...sorted];
     }
 
-    const lateStartStaff = targetMorningMins >= 720;
+    const lateStartStaff = targetMorningMins >= 720; // 12:00 PM or later
 
+    // Half-day leave covering the morning means the employee works only the
+    // afternoon. Their first afternoon scan is their work-start "In" scan,
+    // and it belongs in Lunch In even when their normal scan policy is 4X.
+    // This also applies to late-start / part-time staff.
+    // Half-day leave covering the afternoon means the employee works only the
+    // morning. Their first scan is Morning In and their second scan is Lunch Out,
+    // even when their normal scan policy would not require a Lunch Out.
     if (forceMorningHalfDay) {
       morningIn = sorted[0]?.original || '';
       lunchOut = sorted[1]?.original || '';
@@ -3270,6 +4615,7 @@
         eveningOut = filteredScans[filteredScans.length - 1].original;
       }
     } else {
+      // 4X Shift
       if (!morningIn && filteredScans.length > 0 && filteredScans[0].mins < 660) {
         morningIn = filteredScans[0].original;
       }
@@ -3395,6 +4741,13 @@
     return html;
   }
 
+
+  // Look up a leave / day-off / holiday type for a staff member on a given
+  // date, using the Daily Attendance tab's live data (dailyLeaveRecords) from
+  // the main dashboard script. Returns '' if nothing is found.
+  // Return the Daily Attendance code for this employee/date using the same
+  // precedence and half-day rules used by the Daily Attendance export.
+  // This MUST be checked before Scan Activity falls back to P.
   function getDailyAttendanceCode(staffId, dateStr) {
     try {
       if (typeof dailyLeaveRecords === 'undefined' || !dailyLeaveRecords || !dailyLeaveRecords.length) return '';
@@ -3448,10 +4801,20 @@
       else if (l.H > 0) codes.push('H');
 
       if (codes.length > 1) {
+        // Keep H- on a half-day leave when it is combined with lateness, e.g.
+        // L/H-UP. For multiple leave types without lateness, keep the existing
+        // Daily Attendance normalization (SL/AL, etc.).
+        if (l.Late5m > 0 || l.Late3m > 0) {
+          return [...new Set(codes.map(x => {
+            const isHalfDayLeave = /^H-(?:AL|SL|SP|UP|A|D|OT)$/.test(x);
+            return isHalfDayLeave ? x : x.replace(/^H-/, '');
+          }))].join('/');
+        }
         return [...new Set(codes.map(x => x.replace(/^H-/, '')))].join('/');
       }
       if (codes.length === 1) return codes[0];
 
+      // A Daily Attendance row marked present with no leave/lateness remains P.
       return rec.isPresent ? 'P' : '';
     } catch (err) {
       console.error('Daily Attendance code lookup failed:', err);
@@ -3459,6 +4822,8 @@
     }
   }
 
+  // Check the raw Daily Attendance record so H- is still recognized even
+  // when multiple leave types are combined into a single Status value.
   function hasHalfDayLeaveForDate(staffId, dateStr) {
     try {
       if (typeof dailyLeaveRecords === 'undefined' || !dailyLeaveRecords || !dateStr) return false;
@@ -3485,10 +4850,17 @@
     }
   }
 
+  // Backward-compatible helper retained for any existing callers.
+  function getScanLeaveLabel(staffId, dateStr) {
+    return getDailyAttendanceCode(staffId, dateStr);
+  }
+
   function renderDashboard(staffList) {
     const tbody = document.getElementById('attendanceTable');
     tbody.innerHTML = '';
 
+    // Default: only employees whose Master_Employee column O says Required.
+    // Show All reveals the complete active staff list.
     const displayStaffList = (showAllScanStaff
       ? staffList
       : staffList.filter(staff => normalizeScanPolicy(staff.scanPolicy) === 'required'))
@@ -3504,6 +4876,9 @@
       const isPartTime = positionText.includes('part time') || positionText.includes('part-time');
       const startMins = staff.targetMorningMins || 480;
 
+      // Any Daily Attendance code beginning with H- is a half-day leave.
+      // When the employee works the afternoon half, their first afternoon scan
+      // is treated as the first work-start scan and displayed in Lunch In.
       const dailyAttendanceCode = getDailyAttendanceCode(
         staff.id,
         document.getElementById('dateSelect').value
@@ -3520,8 +4895,8 @@
         .filter(mins => mins !== null)
         .sort((a, b) => a - b);
 
-      const forceMorningHalfDay = isHalfDayLeave && sortedScanMins.length > 0 && sortedScanMins[0] <= 486;
-      const forceAfternoonFirstScan = isHalfDayLeave && sortedScanMins.some(mins => mins >= 720 && mins <= 786);
+      const forceMorningHalfDay = isHalfDayLeave && sortedScanMins.length > 0 && sortedScanMins[0] <= 486; // 8:06 AM
+      const forceAfternoonFirstScan = isHalfDayLeave && sortedScanMins.some(mins => mins >= 720 && mins <= 786); // 1:06 PM
 
       const { morningIn, lunchOut, lunchIn, eveningOut } = organizeScans(
         staff.scans, 
@@ -3531,7 +4906,12 @@
         forceMorningHalfDay
       );
 
+      // Daily Attendance is checked first so leave status controls how scans
+      // are interpreted and displayed.
+
       const hasLeaveCode = !!dailyAttendanceCode && dailyAttendanceCode !== 'P';
+      // Staff whose scheduled work starts at noon or later do not have a
+      // Morning In requirement. Their first applicable scan belongs in Lunch In.
       const lateStartStaff = (staff.shiftType === '2X' && startMins >= 720) || isPartTime;
 
       let mStatus = (hasLeaveCode || lateStartStaff || forceAfternoonFirstScan) ? '' : (forceMorningHalfDay ? 'NOT SCANNED' : 'NOT SCANNED');
@@ -3540,6 +4920,7 @@
       let eStatus = (hasLeaveCode || forceMorningHalfDay) ? '' : 'NOT SCANNED';
       let dailyCode = dailyAttendanceCode || '';
 
+      // Morning In Status (Before or at 8:06 AM -> ON TIME)
       const mInMins = parseTimeToMinutes(morningIn);
       if (morningIn && mInMins !== null) {
         if (forceMorningHalfDay && mInMins <= 486) {
@@ -3553,6 +4934,17 @@
         }
       }
 
+      // If the employee was late in the morning and also has a half-day leave,
+      // keep both statuses in Scan Activity (e.g. L/H-UP).
+      if ((mStatus === 'Late' || mStatus === 'Late (30+)') && dailyCode) {
+        const parts = String(dailyCode).split('/').map(v => v.trim()).filter(Boolean);
+        const hasHalfDayLeave = parts.some(code => /^H-(?:AL|SL|SP|UP|A|D|OT)$/.test(code));
+        if (hasHalfDayLeave && !parts.includes('L') && !parts.includes("L'")) {
+          dailyCode = ['L', ...parts].join('/');
+        }
+      }
+
+      // Lunch Out Status (4X only)
       if (staff.shiftType !== '2X' && lunchOut) {
         const lOutMins = parseTimeToMinutes(lunchOut);
         if (lOutMins !== null) {
@@ -3564,10 +4956,17 @@
         }
       }
 
+      // Lunch In Status
+      // 4X uses the normal 12:30 PM lunch-return thresholds.
+      // For late-start 2X staff (start at noon or later), the special first
+      // scan is stored in Lunch In and follows the employee's start-time rule.
       if (lunchIn) {
         const lInMins = parseTimeToMinutes(lunchIn);
         if (lInMins !== null) {
           if (forceAfternoonFirstScan) {
+            // Any H- half-day leave with an afternoon first scan at or before
+            // 1:06 PM is considered the employee's on-time work start,
+            // regardless of their normal morning schedule.
             lInStatus = 'ON TIME';
           } else if (lateStartStaff) {
             if (lInMins <= startMins + 6) {
@@ -3589,8 +4988,13 @@
         }
       }
 
+      // Evening Out Status
       const eOutMins = parseTimeToMinutes(eveningOut);
       if (eveningOut && eOutMins !== null) {
+        // For 2X staff who take a half-day leave, a valid morning scan
+        // satisfies the working half of the day. Therefore the second scan
+        // must not be labelled Early, because the remaining half is covered
+        // by leave.
         const halfDayLeaveCodes = String(dailyCode || '')
           .split('/')
           .map(v => v.trim());
@@ -3610,6 +5014,8 @@
         }
       }
 
+      // Fall back to P only when Daily Attendance has no code for the date.
+      // This prevents a leave day from ever being overwritten by a scan.
       if (!dailyCode && (morningIn || eveningOut || lunchOut || lunchIn)) {
         dailyCode = 'P';
       }
@@ -3661,6 +5067,8 @@
       const firstCode = String(dailyCode || '').split('/')[0].trim();
       const rowColors = rowColorMap[firstCode];
       const tr = document.createElement('tr');
+      // Store Scan Activity details on the row so the status popup can show
+      // the relevant leave type, missed scheduled time, or actual scan time.
       tr.dataset.leaveType = dailyCode || '';
       const h = Math.floor(startMins / 60);
       const m = startMins % 60;
@@ -3695,7 +5103,7 @@
         <td>
           <div class="staff-cell-wrap">
             ${staff.photoUrl
-              ? `<img src="${staff.photoUrl}" class="staff-photo" alt="${staff.name || 'Staff'}" loading="eager" decoding="async" referrerpolicy="no-referrer" data-photo-fallback="${String(staff.photoFallbackUrl || '').replace(/"/g, '&quot;')}" onclick="event.stopPropagation(); openImagePreview('${String(staff.photoUrl).replace(/'/g, "\\x27")}')" onerror="if(this.dataset.photoFallback && this.src !== this.dataset.photoFallback){this.src=this.dataset.photoFallback;}else{this.style.display='none';this.nextElementSibling?.classList.remove('hidden');}">`
+              ? `<img src="${staff.photoUrl}" class="staff-photo" alt="${staff.name || 'Staff'}" loading="eager" decoding="async" referrerpolicy="no-referrer" data-photo-fallback="${String(staff.photoFallbackUrl || '').replace(/"/g, '&quot;')}" onclick="event.stopPropagation(); openImagePreview('${String(staff.photoUrl).replace(/'/g, "\\'")}')" onerror="if(this.dataset.photoFallback && this.src !== this.dataset.photoFallback){this.src=this.dataset.photoFallback;}else{this.style.display='none';this.nextElementSibling?.classList.remove('hidden');}">`
               : `<div class="staff-photo-placeholder">${String(staff.name || '?').trim().charAt(0).toUpperCase()}</div>`}
             <div class="min-w-0">
               <div class="staff-name-main">${staff.name}</div>
@@ -3709,6 +5117,7 @@
         <td>${renderScanCell(lunchIn, lInStatus, getBranchForTime(lunchIn))}</td>
         <td>${renderScanCell(eveningOut, eStatus, getBranchForTime(eveningOut))}</td>
       `;
+      // Click a row to open this staff member's profile (same modal as Dashboard View).
       tr.addEventListener('click', function () {
         const normId = (typeof normalizeId === 'function')
           ? normalizeId(staff.id)
@@ -3787,6 +5196,7 @@
           }
         } else if (j === 1) {
           const codeBadges = cells[1] ? Array.from(cells[1].querySelectorAll('.code-badge')).map(b => b.textContent.trim().toLowerCase()) : [];
+          // Daily Code filtering is exact: selecting P must not include SP/UP/etc.
           if (!codeBadges.includes(filterVal)) {
             isMatch = false;
             break;
@@ -3809,6 +5219,8 @@
         const dailyCodes = cells[1] ? Array.from(cells[1].querySelectorAll('.code-badge')).map(b => b.textContent.trim()) : [];
         const primaryCode = dailyCodes[0] || '';
 
+        // Count as Present when the Daily Code is P OR when the staff has
+        // scanned at least once, even if their Daily Code is another code.
         const hasAnyScan = [2, 3, 4, 5].some(idx => {
           const cell = cells[idx];
           return !!(cell && cell.querySelector('.scan-time-val'));
@@ -3834,6 +5246,7 @@
     document.getElementById('cntLate5').innerText = cntLate5;
     document.getElementById('cntLate30').innerText = cntLate30;
   }
+
 
   function openScanStatusPanel(status) {
     const labels = { leave: 'On Leave', notScanned: 'Not Scanned', late: 'Late', late30: 'Late 30+' };
@@ -3862,7 +5275,7 @@
       const meta = staff.querySelector('.staff-meta-line')?.textContent || '';
       const initial = name.trim().charAt(0).toUpperCase();
       const id = meta.split('•')[0].trim();
-      const safeId = String(id).replace(/'/g, "\\x27");
+      const safeId = String(id).replace(/'/g, "\\'");
       const codes = Array.from(cells[1]?.querySelectorAll('.code-badge') || []).map(b => b.textContent.trim());
       const leaveType = row.dataset.leaveType || codes.join(' / ') || '-';
       const missedTime = row.dataset.primaryTarget || row.dataset.morningTarget || '-';
@@ -3901,17 +5314,5 @@
   fetchLiveData();
   setInterval(fetchLiveData, 30000);
 </script>
-
-<!-- Progressive Web App (PWA) Service Worker Registration -->
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js').catch(err => {
-        console.log('Service Worker registration failed:', err);
-      });
-    });
-  }
-</script>
-
 </body>
 </html>
