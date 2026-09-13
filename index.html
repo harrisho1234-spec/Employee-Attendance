@@ -2079,6 +2079,72 @@
         }
 
 
+        /* Editable staff warning status */
+        .staff-warning-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 7px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            border: 1px solid transparent;
+            font-size: 8px;
+            line-height: 1;
+            font-weight: 800;
+            cursor: pointer;
+            transition: transform .15s ease, box-shadow .15s ease;
+        }
+        .staff-warning-badge:hover { transform: translateY(-1px); box-shadow: 0 2px 6px rgba(15,23,42,.08); }
+        .staff-warning-badge.warning-normal { background:#ecfdf5; color:#047857; border-color:#a7f3d0; }
+        .staff-warning-badge.warning-verbal { background:#fefce8; color:#a16207; border-color:#fde68a; }
+        .staff-warning-badge.warning-written { background:#fff7ed; color:#c2410c; border-color:#fdba74; }
+        .staff-warning-badge.warning-final { background:#fef2f2; color:#b91c1c; border-color:#fca5a5; }
+        .mobile-attention-badge.warning-verbal { background:#fefce8; color:#a16207; border-color:#fde68a; }
+        .mobile-attention-badge.warning-written { background:#fff7ed; color:#c2410c; border-color:#fdba74; }
+        .mobile-attention-badge.warning-final { background:#fef2f2; color:#b91c1c; border-color:#fca5a5; }
+        .staff-warning-count { display:inline-flex; align-items:center; gap:3px; margin-left:5px; font-size:9px; font-weight:800; color:#64748b; background:#f8fafc; border:1px solid #e2e8f0; border-radius:999px; padding:2px 6px; vertical-align:middle; }
+
+        /* Subtle warning-level tint around Dashboard staff cards */
+        .mobile-staff-card.staff-warning-card-verbal {
+            border-color:#fde68a !important;
+            background:linear-gradient(135deg, rgba(254,252,232,.72) 0%, #fff 34%);
+            box-shadow:0 0 0 1px rgba(234,179,8,.08), 0 4px 14px rgba(161,98,7,.06);
+        }
+        .mobile-staff-card.staff-warning-card-written {
+            border-color:#fdba74 !important;
+            background:linear-gradient(135deg, rgba(255,247,237,.78) 0%, #fff 34%);
+            box-shadow:0 0 0 1px rgba(249,115,22,.08), 0 4px 14px rgba(194,65,12,.07);
+        }
+        .mobile-staff-card.staff-warning-card-final {
+            border-color:#fca5a5 !important;
+            background:linear-gradient(135deg, rgba(254,242,242,.82) 0%, #fff 34%);
+            box-shadow:0 0 0 1px rgba(239,68,68,.09), 0 4px 15px rgba(185,28,28,.08);
+        }
+        .mobile-staff-card.staff-warning-card-verbal:hover { border-color:#facc15 !important; }
+        .mobile-staff-card.staff-warning-card-written:hover { border-color:#fb923c !important; }
+        .mobile-staff-card.staff-warning-card-final:hover { border-color:#f87171 !important; }
+        .warning-history-list { display:flex; flex-direction:column; gap:8px; max-height:230px; overflow:auto; padding-right:2px; }
+        .warning-history-item { position:relative; border:1px solid #e2e8f0; border-radius:12px; padding:10px 11px 10px 14px; background:#fff; }
+        .warning-history-item::before { content:''; position:absolute; left:0; top:10px; bottom:10px; width:3px; border-radius:0 4px 4px 0; background:#94a3b8; }
+        .warning-history-item.verbal::before { background:#eab308; }
+        .warning-history-item.written::before { background:#f97316; }
+        .warning-history-item.final::before { background:#ef4444; }
+        .warning-history-stage { display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:11px; font-weight:800; color:#0f172a; }
+        .warning-history-period { margin-top:3px; font-size:9px; color:#64748b; font-weight:600; }
+        .warning-history-note { margin-top:6px; font-size:10px; line-height:1.45; color:#334155; background:#f8fafc; border-radius:8px; padding:6px 8px; white-space:pre-wrap; }
+        /* Cross-tab warning indicators: subtle and consistent with Dashboard warning colors. */
+        .warning-inline-indicator { display:inline-flex; align-items:center; justify-content:center; gap:3px; min-width:16px; height:16px; padding:0 5px; border-radius:999px; border:1px solid transparent; font-size:8px; font-weight:800; line-height:1; vertical-align:middle; cursor:pointer; white-space:nowrap; box-shadow:0 1px 2px rgba(15,23,42,.04); }
+        .warning-inline-indicator i { font-size:7px; }
+        .warning-inline-indicator.warning-verbal { background:#fefce8; color:#a16207; border-color:#fde68a; }
+        .warning-inline-indicator.warning-written { background:#fff7ed; color:#c2410c; border-color:#fdba74; }
+        .warning-inline-indicator.warning-final { background:#fef2f2; color:#b91c1c; border-color:#fca5a5; }
+        .warning-dot-indicator { position:absolute; top:-3px; right:-4px; width:12px; height:12px; border-radius:999px; border:2px solid #fff; box-shadow:0 1px 3px rgba(15,23,42,.18); cursor:pointer; z-index:20; }
+        .warning-dot-indicator.warning-verbal { background:#eab308; }
+        .warning-dot-indicator.warning-written { background:#f97316; }
+        .warning-dot-indicator.warning-final { background:#ef4444; }
+        .staff-card-export-btn { display:inline-flex; align-items:center; gap:4px; border:1px solid #dbe3ec; background:#fff; color:#475569; border-radius:8px; padding:4px 7px; font-size:9px; line-height:1; font-weight:800; cursor:pointer; transition:.15s ease; }
+        .staff-card-export-btn:hover { background:#eff6ff; color:#2563eb; border-color:#bfdbfe; }
+
         /* Detailed staff-card metrics: shared mobile + desktop */
         .mobile-staff-leave-panel {
             margin-top: 9px;
@@ -2164,6 +2230,12 @@
             .mobile-staff-attendance-metric span { font-size: 8px; }
             .mobile-staff-attendance-metric strong { font-size: 12px; }
         }
+
+        /* Notice-period / future resignation indicator */
+        .notice-period-badge { display:inline-flex; align-items:center; gap:5px; padding:4px 8px; border-radius:999px; border:1px solid #fde68a; background:#fffbeb; color:#92400e; font-size:10px; font-weight:800; line-height:1; white-space:nowrap; box-shadow:0 1px 2px rgba(146,64,14,.05); }
+        .notice-period-badge.compact { padding:3px 6px; font-size:9px; }
+        .mobile-staff-last-day { margin-top:4px; font-size:9px; line-height:1.2; font-weight:700; color:#92400e; display:flex; align-items:center; gap:4px; }
+        .mobile-staff-card:has(.notice-period-badge) { border-color:#fde68a; box-shadow:0 1px 3px rgba(146,64,14,.06), inset 0 0 0 1px rgba(254,243,199,.45); }
 </style>
 </head>
 <body class="text-slate-800 h-screen flex flex-col" data-active-tab="daily">
@@ -2384,8 +2456,19 @@
                             <div id="mobileDashboardCompanyChecks" class="mobile-filter-check-grid"></div>
                         </div>
                         <div class="mobile-filter-group">
-                            <label class="mobile-filter-label" for="mobileDashboardDepartment">Department</label>
-                            <select id="mobileDashboardDepartment" class="mobile-filter-select" onchange="mobileDashboardSetDepartment(this.value)"></select>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="mobile-filter-label !mb-0">Department</span>
+                                <label class="text-[10px] font-semibold text-blue-600 flex items-center gap-1.5">
+                                    <input id="mobileDashAllDepartments" type="checkbox" class="rounded" onchange="mobileDashboardSelectAllDepartments(this.checked)"> All
+                                </label>
+                            </div>
+                            <button type="button" id="mobileDashboardDepartmentBtn" class="mobile-filter-select flex items-center justify-between text-left" onclick="toggleMobileDashboardDepartmentMenu()">
+                                <span id="mobileDashboardDepartmentLabel" class="truncate">All Departments</span>
+                                <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 ml-2"></i>
+                            </button>
+                            <div id="mobileDashboardDepartmentMenu" class="hidden mt-2 max-h-56 overflow-y-auto rounded-xl border border-slate-200 bg-slate-50/60 p-2">
+                                <div id="mobileDashboardDepartmentChecks" class="mobile-filter-check-grid"></div>
+                            </div>
                         </div>
                         <div class="mobile-filter-group">
                             <span class="mobile-filter-label">Status</span>
@@ -2398,6 +2481,17 @@
                         <div class="mobile-filter-group grid grid-cols-2 gap-2">
                             <div><label class="mobile-filter-label" for="mobileDashboardMonth">Month</label><select id="mobileDashboardMonth" class="mobile-filter-select" onchange="mobileDashboardSetMonth(this.value)"></select></div>
                             <div><label class="mobile-filter-label" for="mobileDashboardLeaveType">Leave Type</label><select id="mobileDashboardLeaveType" class="mobile-filter-select" onchange="mobileDashboardSetLeaveType(this.value)"></select></div>
+                        </div>
+                        <div class="mobile-filter-group">
+                            <label class="mobile-filter-label" for="mobileDashboardWarning">Warning Status</label>
+                            <select id="mobileDashboardWarning" class="mobile-filter-select" onchange="mobileDashboardSetWarning(this.value)">
+                                <option value="All">All Warning Statuses</option>
+                                <option value="AnyWarning">Any Warning</option>
+                                <option value="normal">🟢 Normal</option>
+                                <option value="verbal">🟡 Verbal Warning</option>
+                                <option value="written">🟠 Written Warning</option>
+                                <option value="final">🔴 Final Warning</option>
+                            </select>
                         </div>
                         <div class="mobile-filter-group">
                             <label class="mobile-filter-label" for="mobileDashboardFilterSearch">Search</label>
@@ -2812,6 +2906,22 @@
                 <div id="modalResignedSection" class="hidden bg-orange-50 rounded-xl p-3 border border-orange-200 shadow-sm mb-5">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3"><div class="sm:border-r border-orange-200"><p class="text-[10px] text-orange-600 font-bold mb-1">Inactive Date</p><p class="text-sm font-semibold text-orange-900" id="modalResignedDate">-</p></div><div><p class="text-[10px] text-orange-600 font-bold mb-1">Reason</p><p class="text-sm font-semibold text-orange-900" id="modalResignedReason">-</p></div></div>
                 </div>
+                <div id="modalWarningSection" class="hidden bg-white rounded-xl border shadow-sm mb-5 overflow-hidden">
+                    <div id="modalWarningAccent" class="h-1 bg-emerald-500"></div>
+                    <div class="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Warning Status</p>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span id="modalWarningBadge" class="staff-warning-badge warning-normal"><i class="fa-solid fa-circle-check"></i>Normal</span>
+                                <span id="modalWarningCount" class="text-[10px] font-bold text-slate-500 bg-slate-50 border border-slate-200 rounded-full px-2 py-1">0 warnings</span>
+                            </div>
+                            <p id="modalWarningLatest" class="text-[11px] text-slate-500 mt-2 leading-relaxed"></p>
+                        </div>
+                        <button id="modalWarningEditBtn" type="button" class="shrink-0 px-3 py-2 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-bold text-slate-700 flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-clock-rotate-left"></i> View / Edit Timeline
+                        </button>
+                    </div>
+                </div>
                 <h3 class="text-sm font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-scale-balanced text-blue-500"></i> Leave Balances (YTD)</h3>
                 <div class="bg-white border rounded-xl overflow-x-auto mb-4 shadow-sm custom-scrollbar">
                     <table class="w-full text-xs sm:text-sm text-left min-w-[400px]">
@@ -2885,6 +2995,89 @@
         </div>
     </div>
 
+    <!-- Staff Warning Status Editor -->
+    <div id="warningEditModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-[85] flex items-center justify-center p-3 sm:p-4 opacity-0 transition-opacity duration-300" onclick="if(event.target===this) closeWarningEditor()">
+        <div id="warningEditModalContent" class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden transform scale-95 transition-transform duration-300 max-h-[92vh] flex flex-col">
+            <div class="p-4 border-b flex justify-between items-center relative shrink-0">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 via-amber-400 to-red-500"></div>
+                <div>
+                    <h3 class="font-bold text-slate-900 text-lg flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation text-amber-500"></i> Warning History</h3>
+                    <p id="warningEditStaffName" class="text-xs text-slate-500 mt-0.5">Staff</p>
+                </div>
+                <button onclick="closeWarningEditor()" class="text-slate-400 hover:bg-slate-100 w-8 h-8 rounded-full"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-4 sm:p-5 overflow-y-auto">
+                <input type="hidden" id="warningEditStaffId">
+                <div id="warningStageForm" class="hidden mb-5 rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2">New / Current Level</label>
+                        <select id="warningEditLevel" class="w-full border border-slate-300 rounded-xl p-3 text-sm font-bold bg-white outline-none focus:border-blue-500">
+                            <option value="normal">🟢 Normal</option>
+                            <option value="verbal">🟡 Verbal Warning</option>
+                            <option value="written">🟠 Written Warning</option>
+                            <option value="final">🔴 Final Warning</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Warning Start</label>
+                        <input id="warningEditStartAt" type="datetime-local" class="w-full border border-slate-300 rounded-xl p-3 text-sm font-semibold bg-white outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Issued / Updated By</label>
+                        <input id="warningEditIssuer" type="text" class="w-full border border-slate-300 rounded-xl p-3 text-sm font-semibold bg-white outline-none focus:border-blue-500" placeholder="e.g. HR Manager">
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Stage Note / Reason</label>
+                    <textarea id="warningEditNote" rows="3" class="w-full border border-slate-300 rounded-xl p-3 text-sm bg-white outline-none focus:border-blue-500 resize-y" placeholder="Reason, improvement required, follow-up details..."></textarea>
+                    <p class="text-[10px] text-slate-400 mt-1">Changing level closes the previous stage and starts a new dated stage. Saving the same level updates its current note.</p>
+                </div>
+                </div>
+                <div class="border-t pt-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <div><h4 class="text-xs font-extrabold text-slate-700 uppercase tracking-wide">Warning Timeline</h4><p id="warningHistorySummary" class="text-[10px] text-slate-400 mt-0.5"></p></div>
+                        <div class="flex items-center gap-2 flex-wrap justify-end">
+                            <select id="warningHistoryYearSelect" onchange="changeWarningHistoryYear(this.value)" class="text-[10px] font-bold text-slate-700 bg-white border border-slate-200 px-2.5 py-1.5 rounded-lg outline-none focus:border-blue-400"></select>
+                            <button id="warningAddChangeBtn" type="button" onclick="showWarningStageForm()" class="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1.5 rounded-lg hover:bg-amber-100"><i class="fa-solid fa-plus mr-1"></i>Add / Change Warning</button>
+                            <button type="button" onclick="exportWarningEmployeeFromEditor()" class="text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-100 px-2.5 py-1.5 rounded-lg hover:bg-blue-100"><i class="fa-solid fa-file-export mr-1"></i>Export Staff</button>
+                        </div>
+                    </div>
+                    <div id="warningHistoryList" class="warning-history-list"></div>
+                </div>
+            </div>
+            <div class="p-4 border-t flex justify-end gap-3 bg-slate-50 shrink-0">
+                <button id="warningTimelineCloseBtn" onclick="closeWarningEditor()" class="px-4 py-2 text-sm font-bold text-slate-600 bg-white border rounded-lg">Close</button>
+                <button id="warningFormBackBtn" onclick="hideWarningStageForm()" class="hidden px-4 py-2 text-sm font-bold text-slate-600 bg-white border rounded-lg">Back to Timeline</button>
+                <button id="warningSaveStageBtn" onclick="saveWarningStatus()" class="hidden px-5 py-2 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg"><i class="fa-solid fa-floppy-disk mr-1.5"></i> Save Stage</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Warning Timeline Entry Editor -->
+    <div id="warningHistoryEditModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-[90] flex items-center justify-center p-3 sm:p-4 opacity-0 transition-opacity duration-300" onclick="if(event.target===this) closeWarningHistoryEntryEditor()">
+        <div id="warningHistoryEditModalContent" class="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden transform scale-95 transition-transform duration-300 max-h-[92vh] flex flex-col">
+            <div class="p-4 border-b flex justify-between items-center relative shrink-0">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500"></div>
+                <div><h3 class="font-bold text-slate-900 text-lg">Edit Warning Stage</h3><p class="text-xs text-slate-500 mt-0.5">Dates, stage, note and issuer can be corrected here.</p></div>
+                <button onclick="closeWarningHistoryEntryEditor()" class="text-slate-400 hover:bg-slate-100 w-8 h-8 rounded-full"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-4 sm:p-5 overflow-y-auto">
+                <input type="hidden" id="warningHistoryEditStaffId">
+                <input type="hidden" id="warningHistoryEditIndex">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2">Stage</label><select id="warningHistoryEditLevel" class="w-full border border-slate-300 rounded-xl p-3 text-sm font-bold bg-white"><option value="verbal">🟡 Verbal Warning</option><option value="written">🟠 Written Warning</option><option value="final">🔴 Final Warning</option></select></div>
+                    <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2">Issued / Updated By</label><input id="warningHistoryEditIssuer" type="text" class="w-full border border-slate-300 rounded-xl p-3 text-sm font-semibold bg-white"></div>
+                    <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2">Start Date / Time</label><input id="warningHistoryEditStartAt" type="datetime-local" class="w-full border border-slate-300 rounded-xl p-3 text-sm font-semibold bg-white"></div>
+                    <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2">End Date / Time</label><input id="warningHistoryEditEndAt" type="datetime-local" class="w-full border border-slate-300 rounded-xl p-3 text-sm font-semibold bg-white"><p class="text-[10px] text-slate-400 mt-1">Leave blank if this is the current active stage.</p></div>
+                </div>
+                <div class="mt-4"><label class="block text-xs font-bold text-slate-500 uppercase mb-2">Note / Reason</label><textarea id="warningHistoryEditNote" rows="4" class="w-full border border-slate-300 rounded-xl p-3 text-sm bg-white resize-y"></textarea></div>
+                <div id="warningHistoryEditError" class="hidden mt-3 text-xs font-semibold text-red-600 bg-red-50 border border-red-200 rounded-lg p-2.5"></div>
+            </div>
+            <div class="p-4 border-t flex justify-end gap-3 bg-slate-50 shrink-0"><button onclick="closeWarningHistoryEntryEditor()" class="px-4 py-2 text-sm font-bold text-slate-600 bg-white border rounded-lg">Cancel</button><button onclick="saveWarningHistoryEntry()" class="px-5 py-2 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg"><i class="fa-solid fa-floppy-disk mr-1.5"></i>Save Changes</button></div>
+        </div>
+    </div>
+
     <!-- Edit Note Modal -->
     <div id="noteEditModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-[80] flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
         <div class="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden transform scale-95 transition-transform duration-300">
@@ -2923,12 +3116,13 @@
         let allEmployees = []; let filteredEmployees = []; 
         let companies = new Set(); let departments = new Set();
         let selectedCompanies = []; let selectedCalendarCompanies = []; let selectedDailyCompanies = []; let selectedCalendarRowCompany = 'ITC'; let selectedCalendarRowDepartments = null; let selectedCalendarRowMonth = new Date().getMonth(); let selectedCalendarRowYear = new Date().getFullYear(); const attendanceDataYear = new Date().getFullYear();
-        let selectedDepartments = 'All'; let selectedStatuses = ['Active']; let selectedDashboardMonth = 'All'; let searchQuery = ''; let dailySearchQuery = '';
+        let selectedDepartments = null; // null = all departments; otherwise array of selected department names
+        let selectedStatuses = ['Active']; let selectedDashboardMonth = 'All'; let selectedDashboardWarning = 'All'; let searchQuery = ''; let dailySearchQuery = '';
         let currentSortColumn = 'id'; let isSortAscending = true;
         let leaveHistoryByEmployee = {}; let dailyLeaveRecords = []; let currentDailyGroupedData = {}; 
         let currentCalendarDate = new Date(); let selectedCalendarDate = new Date().getDate();
         let activeLeaveFilter = null; 
-        let customNotes = {}; let customReasons = {};
+        let customNotes = {}; let customReasons = {}; let staffWarnings = {};
         const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
         window.allLeaveTypeKeys = ['AL', 'SL', 'SP', 'UP', 'A', 'Late', 'OT', 'D'];
         window.selectedDailyLeaveTypes = [...window.allLeaveTypeKeys];
@@ -2999,6 +3193,7 @@
             try {
                 let ln = localStorage.getItem('appCustomNotes'); if(ln) customNotes = JSON.parse(ln);
                 let lr = localStorage.getItem('appCustomReasons'); if(lr) customReasons = JSON.parse(lr);
+                let lw = localStorage.getItem('appStaffWarnings'); if(lw) staffWarnings = JSON.parse(lw);
                 if(window.authReady && window.db && window.appId) {
                     await window.authReady;
                     const snap = await window.fbGetDoc(window.fbDoc(window.db, 'artifacts', window.appId, 'public', 'data', 'customNotes', 'records'));
@@ -3006,6 +3201,7 @@
                         let d = snap.data();
                         if (d.notes) { customNotes = JSON.parse(d.notes); localStorage.setItem('appCustomNotes', JSON.stringify(customNotes)); }
                         if (d.reasons) { customReasons = JSON.parse(d.reasons); localStorage.setItem('appCustomReasons', JSON.stringify(customReasons)); }
+                        if (d.warnings) { staffWarnings = JSON.parse(d.warnings); localStorage.setItem('appStaffWarnings', JSON.stringify(staffWarnings)); }
                     }
                 }
             } catch(e) {}
@@ -3015,9 +3211,10 @@
             try {
                 localStorage.setItem('appCustomNotes', JSON.stringify(customNotes));
                 localStorage.setItem('appCustomReasons', JSON.stringify(customReasons));
+                localStorage.setItem('appStaffWarnings', JSON.stringify(staffWarnings));
                 if (window.authReady && window.db && window.appId) {
                     await window.authReady;
-                    await window.fbSetDoc(window.fbDoc(window.db, 'artifacts', window.appId, 'public', 'data', 'customNotes', 'records'), { notes: JSON.stringify(customNotes), reasons: JSON.stringify(customReasons), updatedAt: Date.now() });
+                    await window.fbSetDoc(window.fbDoc(window.db, 'artifacts', window.appId, 'public', 'data', 'customNotes', 'records'), { notes: JSON.stringify(customNotes), reasons: JSON.stringify(customReasons), warnings: JSON.stringify(staffWarnings), updatedAt: Date.now() });
                 }
             } catch(e) {}
         };
@@ -3101,7 +3298,7 @@
                 });
             }
 
-            ['departmentFilter', 'dashboardMonthFilter', 'dashboardLeaveTypeFilter'].forEach(id => { const el = document.getElementById(id); if(el) el.addEventListener('change', e => { if(id==='departmentFilter') selectedDepartments=e.target.value; else if(id==='dashboardMonthFilter') selectedDashboardMonth=e.target.value; applyFilters(); }); });
+            ['departmentFilter', 'dashboardMonthFilter', 'dashboardLeaveTypeFilter'].forEach(id => { const el = document.getElementById(id); if(el) el.addEventListener('change', e => { if(id==='departmentFilter') selectedDepartments = e.target.value === 'All' ? null : [e.target.value]; else if(id==='dashboardMonthFilter') selectedDashboardMonth=e.target.value; applyFilters(); }); });
             document.getElementById('searchInput')?.addEventListener('input', e => { searchQuery=e.target.value.toLowerCase(); applyFilters(); });
             document.getElementById('dailySearchInput')?.addEventListener('input', e => { dailySearchQuery=e.target.value.toLowerCase(); renderDailyAttendance(); });
             document.querySelectorAll('th.sortable').forEach(th => th.addEventListener('click', () => handleSort(th.dataset.sort)));
@@ -3245,32 +3442,77 @@
             } catch(e) { console.error(e); showAppToast("Error loading data: " + e.message, "error"); }
         }
 
+        function normalizeHeaderName(v) {
+            return String(v || '').trim().toLowerCase().replace(/[_\-]+/g, ' ').replace(/\s+/g, ' ');
+        }
+
+        function findHeaderColumn(rows, aliases, fallbackIndex = -1, maxHeaderRows = 8) {
+            if (!Array.isArray(rows)) return fallbackIndex;
+            const normalizedAliases = aliases.map(normalizeHeaderName);
+            for (let r = 0; r < Math.min(rows.length, maxHeaderRows); r++) {
+                const row = rows[r] || [];
+                for (let c = 0; c < row.length; c++) {
+                    const h = normalizeHeaderName(row[c]);
+                    if (!h) continue;
+                    if (normalizedAliases.some(a => h === a || h.includes(a))) return c;
+                }
+            }
+            return fallbackIndex;
+        }
+
         function processData(info, pull, grids, resig, photos) {
             allEmployees = []; leaveHistoryByEmployee = {}; dailyLeaveRecords = []; companies.clear(); departments.clear();
 
+            // Detect these columns by their sheet headers instead of assuming fixed letters.
+            // This keeps Notice Period working even if Employee Info columns are inserted/reordered.
+            const infoStatusCol = findHeaderColumn(info, ['employment status','staff status','status'], 32);
+            const infoLastDayCol = findHeaderColumn(info, [
+                'last working day','last work day','last working date','last day of work','last date of work',
+                'final working day','resign date','resigned date','resignation date','inactive date'
+            ], 33);
+            const infoEntityCol = findHeaderColumn(info, ['entity'], 34);
+
             info.forEach((row, i) => {
                 if(i<3) return; let rawId=String(row[1]||'').trim(); let id=normalizeId(rawId); if(!id||id.includes('STAFFID')) return;
-                let c=row[3]||'Unknown', d=row[4]||'Unknown', sStr=String(row[32]||'').toLowerCase(), stat='Active';
+                let c=row[3]||'Unknown', d=row[4]||'Unknown', sStr=String(row[infoStatusCol]||'').toLowerCase(), stat='Active';
                 if(sStr.includes('terminate')) stat='Terminated'; else if(sStr.includes('resign')) stat='Resigned';
                 if(c!=='Unknown') companies.add(c); if(d) departments.add(d);
                 let jd = new Date(row[6]||'');
-                let entity = String(row[34]||'').trim() || c;
+                let entity = String(row[infoEntityCol]||'').trim() || c;
+                const detectedLastDay = row[infoLastDayCol] || null;
                 allEmployees.push({
-                    id: id, displayId: rawId, name: row[2]||'', company: c, department: d, position: row[5]||'Unknown', entity: entity, joinDate: row[6]||'N/A', sortableJoinDate: isNaN(jd.getTime())?0:jd.getTime(), status: stat, totalLate5m: 0, totalLate3m: 0, resignedDate: null, resignedReason: null, photoUrl: null,
+                    id: id, displayId: rawId, name: row[2]||'', company: c, department: d, position: row[5]||'Unknown', entity: entity, joinDate: row[6]||'N/A', sortableJoinDate: isNaN(jd.getTime())?0:jd.getTime(), status: stat, totalLate5m: 0, totalLate3m: 0,
+                    resignedDate: stat !== 'Active' ? detectedLastDay : null, resignedReason: null, photoUrl: null,
                     leaves: { available: {AL:parseFloat(row[8])||0, SL:parseFloat(row[9])||0, SP:parseFloat(row[10])||0}, used: {SL:parseFloat(row[16])||0, AL:parseFloat(row[17])||0, SP:parseFloat(row[19])||0}, remaining: {AL:parseFloat(row[20])||0, SL:parseFloat(row[21])||0, SP:parseFloat(row[22])||0}, unpaid: parseFloat(row[12])||0, absences: parseFloat(row[13])||0 }
                 });
             });
 
-            if(resig) resig.forEach((row, i) => {
-                if(i<2||row.length<5) return; let id=normalizeId(row[1]); if(!id||id.includes('STAFFID')) return;
-                let sStr=String(row[9]||'').toLowerCase(), stat=(sStr.includes('terminate')||sStr.includes('walked out'))?'Terminated':'Resigned';
-                let emp=allEmployees.find(e=>e.id===id);
-                if(emp) { emp.status=stat; emp.resignedDate=row[8]||'N/A'; emp.resignedReason=row[10]||'N/A'; }
-                else {
-                    let c=row[3]||'Unknown', d=row[4]||'Unknown'; if(c!=='Unknown') companies.add(c); if(d) departments.add(d); let jd=new Date(row[6]||'');
-                    allEmployees.push({ id: id, displayId: String(row[1]||'').trim(), name: row[2]||'', company: c, department: d, position: row[5]||'Unknown', entity: c, joinDate: row[6]||'N/A', sortableJoinDate: isNaN(jd.getTime())?0:jd.getTime(), status: stat, totalLate5m: 0, totalLate3m: 0, resignedDate: row[8]||'N/A', resignedReason: row[10]||'N/A', photoUrl: null, leaves: {available:{AL:0,SL:0,SP:0},used:{AL:0,SL:0,SP:0},remaining:{AL:0,SL:0,SP:0},unpaid:0,absences:0} });
-                }
-            });
+            if(resig) {
+                const resigIdCol = findHeaderColumn(resig, ['staff id','employee id'], 1);
+                const resigStatusCol = findHeaderColumn(resig, ['employment status','staff status','status'], 9);
+                const resigLastDayCol = findHeaderColumn(resig, [
+                    'last working day','last work day','last working date','last day of work','last date of work',
+                    'final working day','resign date','resigned date','resignation date','inactive date'
+                ], 8);
+                const resigReasonCol = findHeaderColumn(resig, ['reason','resign reason','resignation reason','termination reason'], 10);
+                resig.forEach((row, i) => {
+                    if(i<2||row.length<5) return; let id=normalizeId(row[resigIdCol]); if(!id||id.includes('STAFFID')) return;
+                    let sStr=String(row[resigStatusCol]||'').toLowerCase(), stat=(sStr.includes('terminate')||sStr.includes('walked out'))?'Terminated':'Resigned';
+                    let emp=allEmployees.find(e=>e.id===id);
+                    const sourceLastDay = row[resigLastDayCol] || null;
+                    const sourceReason = row[resigReasonCol] || null;
+                    if(emp) {
+                        emp.status=stat;
+                        // Do not overwrite a valid Employee Info last-working-day with an empty resigned-sheet value.
+                        if(sourceLastDay) emp.resignedDate=sourceLastDay;
+                        if(sourceReason) emp.resignedReason=sourceReason;
+                    }
+                    else {
+                        let c=row[3]||'Unknown', d=row[4]||'Unknown'; if(c!=='Unknown') companies.add(c); if(d) departments.add(d); let jd=new Date(row[6]||'');
+                        allEmployees.push({ id: id, displayId: String(row[resigIdCol]||'').trim(), name: row[2]||'', company: c, department: d, position: row[5]||'Unknown', entity: c, joinDate: row[6]||'N/A', sortableJoinDate: isNaN(jd.getTime())?0:jd.getTime(), status: stat, totalLate5m: 0, totalLate3m: 0, resignedDate: sourceLastDay||'N/A', resignedReason: sourceReason||'N/A', photoUrl: null, leaves: {available:{AL:0,SL:0,SP:0},used:{AL:0,SL:0,SP:0},remaining:{AL:0,SL:0,SP:0},unpaid:0,absences:0} });
+                    }
+                });
+            }
 
             if(photos) {
                 photos.forEach(row => {
@@ -3444,6 +3686,68 @@
 
         window.toggleDeptDropdown = function(e, cId, dept) { e.stopPropagation(); document.querySelectorAll('[id^="dept-dropdown-"]').forEach(el=>el.classList.add('hidden')); openDeptModal(cId.replace(/-/g,' '), dept); };
 
+        function parseStaffDateValue(value) {
+            if (value === null || value === undefined || value === '' || value === 'N/A') return null;
+            const raw = String(value).trim();
+            // Handle spreadsheet serial dates if one reaches the CSV as a number.
+            if (/^\d{5}(?:\.\d+)?$/.test(raw)) {
+                const serial = Number(raw);
+                if (serial > 20000 && serial < 100000) {
+                    const d = new Date(Date.UTC(1899, 11, 30) + serial * 86400000);
+                    if (!isNaN(d.getTime())) return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+                }
+            }
+            let d = new Date(raw);
+            if (!isNaN(d.getTime())) return d;
+            let m = raw.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})(?:\s+.*)?$/);
+            if (m) { d = new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1])); if (!isNaN(d.getTime())) return d; }
+            m = raw.match(/^(\d{1,2})[-\s]([A-Za-z]{3,9})[-\s](\d{4})(?:\s+.*)?$/);
+            if (m) { d = new Date(`${m[1]} ${m[2]} ${m[3]}`); if (!isNaN(d.getTime())) return d; }
+            return null;
+        }
+
+        function isNoticePeriodStaff(emp, referenceDate = new Date()) {
+            if (!emp || !['Resigned','Terminated'].includes(emp.status)) return false;
+            const lastDay = parseStaffDateValue(emp.resignedDate);
+            if (!lastDay) return false;
+            const ref = new Date(referenceDate); ref.setHours(0,0,0,0);
+            lastDay.setHours(23,59,59,999);
+            return lastDay >= ref;
+        }
+
+        // One shared employment-visibility rule used by every tab.
+        // Active staff are always visible. Resigned/Terminated staff remain visible
+        // through their Last Working Day, then disappear from current staff views.
+        function isEmploymentVisible(emp, referenceDate = new Date()) {
+            if (!emp) return false;
+            if (emp.status === 'Active') return true;
+            if (emp.status === 'Resigned' || emp.status === 'Terminated') {
+                return isNoticePeriodStaff(emp, referenceDate);
+            }
+            return false;
+        }
+
+        function getEffectiveStaffStatus(emp, referenceDate = new Date()) {
+            return isEmploymentVisible(emp, referenceDate) ? 'Active' : (emp?.status || 'Active');
+        }
+
+        function formatStaffLastDay(emp) {
+            if (!emp?.resignedDate || emp.resignedDate === 'N/A') return '';
+            const d = parseStaffDateValue(emp.resignedDate);
+            if (!d) return String(emp.resignedDate);
+            return d.toLocaleDateString(undefined, { day:'2-digit', month:'short', year:'numeric' });
+        }
+
+        function noticePeriodBadgeHtml(emp, compact=false, referenceDate=new Date()) {
+            if (!isNoticePeriodStaff(emp, referenceDate)) return '';
+            const last = formatStaffLastDay(emp);
+            const shortLabel = emp.status === 'Terminated' ? 'Ending' : 'Notice';
+            const fullLabel = emp.status === 'Terminated' ? 'Employment Ending' : 'Notice Period';
+            return compact
+                ? `<span class="notice-period-badge compact"><i class="fa-solid fa-hourglass-half"></i> ${shortLabel}</span>`
+                : `<span class="notice-period-badge"><i class="fa-solid fa-hourglass-half"></i> ${fullLabel}${last ? ` · Last Day ${last}` : ''}</span>`;
+        }
+
         function applyFilters() {
             let act=0, inact=0, tot=0, lSum=0, aAl=0, aSl=0, aSp=0, rAl=0, rSl=0, rSp=0, tUp=0, tL5=0, tL3=0;
             let lType=document.getElementById('dashboardLeaveTypeFilter')?.value||'All';
@@ -3453,8 +3757,12 @@
 
             filteredEmployees = allEmployees.filter(e => {
                 if(selectedCompanies.length>0 && !selectedCompanies.includes(e.company)) return false;
-                if(selectedDepartments!=='All' && e.department!==selectedDepartments) return false;
-                if(selectedStatuses.length > 0 && !selectedStatuses.includes(e.status)) return false;
+                if(Array.isArray(selectedDepartments) && selectedDepartments.length > 0 && !selectedDepartments.includes(e.department)) return false;
+                if(Array.isArray(selectedDepartments) && selectedDepartments.length === 0) return false;
+                if(selectedStatuses.length > 0 && !selectedStatuses.includes(getEffectiveStaffStatus(e))) return false;
+                const warningLevel = getStaffWarningLevel(e.id);
+                if (selectedDashboardWarning === 'AnyWarning' && warningLevel === 'normal') return false;
+                if (!['All','AnyWarning'].includes(selectedDashboardWarning) && warningLevel !== selectedDashboardWarning) return false;
                 let sSum=0, mMatch=true;
                 if(selectedDashboardMonth!=='All') {
                     let hm=leaveHistoryByEmployee[e.id]?.[selectedDashboardMonth];
@@ -3462,8 +3770,8 @@
                 } else { let ha=leaveHistoryByEmployee[e.id]; if(ha) Object.values(ha).forEach(h=>{ sSum+=lType==='All'?(h.AL+h.SL+h.SP+h.UP+h.A+h.D+h.OT+h.Late5m+h.Late3m):(lType==='Late'?(h.Late5m+h.Late3m):(h[lType]||0));}); }
                 if(lType!=='All' && sSum<=0) return false;
                 if(searchQuery && !e.name.toLowerCase().includes(searchQuery) && !e.displayId.toLowerCase().includes(searchQuery)) return false;
-                if(mMatch) { tot++; lSum+=sSum; aAl+=e.leaves.available.AL; aSl+=e.leaves.available.SL; aSp+=e.leaves.available.SP; rAl+=e.leaves.remaining.AL; rSl+=e.leaves.remaining.SL; rSp+=e.leaves.remaining.SP; tUp+=e.leaves.unpaid; tL5+=e.totalLate5m; tL3+=e.totalLate3m; if(e.status==='Active')act++; else inact++; 
-                    e.isProbation = e.status === 'Active' && e.sortableJoinDate > ninetyDaysAgo.getTime();
+                if(mMatch) { tot++; lSum+=sSum; aAl+=e.leaves.available.AL; aSl+=e.leaves.available.SL; aSp+=e.leaves.available.SP; rAl+=e.leaves.remaining.AL; rSl+=e.leaves.remaining.SL; rSp+=e.leaves.remaining.SP; tUp+=e.leaves.unpaid; tL5+=e.totalLate5m; tL3+=e.totalLate3m; if(getEffectiveStaffStatus(e)==='Active')act++; else inact++; 
+                    e.isProbation = getEffectiveStaffStatus(e) === 'Active' && !isNoticePeriodStaff(e) && e.sortableJoinDate > ninetyDaysAgo.getTime();
                     return true; 
                 } return false;
             });
@@ -3503,7 +3811,8 @@
                 let tr=document.createElement('tr');
                 
                 let rowColorClass = "hover:bg-slate-50"; let nameBadge = "";
-                if (e.status === 'Resigned') { rowColorClass = "bg-orange-50/50 hover:bg-orange-100/60"; nameBadge = `<span class="bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded text-[9px] font-bold border border-orange-200 shadow-sm ml-2">Resigned</span>`; }
+                if (isNoticePeriodStaff(e)) { rowColorClass = "bg-amber-50/40 hover:bg-amber-100/50"; nameBadge = `${noticePeriodBadgeHtml(e,true)} <span class="text-[9px] font-semibold text-amber-700 ml-1">Last Day: ${formatStaffLastDay(e)}</span>`; }
+                else if (e.status === 'Resigned') { rowColorClass = "bg-orange-50/50 hover:bg-orange-100/60"; nameBadge = `<span class="bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded text-[9px] font-bold border border-orange-200 shadow-sm ml-2">Resigned</span>`; }
                 else if (e.status === 'Terminated') { rowColorClass = "bg-red-50/50 hover:bg-red-100/60"; nameBadge = `<span class="bg-red-100 text-red-700 px-1.5 py-0.5 rounded text-[9px] font-bold border border-red-200 shadow-sm ml-2">Terminated</span>`; }
                 else if (e.isProbation) { rowColorClass = "bg-indigo-50/40 hover:bg-indigo-100/50"; nameBadge = `<span class="bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded text-[9px] font-bold border border-indigo-200 shadow-sm ml-2">Probation</span>`; }
                 
@@ -3549,7 +3858,7 @@
             }
             const cl = document.getElementById('companyDropdownLabel');
             if (cl) cl.innerText = selectedCompanies.length === companies.size ? 'All Companies' : (selectedCompanies.length === 0 ? 'Select Company' : (selectedCompanies.length === 1 ? selectedCompanies[0] : `${selectedCompanies.length} Companies`));
-            const df = document.getElementById('departmentFilter'); if (df) df.value = selectedDepartments;
+            const df = document.getElementById('departmentFilter'); if (df) df.value = (!Array.isArray(selectedDepartments) || selectedDepartments.length !== 1) ? 'All' : selectedDepartments[0];
             const mf = document.getElementById('dashboardMonthFilter'); if (mf) mf.value = selectedDashboardMonth;
             const sf = document.getElementById('searchInput'); if (sf) sf.value = searchQuery;
             document.querySelectorAll('.status-checkbox').forEach(cb => cb.checked = selectedStatuses.includes(cb.value));
@@ -3570,10 +3879,32 @@
             const all = document.getElementById('mobileDashAllCompanies');
             if (all) { all.checked = selectedCompanies.length === companies.size; all.indeterminate = selectedCompanies.length > 0 && selectedCompanies.length < companies.size; }
 
-            const dept = document.getElementById('mobileDashboardDepartment');
-            if (dept) {
-                dept.innerHTML = '<option value="All">All Departments</option>' + Array.from(departments).sort().map(d => `<option value="${d.replace(/"/g,'&quot;')}">${d}</option>`).join('');
-                dept.value = selectedDepartments;
+            const availableDepartments = Array.from(departments).sort();
+            if (Array.isArray(selectedDepartments)) {
+                selectedDepartments = selectedDepartments.filter(d => availableDepartments.includes(d));
+            }
+            const deptChecks = document.getElementById('mobileDashboardDepartmentChecks');
+            if (deptChecks) {
+                deptChecks.innerHTML = availableDepartments.map(d => {
+                    const safe = d.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+                    const checked = selectedDepartments === null || selectedDepartments.includes(d) ? 'checked' : '';
+                    return `<label class="mobile-filter-check"><input type="checkbox" data-department="${safe}" ${checked} onchange="mobileDashboardToggleDepartment(this.dataset.department,this.checked)" class="rounded"><span class="truncate">${safe}</span></label>`;
+                }).join('') || '<div class="text-xs text-slate-400 px-2 py-2">No departments found</div>';
+            }
+            const deptAll = document.getElementById('mobileDashAllDepartments');
+            if (deptAll) {
+                const count = selectedDepartments === null ? availableDepartments.length : selectedDepartments.length;
+                deptAll.checked = availableDepartments.length > 0 && count === availableDepartments.length;
+                deptAll.indeterminate = count > 0 && count < availableDepartments.length;
+                deptAll.disabled = availableDepartments.length === 0;
+            }
+            const deptLabel = document.getElementById('mobileDashboardDepartmentLabel');
+            if (deptLabel) {
+                if (!availableDepartments.length) deptLabel.textContent = 'No Departments';
+                else if (selectedDepartments === null || selectedDepartments.length === availableDepartments.length) deptLabel.textContent = 'All Departments';
+                else if (selectedDepartments.length === 0) deptLabel.textContent = 'No Departments';
+                else if (selectedDepartments.length === 1) deptLabel.textContent = selectedDepartments[0];
+                else deptLabel.textContent = `${selectedDepartments.length} Departments`;
             }
             document.querySelectorAll('.mobile-dashboard-status').forEach(cb => cb.checked = selectedStatuses.includes(cb.value));
 
@@ -3588,11 +3919,363 @@
                 lt.innerHTML = Array.from(deskLt.options).map(o => `<option value="${o.value}">${o.text}</option>`).join('');
                 lt.value = deskLt.value;
             }
+            const warningFilter = document.getElementById('mobileDashboardWarning');
+            if (warningFilter) warningFilter.value = selectedDashboardWarning;
             const searchA = document.getElementById('mobileDashboardSearch');
             const searchB = document.getElementById('mobileDashboardFilterSearch');
             if (searchA && searchA.value !== searchQuery) searchA.value = searchQuery;
             if (searchB && searchB.value !== searchQuery) searchB.value = searchQuery;
         }
+
+        const WARNING_LEGACY_BASE_YEAR = 2026;
+        let selectedWarningHistoryYear = new Date().getFullYear();
+
+        function warningNormalizeKey(staffId) {
+            return (typeof normalizeId === 'function') ? normalizeId(staffId) : String(staffId || '').trim();
+        }
+        function warningEntryYear(entry) {
+            if (entry && Number.isInteger(Number(entry.year))) return Number(entry.year);
+            if (entry && entry.startAt) {
+                const d = new Date(entry.startAt);
+                if (!isNaN(d.getTime())) return d.getFullYear();
+            }
+            return WARNING_LEGACY_BASE_YEAR;
+        }
+        function warningNormalizeRecord(staffId) {
+            const key = warningNormalizeKey(staffId);
+            const raw = staffWarnings[key];
+            if (!raw) return { level:'normal', history:[] };
+            if (typeof raw === 'string') {
+                const level = ['normal','verbal','written','final'].includes(raw.toLowerCase()) ? raw.toLowerCase() : 'normal';
+                return { level, history: level === 'normal' ? [] : [{ level, year:WARNING_LEGACY_BASE_YEAR, startAt:null, endAt:null, note:'Imported from previous saved warning status.', issuer:'' }] };
+            }
+            const level = ['normal','verbal','written','final'].includes(String(raw.level || '').toLowerCase()) ? String(raw.level).toLowerCase() : 'normal';
+            const history = Array.isArray(raw.history) ? raw.history.map(h => ({
+                level: ['verbal','written','final'].includes(String(h.level || '').toLowerCase()) ? String(h.level).toLowerCase() : 'verbal',
+                year: warningEntryYear(h),
+                startAt: h.startAt || null,
+                endAt: h.endAt || null,
+                note: String(h.note || ''),
+                issuer: String(h.issuer || '')
+            })) : [];
+            return { level, history };
+        }
+        function getStaffWarningHistory(staffId, year = new Date().getFullYear()) {
+            const y = Number(year) || new Date().getFullYear();
+            return warningNormalizeRecord(staffId).history.filter(h => warningEntryYear(h) === y);
+        }
+        function getStaffWarningLevel(staffId, year = new Date().getFullYear()) {
+            const y = Number(year) || new Date().getFullYear();
+            const history = getStaffWarningHistory(staffId, y).slice().sort((a,b) => {
+                const at = a.startAt ? new Date(a.startAt).getTime() : 0;
+                const bt = b.startAt ? new Date(b.startAt).getTime() : 0;
+                return at - bt;
+            });
+            if (!history.length) return 'normal';
+            const latest = history[history.length - 1];
+            // A closed final stage means the employee returned to Normal for the remainder of that year.
+            if (latest.endAt) {
+                const end = new Date(latest.endAt);
+                if (!isNaN(end.getTime()) && end.getFullYear() === y) return 'normal';
+            }
+            return latest.level || 'normal';
+        }
+        function getStaffWarningCount(staffId, year = new Date().getFullYear()) {
+            return getStaffWarningHistory(staffId, year).filter(h => ['verbal','written','final'].includes(h.level)).length;
+        }
+        function getStaffWarningMeta(staffId, year = new Date().getFullYear()) {
+            const level = getStaffWarningLevel(staffId, year);
+            const map = {
+                normal:  { label:'Normal', icon:'fa-circle-check', cls:'warning-normal', score:0 },
+                verbal:  { label:'Verbal Warning', icon:'fa-comment-dots', cls:'warning-verbal', score:18 },
+                written: { label:'Written Warning', icon:'fa-file-circle-exclamation', cls:'warning-written', score:35 },
+                final:   { label:'Final Warning', icon:'fa-triangle-exclamation', cls:'warning-final', score:60 }
+            };
+            return { level, year:Number(year)||new Date().getFullYear(), count:getStaffWarningCount(staffId, year), ...map[level] };
+        }
+        function warningInlineIndicatorHtml(staffId, options = {}) {
+            const year = Number(options.year) || new Date().getFullYear();
+            const meta = getStaffWarningMeta(staffId, year);
+            if (!meta || meta.level === 'normal') return '';
+            const compact = options.compact !== false;
+            const label = compact ? ({verbal:'V', written:'W', final:'F'}[meta.level] || '!') : meta.label;
+            const safeId = String(staffId || '').replace(/'/g, "\\'");
+            return `<span class="warning-inline-indicator ${meta.cls}" title="${meta.label} • ${meta.count} warning${meta.count===1?'':'s'}" onclick="event.stopPropagation(); openWarningEditor(event, '${safeId}', ${year})"><i class="fa-solid ${meta.icon}"></i>${label}</span>`;
+        }
+        function warningDotIndicatorHtml(staffId, options = {}) {
+            const year = Number(options.year) || new Date().getFullYear();
+            const meta = getStaffWarningMeta(staffId, year);
+            if (!meta || meta.level === 'normal') return '';
+            const safeId = String(staffId || '').replace(/'/g, "\\'");
+            return `<span class="warning-dot-indicator ${meta.cls}" title="${meta.label}" onclick="event.stopPropagation(); openWarningEditor(event, '${safeId}', ${year})"></span>`;
+        }
+        function warningEscapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
+        }
+        function warningFormatDateTime(value) {
+            if (!value) return 'Earlier record';
+            const d = new Date(value);
+            if (isNaN(d.getTime())) return String(value);
+            return d.toLocaleString([], { year:'numeric', month:'short', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+        }
+        function warningToLocalInput(value) {
+            const d = value ? new Date(value) : new Date();
+            if (isNaN(d.getTime())) return '';
+            const pad = n => String(n).padStart(2,'0');
+            return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+        function warningLocalInputToISO(value) {
+            if (!value) return null;
+            const d = new Date(value);
+            return isNaN(d.getTime()) ? null : d.toISOString();
+        }
+        function getWarningAvailableYears(staffId) {
+            const years = new Set([new Date().getFullYear(), selectedWarningHistoryYear]);
+            warningNormalizeRecord(staffId).history.forEach(h => years.add(warningEntryYear(h)));
+            return Array.from(years).filter(Number.isFinite).sort((a,b)=>b-a);
+        }
+        function renderWarningYearSelector(staffId) {
+            const sel = document.getElementById('warningHistoryYearSelect');
+            if (!sel) return;
+            const years = getWarningAvailableYears(staffId);
+            if (!years.includes(selectedWarningHistoryYear)) years.push(selectedWarningHistoryYear);
+            years.sort((a,b)=>b-a);
+            sel.innerHTML = years.map(y => `<option value="${y}" ${y===selectedWarningHistoryYear?'selected':''}>${y}</option>`).join('');
+        }
+        window.changeWarningHistoryYear = function(value) {
+            const y = Number(value);
+            if (!Number.isInteger(y)) return;
+            selectedWarningHistoryYear = y;
+            const id = document.getElementById('warningEditStaffId').value;
+            if (id) { renderWarningHistory(id); setWarningEditorMode('timeline'); }
+        };
+        function renderWarningHistory(staffId) {
+            const list = document.getElementById('warningHistoryList');
+            const summary = document.getElementById('warningHistorySummary');
+            if (!list) return;
+            renderWarningYearSelector(staffId);
+            const history = getStaffWarningHistory(staffId, selectedWarningHistoryYear).map(h => {
+                const full = warningNormalizeRecord(staffId).history;
+                return {...h,_index:full.findIndex(x => x === h || (x.level===h.level && x.startAt===h.startAt && x.endAt===h.endAt && x.note===h.note && warningEntryYear(x)===selectedWarningHistoryYear))};
+            }).sort((a,b) => {
+                const at = a.startAt ? new Date(a.startAt).getTime() : 0;
+                const bt = b.startAt ? new Date(b.startAt).getTime() : 0;
+                return bt - at;
+            });
+            const count = history.length;
+            const meta = getStaffWarningMeta(staffId, selectedWarningHistoryYear);
+            if (summary) summary.textContent = `${selectedWarningHistoryYear} • ${count} warning stage${count===1?'':'s'} • Current: ${meta.label}`;
+            if (!count) {
+                list.innerHTML = `<div class="text-center py-7 text-xs text-slate-400 bg-slate-50 border border-dashed rounded-xl"><i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i>No warning history in ${selectedWarningHistoryYear}. Employee starts this year in normal standing.</div>`;
+                return;
+            }
+            const labels = { verbal:'Verbal Warning', written:'Written Warning', final:'Final Warning' };
+            list.innerHTML = history.map(h => {
+                const end = h.endAt ? warningFormatDateTime(h.endAt) : 'Year end / Current';
+                const isCurrent = meta.level === h.level && !h.endAt && history[0] === h;
+                return `<div class="warning-history-item ${h.level}">
+                    <div class="warning-history-stage"><span>${labels[h.level] || h.level}</span><span class="flex items-center gap-2"><span class="text-[9px] text-slate-400">${isCurrent ? 'Active' : (h.endAt ? 'Closed' : 'Year record')}</span><button type="button" onclick="openWarningHistoryEntryEditor(event,'${warningEscapeHtml(warningNormalizeKey(staffId))}',${h._index})" class="text-[9px] font-bold text-blue-600 bg-blue-50 border border-blue-100 px-2 py-1 rounded-md hover:bg-blue-100"><i class="fa-solid fa-pen mr-1"></i>Edit</button></span></div>
+                    <div class="warning-history-period">${warningFormatDateTime(h.startAt)} → ${end}</div>
+                    ${h.issuer ? `<div class="warning-history-period"><i class="fa-solid fa-user-pen mr-1"></i>${warningEscapeHtml(h.issuer)}</div>` : ''}
+                    ${h.note ? `<div class="warning-history-note">${warningEscapeHtml(h.note)}</div>` : '<div class="warning-history-note text-slate-400 italic">No note recorded.</div>'}
+                </div>`;
+            }).join('');
+        }
+        function setWarningEditorMode(mode) {
+            const form = document.getElementById('warningStageForm');
+            const addBtn = document.getElementById('warningAddChangeBtn');
+            const closeBtn = document.getElementById('warningTimelineCloseBtn');
+            const backBtn = document.getElementById('warningFormBackBtn');
+            const saveBtn = document.getElementById('warningSaveStageBtn');
+            const editing = mode === 'edit';
+            if (form) form.classList.toggle('hidden', !editing);
+            if (addBtn) addBtn.classList.toggle('hidden', editing);
+            if (closeBtn) closeBtn.classList.toggle('hidden', editing);
+            if (backBtn) backBtn.classList.toggle('hidden', !editing);
+            if (saveBtn) saveBtn.classList.toggle('hidden', !editing);
+        }
+        window.showWarningStageForm = function() {
+            const id = document.getElementById('warningEditStaffId').value;
+            const record = warningNormalizeRecord(id);
+            const yearHistory = getStaffWarningHistory(id, selectedWarningHistoryYear);
+            const currentLevel = getStaffWarningLevel(id, selectedWarningHistoryYear);
+            const current = yearHistory.slice().reverse().find(h => !h.endAt && h.level === currentLevel);
+            document.getElementById('warningEditLevel').value = currentLevel;
+            document.getElementById('warningEditNote').value = current ? current.note || '' : '';
+            document.getElementById('warningEditIssuer').value = current ? current.issuer || '' : '';
+            let defaultDate = current && current.startAt ? new Date(current.startAt) : new Date();
+            if (selectedWarningHistoryYear !== defaultDate.getFullYear()) defaultDate = new Date(selectedWarningHistoryYear, 0, 1, 9, 0, 0);
+            document.getElementById('warningEditStartAt').value = warningToLocalInput(defaultDate);
+            setWarningEditorMode('edit');
+        };
+        window.hideWarningStageForm = function() { setWarningEditorMode('timeline'); };
+
+        window.openWarningEditor = function(event, staffId, year = null) {
+            if (event) event.stopPropagation();
+            const key = warningNormalizeKey(staffId);
+            selectedWarningHistoryYear = Number(year) || new Date().getFullYear();
+            const emp = allEmployees.find(e => e.id === key || normalizeId(e.displayId) === key);
+            const record = warningNormalizeRecord(key);
+            document.getElementById('warningEditStaffId').value = key;
+            document.getElementById('warningEditStaffName').textContent = emp ? `${emp.name} • ${emp.displayId}` : key;
+            renderWarningHistory(key);
+            setWarningEditorMode('timeline');
+            const md = document.getElementById('warningEditModal');
+            const co = document.getElementById('warningEditModalContent');
+            md.classList.remove('hidden');
+            setTimeout(() => { md.classList.remove('opacity-0'); co.classList.remove('scale-95'); document.body.classList.add('modal-open'); }, 10);
+        };
+        window.closeWarningEditor = function() {
+            const md = document.getElementById('warningEditModal');
+            const co = document.getElementById('warningEditModalContent');
+            if (!md || !co) return;
+            md.classList.add('opacity-0'); co.classList.add('scale-95');
+            setTimeout(() => md.classList.add('hidden'), 250);
+            document.body.classList.remove('modal-open');
+        };
+        window.saveWarningStatus = async function() {
+            const id = document.getElementById('warningEditStaffId').value;
+            const level = document.getElementById('warningEditLevel').value;
+            const note = document.getElementById('warningEditNote').value.trim();
+            const issuer = document.getElementById('warningEditIssuer').value.trim();
+            const chosenStart = warningLocalInputToISO(document.getElementById('warningEditStartAt').value);
+            if (!id || !chosenStart) { showAppToast('Please choose a valid warning start date/time.', 'error'); return; }
+            const startDate = new Date(chosenStart);
+            if (startDate.getFullYear() !== selectedWarningHistoryYear) { showAppToast(`Warning date must be within ${selectedWarningHistoryYear}.`, 'error'); return; }
+            const record = warningNormalizeRecord(id);
+            let history = record.history.map(h => ({...h, year:warningEntryYear(h)}));
+            const yearIndexes = history.map((h,i)=>({h,i})).filter(x => warningEntryYear(x.h) === selectedWarningHistoryYear);
+            const currentLevel = getStaffWarningLevel(id, selectedWarningHistoryYear);
+            const activeIndex = [...yearIndexes].reverse().find(x => !x.h.endAt);
+
+            if (level === currentLevel) {
+                if (level !== 'normal') {
+                    if (activeIndex) {
+                        const previousClosed = yearIndexes.filter(x=>x.i!==activeIndex.i && x.h.endAt).map(x=>x.h).sort((a,b)=>new Date(b.endAt||0)-new Date(a.endAt||0))[0];
+                        if (previousClosed && new Date(chosenStart) < new Date(previousClosed.endAt)) { showAppToast('Start date overlaps the previous warning stage.', 'error'); return; }
+                        history[activeIndex.i].note = note;
+                        history[activeIndex.i].issuer = issuer;
+                        history[activeIndex.i].startAt = chosenStart;
+                        history[activeIndex.i].year = selectedWarningHistoryYear;
+                    } else {
+                        history.push({ level, year:selectedWarningHistoryYear, startAt:chosenStart, endAt:null, note, issuer });
+                    }
+                }
+            } else {
+                if (activeIndex) {
+                    const activeStart = history[activeIndex.i].startAt ? new Date(history[activeIndex.i].startAt) : null;
+                    if (activeStart && new Date(chosenStart) < activeStart) { showAppToast('New stage cannot start before the current stage began.', 'error'); return; }
+                    history[activeIndex.i].endAt = chosenStart;
+                }
+                if (level !== 'normal') history.push({ level, year:selectedWarningHistoryYear, startAt:chosenStart, endAt:null, note, issuer });
+            }
+            staffWarnings[id] = { level:getStaffWarningLevelFromHistory(history, new Date().getFullYear()), history };
+            await window.saveCustomNotes();
+            renderWarningHistory(id);
+            renderMobileDashboardUI();
+            setWarningEditorMode('timeline');
+            const meta = getStaffWarningMeta(id, selectedWarningHistoryYear);
+            showAppToast(`${selectedWarningHistoryYear} warning stage saved: ${meta.label}`, 'info');
+        };
+
+        function getStaffWarningLevelFromHistory(history, year) {
+            const y = Number(year) || new Date().getFullYear();
+            const list = history.filter(h => warningEntryYear(h) === y).slice().sort((a,b)=>{
+                const at=a.startAt?new Date(a.startAt).getTime():0, bt=b.startAt?new Date(b.startAt).getTime():0; return at-bt;
+            });
+            if (!list.length) return 'normal';
+            const latest=list[list.length-1];
+            if (latest.endAt) { const d=new Date(latest.endAt); if (!isNaN(d.getTime()) && d.getFullYear()===y) return 'normal'; }
+            return latest.level || 'normal';
+        }
+
+        window.openWarningHistoryEntryEditor = function(event, staffId, index) {
+            if (event) event.stopPropagation();
+            const id = warningNormalizeKey(staffId);
+            const record = warningNormalizeRecord(id);
+            const h = record.history[index];
+            if (!h) return;
+            document.getElementById('warningHistoryEditStaffId').value = id;
+            document.getElementById('warningHistoryEditIndex').value = index;
+            document.getElementById('warningHistoryEditLevel').value = h.level;
+            document.getElementById('warningHistoryEditStartAt').value = warningToLocalInput(h.startAt || new Date());
+            document.getElementById('warningHistoryEditEndAt').value = h.endAt ? warningToLocalInput(h.endAt) : '';
+            document.getElementById('warningHistoryEditIssuer').value = h.issuer || '';
+            document.getElementById('warningHistoryEditNote').value = h.note || '';
+            selectedWarningHistoryYear = warningEntryYear(h);
+            renderWarningYearSelector(id);
+            const err = document.getElementById('warningHistoryEditError'); if (err) { err.classList.add('hidden'); err.textContent=''; }
+            const md = document.getElementById('warningHistoryEditModal'); const co = document.getElementById('warningHistoryEditModalContent');
+            md.classList.remove('hidden'); setTimeout(()=>{ md.classList.remove('opacity-0'); co.classList.remove('scale-95'); },10);
+        };
+        window.closeWarningHistoryEntryEditor = function() {
+            const md = document.getElementById('warningHistoryEditModal'); const co = document.getElementById('warningHistoryEditModalContent');
+            if (!md || !co) return; md.classList.add('opacity-0'); co.classList.add('scale-95'); setTimeout(()=>md.classList.add('hidden'),250);
+        };
+        window.saveWarningHistoryEntry = async function() {
+            const id = document.getElementById('warningHistoryEditStaffId').value;
+            const index = Number(document.getElementById('warningHistoryEditIndex').value);
+            const level = document.getElementById('warningHistoryEditLevel').value;
+            const startAt = warningLocalInputToISO(document.getElementById('warningHistoryEditStartAt').value);
+            const endAt = warningLocalInputToISO(document.getElementById('warningHistoryEditEndAt').value);
+            const issuer = document.getElementById('warningHistoryEditIssuer').value.trim();
+            const note = document.getElementById('warningHistoryEditNote').value.trim();
+            const err = document.getElementById('warningHistoryEditError');
+            const fail = msg => { if (err) { err.textContent=msg; err.classList.remove('hidden'); } };
+            if (!id || !startAt) return fail('A valid start date/time is required.');
+            if (new Date(startAt).getFullYear() !== selectedWarningHistoryYear) return fail(`Start date must be within ${selectedWarningHistoryYear}.`);
+            if (endAt && new Date(endAt).getFullYear() !== selectedWarningHistoryYear) return fail(`End date must be within ${selectedWarningHistoryYear}.`);
+            if (endAt && new Date(endAt) <= new Date(startAt)) return fail('End date/time must be after the start date/time.');
+            const record = warningNormalizeRecord(id);
+            let history = record.history.map(h=>({...h}));
+            if (!history[index]) return fail('This warning entry could not be found.');
+            const candidateStart = new Date(startAt).getTime();
+            const candidateEnd = endAt ? new Date(endAt).getTime() : Infinity;
+            for (let i=0;i<history.length;i++) {
+                if (i===index) continue;
+                const h=history[i];
+                const hs = h.startAt ? new Date(h.startAt).getTime() : -Infinity;
+                const he = h.endAt ? new Date(h.endAt).getTime() : Infinity;
+                if (candidateStart < he && candidateEnd > hs) return fail('These dates overlap another warning stage. Adjust the start/end dates first.');
+            }
+            history[index] = { level, year:selectedWarningHistoryYear, startAt, endAt:endAt||null, note, issuer };
+            const active = history.filter(h=>!h.endAt);
+            if (active.length > 1) return fail('Only one warning stage can be active at a time. Add an end date to the other active stage.');
+            const currentLevel = getStaffWarningLevelFromHistory(history, new Date().getFullYear());
+            staffWarnings[id] = { level:currentLevel, history };
+            await window.saveCustomNotes();
+            renderWarningHistory(id);
+            renderMobileDashboardUI();
+            closeWarningHistoryEntryEditor();
+            showAppToast('Warning timeline entry updated.', 'info');
+        };
+
+        window.exportWarningEmployeeFromEditor = function() {
+            const id = document.getElementById('warningEditStaffId').value;
+            if (id) exportEmployeeCard(null, id);
+        };
+        window.exportEmployeeCard = function(event, staffId) {
+            if (event) event.stopPropagation();
+            const key = warningNormalizeKey(staffId);
+            const e = allEmployees.find(x => x.id === key || normalizeId(x.displayId) === key);
+            if (!e) { showAppToast('Employee not found for export.', 'error'); return; }
+            const ps = getMobileDashboardPeriodStats(e);
+            const exportWarningYear = selectedWarningHistoryYear || new Date().getFullYear();
+            const wm = getStaffWarningMeta(e.id, exportWarningYear);
+            const history = getStaffWarningHistory(e.id, exportWarningYear);
+            const levelLabels = { verbal:'Verbal Warning', written:'Written Warning', final:'Final Warning' };
+            const historyHtml = history.length ? history.map(h => `<div class="hist ${h.level}"><div class="hrow"><b>${levelLabels[h.level] || h.level}</b><span>${h.endAt ? 'Closed' : 'Current'}</span></div><div class="period">${warningEscapeHtml(warningFormatDateTime(h.startAt))} → ${warningEscapeHtml(h.endAt ? warningFormatDateTime(h.endAt) : 'Current')}</div>${h.issuer ? `<div class="period">By: ${warningEscapeHtml(h.issuer)}</div>` : ''}<div class="note">${warningEscapeHtml(h.note || 'No note recorded.')}</div></div>`).join('') : '<div class="empty">No warning history recorded.</div>';
+            const photo = e.photoUrl ? `<img src="${warningEscapeHtml(e.photoUrl)}" class="photo">` : `<div class="avatar">${warningEscapeHtml((e.name||'?')[0])}</div>`;
+            const html = `<!doctype html><html><head><meta charset="utf-8"><title>${warningEscapeHtml(e.name)} - Employee Summary</title><style>
+                *{box-sizing:border-box} body{font-family:Arial,sans-serif;color:#0f172a;margin:0;background:#f8fafc}.page{max-width:900px;margin:24px auto;background:#fff;padding:28px;border:1px solid #e2e8f0;border-radius:16px}.head{display:flex;gap:16px;align-items:center;border-bottom:2px solid #e2e8f0;padding-bottom:18px}.photo,.avatar{width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid #e2e8f0}.avatar{display:flex;align-items:center;justify-content:center;background:#eff6ff;color:#2563eb;font-size:28px;font-weight:bold}.name{font-size:24px;font-weight:800}.meta{color:#64748b;font-size:12px;margin-top:4px}.badge{display:inline-block;margin-top:8px;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:800;border:1px solid #cbd5e1}.normal{background:#ecfdf5;color:#047857}.verbal{background:#fefce8;color:#a16207}.written{background:#fff7ed;color:#c2410c}.final{background:#fef2f2;color:#b91c1c}.section{margin-top:22px}.section h2{font-size:14px;margin:0 0 10px;text-transform:uppercase;color:#475569}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.box{border:1px solid #e2e8f0;border-radius:10px;padding:10px}.box .label{font-size:10px;color:#64748b;text-transform:uppercase;font-weight:700}.box .val{font-size:18px;font-weight:800;margin-top:3px}.leave{width:100%;border-collapse:collapse;font-size:12px}.leave th,.leave td{border:1px solid #e2e8f0;padding:8px;text-align:center}.leave th:first-child,.leave td:first-child{text-align:left}.hist{border:1px solid #e2e8f0;border-left:4px solid #94a3b8;border-radius:10px;padding:10px;margin-bottom:8px}.hist.verbal{border-left-color:#eab308}.hist.written{border-left-color:#f97316}.hist.final{border-left-color:#ef4444}.hrow{display:flex;justify-content:space-between;font-size:12px}.period{font-size:10px;color:#64748b;margin-top:3px}.note{margin-top:6px;background:#f8fafc;padding:7px;border-radius:7px;font-size:11px;white-space:pre-wrap}.empty{color:#94a3b8;font-size:12px;padding:10px;border:1px dashed #cbd5e1;border-radius:10px}.foot{margin-top:22px;font-size:9px;color:#94a3b8;text-align:right}@media print{body{background:white}.page{border:0;margin:0;max-width:none;padding:18px}@page{margin:12mm}}
+            </style></head><body><div class="page"><div class="head">${photo}<div><div class="name">${warningEscapeHtml(e.name)}</div><div class="meta">${warningEscapeHtml(e.displayId)} • ${warningEscapeHtml(e.company)} • ${warningEscapeHtml(e.department || 'Unspecified')}</div><div class="meta">${warningEscapeHtml(e.position || '')}</div><div class="badge ${wm.level}">${warningEscapeHtml(wm.label)} • ${wm.count} warning stage${wm.count===1?'':'s'}</div></div></div>
+            <div class="section"><h2>Leave Summary</h2><table class="leave"><tr><th>Leave</th><th>Available</th><th>Used</th><th>Remaining</th></tr><tr><td>Annual Leave (AL)</td><td>${mobileDashboardFormatNumber(e.leaves.available.AL)}</td><td>${mobileDashboardFormatNumber(e.leaves.used.AL)}</td><td>${mobileDashboardFormatNumber(e.leaves.remaining.AL)}</td></tr><tr><td>Sick Leave (SL)</td><td>${mobileDashboardFormatNumber(e.leaves.available.SL)}</td><td>${mobileDashboardFormatNumber(e.leaves.used.SL)}</td><td>${mobileDashboardFormatNumber(e.leaves.remaining.SL)}</td></tr><tr><td>Special Leave (SP)</td><td>${mobileDashboardFormatNumber(e.leaves.available.SP)}</td><td>${mobileDashboardFormatNumber(e.leaves.used.SP)}</td><td>${mobileDashboardFormatNumber(e.leaves.remaining.SP)}</td></tr></table></div>
+            <div class="section"><h2>Attendance Exceptions</h2><div class="grid"><div class="box"><div class="label">Unpaid Leave</div><div class="val">${mobileDashboardFormatNumber(ps.UP)}</div></div><div class="box"><div class="label">Absence</div><div class="val">${mobileDashboardFormatNumber(ps.A)}</div></div><div class="box"><div class="label">Late</div><div class="val">${mobileDashboardFormatNumber(ps.Late5m)}</div></div><div class="box"><div class="label">Late 30+</div><div class="val">${mobileDashboardFormatNumber(ps.Late3m)}</div></div></div></div>
+            <div class="section"><h2>Warning Timeline (${exportWarningYear})</h2>${historyHtml}</div><div class="foot">Generated ${warningEscapeHtml(new Date().toLocaleString())}</div></div><script>window.onload=()=>setTimeout(()=>window.print(),250)<\/script></body></html>`;
+            const w = window.open('', '_blank', 'noopener,noreferrer');
+            if (!w) { showAppToast('Please allow pop-ups to export the employee card.', 'error'); return; }
+            w.document.open(); w.document.write(html); w.document.close();
+        };
 
         function renderMobileDashboardUI() {
             const shell = document.getElementById('dashboardMobileShell');
@@ -3603,14 +4286,16 @@
             const attention = [];
             filteredEmployees.forEach(e => {
                 const ps = getMobileDashboardPeriodStats(e);
-                if (e.status === 'Active') active++;
+                if (getEffectiveStaffStatus(e) === 'Active') active++;
                 leave += ps.AL + ps.SL + ps.SP + ps.UP;
                 late += ps.Late5m + ps.Late3m;
                 absence += ps.A;
 
-                if (e.status === 'Active') {
+                if (getEffectiveStaffStatus(e) === 'Active') {
                     const reasons = [];
                     let score = 0;
+                    const warningMeta = getStaffWarningMeta(e.id);
+                    if (warningMeta.level !== 'normal') { reasons.push(warningMeta.label); score += warningMeta.score; }
                     if (ps.A > 0) { reasons.push(`A ${mobileDashboardFormatNumber(ps.A)}`); score += 6 + ps.A; }
                     if (ps.Late3m > 0) { reasons.push(`L30+ ${mobileDashboardFormatNumber(ps.Late3m)}`); score += 5 + ps.Late3m; }
                     if (ps.UP > 0) { reasons.push(`UP ${mobileDashboardFormatNumber(ps.UP)}`); score += 4 + ps.UP; }
@@ -3626,15 +4311,20 @@
             const period = selectedDashboardMonth === 'All' ? 'YTD' : selectedDashboardMonth;
             const companyText = selectedCompanies.length === companies.size ? 'All Companies' : (selectedCompanies.length === 1 ? selectedCompanies[0] : `${selectedCompanies.length} Companies`);
             const scope = document.getElementById('mobileDashboardScope');
-            if (scope) scope.textContent = `${companyText} • ${selectedDepartments === 'All' ? 'All Departments' : selectedDepartments} • ${period}`;
+            const deptText = selectedDepartments === null ? 'All Departments' : (selectedDepartments.length === 0 ? 'No Departments' : (selectedDepartments.length === 1 ? selectedDepartments[0] : `${selectedDepartments.length} Departments`));
+            if (scope) scope.textContent = `${companyText} • ${deptText} • ${period}`;
 
             const chips = [];
             if (selectedCompanies.length !== companies.size) chips.push(companyText);
-            if (selectedDepartments !== 'All') chips.push(selectedDepartments);
+            if (selectedDepartments !== null) chips.push(deptText);
             if (!(selectedStatuses.length === 1 && selectedStatuses[0] === 'Active')) chips.push(selectedStatuses.length ? selectedStatuses.join(' + ') : 'No Status');
             if (selectedDashboardMonth !== 'All') chips.push(selectedDashboardMonth);
             const leaveType = document.getElementById('dashboardLeaveTypeFilter')?.value || 'All';
             if (leaveType !== 'All') chips.push(leaveType === 'Late' ? 'Late only' : `${leaveType} only`);
+            if (selectedDashboardWarning !== 'All') {
+                const labels = { AnyWarning:'Any Warning', normal:'Normal', verbal:'Verbal Warning', written:'Written Warning', final:'Final Warning' };
+                chips.push(labels[selectedDashboardWarning] || selectedDashboardWarning);
+            }
             if (searchQuery) chips.push(`Search: ${searchQuery}`);
             const chipWrap = document.getElementById('mobileDashboardFilterChips');
             if (chipWrap) chipWrap.innerHTML = chips.map(c => `<span class="mobile-dashboard-chip">${c}</span>`).join('');
@@ -3655,7 +4345,7 @@
                             <div class="min-w-0 flex-1">
                                 <div class="flex items-center justify-between gap-2"><div class="text-[11px] font-extrabold text-slate-800 truncate">${e.name}</div><i class="fa-solid fa-chevron-right text-[9px] text-slate-300"></i></div>
                                 <div class="text-[8px] text-slate-400 mt-0.5 truncate">${e.displayId} • ${e.department || 'Unspecified'}</div>
-                                <div class="mobile-attention-reasons">${reasons.map(r=>`<span class="mobile-attention-badge">${r}</span>`).join('')}</div>
+                                <div class="mobile-attention-reasons">${reasons.map(r=>{ const wm = ['Verbal Warning','Written Warning','Final Warning'].includes(r) ? ` warning-${r.split(' ')[0].toLowerCase()}` : ''; return `<span class="mobile-attention-badge${wm}">${r}</span>`; }).join('')}</div>
                             </div>
                         </div>`).join('');
                 }
@@ -3671,22 +4361,31 @@
                 if (ps.A>0) flags.push(`<span class="mobile-staff-flag text-red-700 bg-red-50 border-red-100">A ${mobileDashboardFormatNumber(ps.A)}</span>`);
                 if (ps.Late5m>0) flags.push(`<span class="mobile-staff-flag text-amber-700 bg-amber-50 border-amber-100">L ${mobileDashboardFormatNumber(ps.Late5m)}</span>`);
                 if (ps.Late3m>0) flags.push(`<span class="mobile-staff-flag text-orange-700 bg-orange-50 border-orange-100">L30+ ${mobileDashboardFormatNumber(ps.Late3m)}</span>`);
-                if (e.status !== 'Active') flags.push(`<span class="mobile-staff-flag">${e.status}</span>`);
+                if (isNoticePeriodStaff(e)) flags.push(`<span class="mobile-staff-flag text-amber-800 bg-amber-50 border-amber-200"><i class="fa-solid fa-hourglass-half mr-1"></i>Notice · Last Day ${formatStaffLastDay(e)}</span>`);
+                else if (!isEmploymentVisible(e)) flags.push(`<span class="mobile-staff-flag">${e.status}</span>`);
                 else if (e.isProbation) flags.push('<span class="mobile-staff-flag text-indigo-700 bg-indigo-50 border-indigo-100">Probation</span>');
-                return `<article class="mobile-staff-card" onclick="openModalById('${String(e.id).replace(/'/g,"\\'")}')">
+                const cardWarningMeta = getStaffWarningMeta(e.id);
+                const cardWarningClass = cardWarningMeta.level === 'verbal' ? 'staff-warning-card-verbal' : cardWarningMeta.level === 'written' ? 'staff-warning-card-written' : cardWarningMeta.level === 'final' ? 'staff-warning-card-final' : '';
+                return `<article class="mobile-staff-card ${cardWarningClass}" onclick="openModalById('${String(e.id).replace(/'/g,"\\'")}')">
                     <div class="mobile-staff-card-top">
                         ${getMobileDashboardPhoto(e,'mobile-staff-avatar')}
                         <div class="min-w-0 flex-1">
                             <div class="flex items-center justify-between gap-2"><div class="mobile-staff-name truncate">${e.name}</div><i class="fa-solid fa-chevron-right text-[10px] text-slate-300"></i></div>
                             <div class="mobile-staff-meta truncate">${e.displayId} • ${e.company} • ${e.department || 'Unspecified'}</div>
                             <div class="mobile-staff-meta truncate">${e.position || 'Position not specified'}</div>
+                            ${isNoticePeriodStaff(e) ? `<div class="mobile-staff-last-day"><i class="fa-regular fa-calendar-xmark"></i> Last Working Day: <strong>${formatStaffLastDay(e)}</strong></div>` : ''}
+                            <div class="flex flex-wrap items-center gap-1.5 mt-1">
+                                ${isNoticePeriodStaff(e) ? noticePeriodBadgeHtml(e,true) : ''}
+                                ${(() => { const wm = getStaffWarningMeta(e.id); return `<button type="button" class="staff-warning-badge ${wm.cls}" onclick="openWarningEditor(event,'${String(e.id).replace(/'/g,"\'")}')"><i class="fa-solid ${wm.icon}"></i>${wm.label}<i class="fa-solid fa-pen text-[7px] opacity-60 ml-0.5"></i></button><span class="staff-warning-count"><i class="fa-solid fa-clock-rotate-left"></i>${wm.count}</span>`; })()}
+                                <button type="button" class="staff-card-export-btn" onclick="exportEmployeeCard(event,'${String(e.id).replace(/'/g,"\'")}')"><i class="fa-solid fa-file-export"></i> Export</button>
+                            </div>
                         </div>
                     </div>
                     <div class="mobile-staff-leave-panel">
-                        <div class="mobile-staff-leave-head"><span>Leave</span><span>AL</span><span>SL</span><span>SP</span></div>
-                        <div class="mobile-staff-leave-row"><span class="metric-label">Available</span><span class="metric-value">${mobileDashboardFormatNumber(e.leaves.available.AL)}</span><span class="metric-value">${mobileDashboardFormatNumber(e.leaves.available.SL)}</span><span class="metric-value">${mobileDashboardFormatNumber(e.leaves.available.SP)}</span></div>
-                        <div class="mobile-staff-leave-row used"><span class="metric-label">Used</span><span class="metric-value">${mobileDashboardFormatNumber(e.leaves.used.AL)}</span><span class="metric-value">${mobileDashboardFormatNumber(e.leaves.used.SL)}</span><span class="metric-value">${mobileDashboardFormatNumber(e.leaves.used.SP)}</span></div>
-                        <div class="mobile-staff-leave-row remaining"><span class="metric-label">Remaining</span><span class="metric-value">${mobileDashboardFormatNumber(e.leaves.remaining.AL)}</span><span class="metric-value">${mobileDashboardFormatNumber(e.leaves.remaining.SL)}</span><span class="metric-value">${mobileDashboardFormatNumber(e.leaves.remaining.SP)}</span></div>
+                        <div class="mobile-staff-leave-head"><span>Leave</span><span>Available</span><span>Used</span><span>Remaining</span></div>
+                        <div class="mobile-staff-leave-row"><span class="metric-label">AL</span><span class="metric-value">${mobileDashboardFormatNumber(e.leaves.available.AL)}</span><span class="metric-value">${mobileDashboardFormatNumber(e.leaves.used.AL)}</span><span class="metric-value">${mobileDashboardFormatNumber(e.leaves.remaining.AL)}</span></div>
+                        <div class="mobile-staff-leave-row used"><span class="metric-label">SL</span><span class="metric-value">${mobileDashboardFormatNumber(e.leaves.available.SL)}</span><span class="metric-value">${mobileDashboardFormatNumber(e.leaves.used.SL)}</span><span class="metric-value">${mobileDashboardFormatNumber(e.leaves.remaining.SL)}</span></div>
+                        <div class="mobile-staff-leave-row remaining"><span class="metric-label">SP</span><span class="metric-value">${mobileDashboardFormatNumber(e.leaves.available.SP)}</span><span class="metric-value">${mobileDashboardFormatNumber(e.leaves.used.SP)}</span><span class="metric-value">${mobileDashboardFormatNumber(e.leaves.remaining.SP)}</span></div>
                     </div>
                     <div class="mobile-staff-attendance-row">
                         <div class="mobile-staff-attendance-metric up"><span>UP</span><strong>${mobileDashboardFormatNumber(ps.UP)}</strong></div>
@@ -3722,13 +4421,32 @@
             selectedCompanies = checked ? Array.from(companies).sort() : [];
             syncDesktopDashboardControlsFromState(); applyFilters();
         };
-        window.mobileDashboardSetDepartment = function(v) { selectedDepartments = v; syncDesktopDashboardControlsFromState(); applyFilters(); };
+        window.toggleMobileDashboardDepartmentMenu = function() {
+            const menu = document.getElementById('mobileDashboardDepartmentMenu');
+            if (menu) menu.classList.toggle('hidden');
+        };
+        window.mobileDashboardToggleDepartment = function(dept, checked) {
+            const available = Array.from(departments).sort();
+            let selected = selectedDepartments === null ? [...available] : [...selectedDepartments];
+            if (checked) { if (!selected.includes(dept)) selected.push(dept); }
+            else selected = selected.filter(d => d !== dept);
+            selectedDepartments = selected.length === available.length ? null : selected;
+            syncDesktopDashboardControlsFromState();
+            applyFilters();
+        };
+        window.mobileDashboardSelectAllDepartments = function(checked) {
+            selectedDepartments = checked ? null : [];
+            syncDesktopDashboardControlsFromState();
+            applyFilters();
+        };
+        window.mobileDashboardSetDepartment = function(v) { selectedDepartments = (!v || v === 'All') ? null : [v]; syncDesktopDashboardControlsFromState(); applyFilters(); };
         window.mobileDashboardSetStatuses = function() {
             selectedStatuses = Array.from(document.querySelectorAll('.mobile-dashboard-status:checked')).map(cb=>cb.value);
             syncDesktopDashboardControlsFromState(); applyFilters();
         };
         window.mobileDashboardSetMonth = function(v) { selectedDashboardMonth = v; syncDesktopDashboardControlsFromState(); applyFilters(); };
         window.mobileDashboardSetLeaveType = function(v) { const d=document.getElementById('dashboardLeaveTypeFilter'); if(d)d.value=v; applyFilters(); };
+        window.mobileDashboardSetWarning = function(v) { selectedDashboardWarning = v || 'All'; applyFilters(); };
         window.mobileDashboardSetSearch = function(v) {
             searchQuery = String(v || '').toLowerCase();
             const d=document.getElementById('searchInput'); if(d)d.value=v;
@@ -3738,9 +4456,10 @@
         };
         window.resetMobileDashboardFilters = function() {
             selectedCompanies = Array.from(companies).sort();
-            selectedDepartments = 'All';
+            selectedDepartments = null;
             selectedStatuses = ['Active'];
             selectedDashboardMonth = 'All';
+            selectedDashboardWarning = 'All';
             searchQuery = '';
             const lt=document.getElementById('dashboardLeaveTypeFilter'); if(lt)lt.value='All';
             syncDesktopDashboardControlsFromState(); applyFilters();
@@ -3778,7 +4497,7 @@
                     else bc+="bg-white text-slate-700 hover:border-blue-400 hover:bg-blue-50/50";
                 }
 
-                let vL=lTM.filter(r=>{if(r.day!==d)return false; let e=allEmployees.find(x=>x.id===r.staffId); return e&&e.status==='Active'&&selectedCalendarCompanies.includes(e.company)&&!(r.isPresent&&r.leaves.AL===0&&r.leaves.SL===0&&r.leaves.SP===0&&r.leaves.UP===0&&r.leaves.A===0&&r.leaves.Late5m===0&&r.leaves.Late3m===0&&r.leaves.D===0&&r.leaves.OT===0&&r.leaves.H===0&&!r.isRawD&&!r.isRawH);});
+                let vL=lTM.filter(r=>{if(r.day!==d)return false; let e=allEmployees.find(x=>x.id===r.staffId); return e&&isEmploymentVisible(e,new Date(yr,mo,d))&&selectedCalendarCompanies.includes(e.company)&&!(r.isPresent&&r.leaves.AL===0&&r.leaves.SL===0&&r.leaves.SP===0&&r.leaves.UP===0&&r.leaves.A===0&&r.leaves.Late5m===0&&r.leaves.Late3m===0&&r.leaves.D===0&&r.leaves.OT===0&&r.leaves.H===0&&!r.isRawD&&!r.isRawH);});
                 let iHtml=''; 
                 if(isHoliday) {
                     iHtml += `<div class="absolute top-1 left-1 text-[8px] sm:text-[10px] text-rose-500 font-bold bg-white/80 rounded px-1 backdrop-blur-sm shadow-sm flex items-center gap-1"><i class="fa-solid fa-gift"></i><span class="hidden sm:inline">Hol</span></div>`;
@@ -3812,13 +4531,13 @@
                 let ini=e.name.split(' ').map(x=>x[0]).join('').substring(0,2).toUpperCase();
                 let customNoteTxt = customNotes[`${e.id}_${dStr}`] || n;
                 let cReason = customReasons[`${e.id}_${dStr}`] || '';
-                return `<div class="bg-white p-3 rounded-xl border shadow-sm mb-3 cursor-pointer hover:border-blue-400 group relative" onclick="openModalById('${e.id}')"><div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 opacity-0 group-hover:opacity-100"></div><div class="flex items-start justify-between"><div class="flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-slate-50 border flex items-center justify-center text-[10px] font-bold">${ini}</div><div><h4 class="font-bold text-xs group-hover:text-blue-600">${e.name}</h4><p class="text-[9px] text-slate-400">${e.position}</p></div></div><span class="text-[9px] bg-slate-50 border px-1.5 py-1 rounded font-bold">${e.displayId}</span></div><div class="mt-2 pl-10 flex flex-wrap gap-0">${b}</div>${customNoteTxt?`<div class="pl-10 mt-1 text-[9px] text-slate-500"><i class="fa-regular fa-clock"></i> ${customNoteTxt}</div>`:''}${cReason?`<div class="pl-10 mt-0.5 text-[9px] text-slate-400 italic">Reason: ${cReason}</div>`:''}</div>`;
+                return `<div class="bg-white p-3 rounded-xl border shadow-sm mb-3 cursor-pointer hover:border-blue-400 group relative" onclick="openModalById('${e.id}')"><div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 opacity-0 group-hover:opacity-100"></div><div class="flex items-start justify-between"><div class="flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-slate-50 border flex items-center justify-center text-[10px] font-bold">${ini}</div><div><h4 class="font-bold text-xs group-hover:text-blue-600 flex items-center gap-1">${e.name}${warningInlineIndicatorHtml(e.id,{year:currentCalendarDate.getFullYear()})}</h4><p class="text-[9px] text-slate-400">${e.position}</p></div></div><span class="text-[9px] bg-slate-50 border px-1.5 py-1 rounded font-bold">${e.displayId}</span></div><div class="mt-2 pl-10 flex flex-wrap gap-0">${b}</div>${customNoteTxt?`<div class="pl-10 mt-1 text-[9px] text-slate-500"><i class="fa-regular fa-clock"></i> ${customNoteTxt}</div>`:''}${cReason?`<div class="pl-10 mt-0.5 text-[9px] text-slate-400 italic">Reason: ${cReason}</div>`:''}</div>`;
             };
 
             if(selectedCalendarDate) {
                 sT.innerText='Daily View'; document.getElementById('calendarSummaryMonth').innerHTML=`<div class="flex justify-between items-center bg-blue-50 p-2.5 rounded-lg border border-blue-200 mt-1 mb-2"><span class="font-bold text-blue-900 text-xs">${mName} ${selectedCalendarDate}, ${currentCalendarDate.getFullYear()}</span><button onclick="selectDate(${selectedCalendarDate})" class="text-[10px] bg-white px-2 py-1 rounded border hover:bg-blue-600 hover:text-white">Back</button></div>`;
                 dailyLeaveRecords.filter(r=>r.month.toLowerCase().startsWith(mName.substring(0,3).toLowerCase())&&r.day===selectedCalendarDate).forEach(r=>{
-                    let e=allEmployees.find(x=>x.id===r.staffId); if(!e||e.status!=='Active'||!selectedCalendarCompanies.includes(e.company))return;
+                    let e=allEmployees.find(x=>x.id===r.staffId); if(!e||!isEmploymentVisible(e,new Date(currentCalendarDate.getFullYear(),currentCalendarDate.getMonth(),selectedCalendarDate||1))||!selectedCalendarCompanies.includes(e.company))return;
                     let h=r.leaves; if(r.isPresent&&h.AL===0&&h.SL===0&&h.SP===0&&h.UP===0&&h.A===0&&h.Late5m===0&&h.Late3m===0&&h.D===0&&h.OT===0&&h.H===0&&!r.isRawD&&!r.isRawH)return;
                     found=true; tA+=h.AL;tSl+=h.SL;tSp+=h.SP;tU+=h.UP;tAb+=h.A;tL5+=h.Late5m;tL3+=h.Late3m;tO+=h.OT;tD+=h.D;tH_count+=h.H;
                     if(!cS[e.company])cS[e.company]={AL:0,SL:0,SP:0,UP:0,A:0,D:0,H:0}; if(h.AL>0)cS[e.company].AL++; if(h.SL>0)cS[e.company].SL++; if(h.SP>0)cS[e.company].SP++; if(h.UP>0)cS[e.company].UP++; if(h.A>0)cS[e.company].A++; if(h.D>0)cS[e.company].D++; if(h.H>0)cS[e.company].H++;
@@ -3827,7 +4546,7 @@
             } else {
                 sT.innerText='Monthly Summary'; document.getElementById('calendarSummaryMonth').innerHTML=`<div class="bg-slate-50 p-2 rounded-lg border mt-1 mb-2"><span class="font-bold text-xs text-slate-700">Aggregated records for ${mName}</span></div>`;
                 allEmployees.forEach(e=>{
-                    if(e.status!=='Active'||!selectedCalendarCompanies.includes(e.company))return;
+                    if(!isEmploymentVisible(e,new Date(currentCalendarDate.getFullYear(),currentCalendarDate.getMonth()+1,0))||!selectedCalendarCompanies.includes(e.company))return;
                     let mk=Object.keys(leaveHistoryByEmployee[e.id]||{}).find(k=>k.toLowerCase().startsWith(mName.substring(0,3).toLowerCase()));
                     if(mk) { let h=leaveHistoryByEmployee[e.id][mk]; if(h.AL===0&&h.SL===0&&h.SP===0&&h.UP===0&&h.A===0&&h.Late5m===0&&h.Late3m===0&&h.D===0&&h.H===0)return;
                         found=true; tA+=h.AL;tSl+=h.SL;tSp+=h.SP;tU+=h.UP;tAb+=h.A;tL5+=h.Late5m;tL3+=h.Late3m;tO+=h.OT;tD+=h.D;tH_count+=h.H;
@@ -3883,7 +4602,7 @@
 
         function getCalendarRowAvailableDepartments() {
             return [...new Set(allEmployees
-                .filter(e => e && e.status === 'Active')
+                .filter(e => e && isEmploymentVisible(e, new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth()+1, 0)))
                 .filter(e => selectedCalendarRowCompany === '__ALL__' || e.company === selectedCalendarRowCompany)
                 .filter(e => !(typeof window.isExcludedPosition === 'function' && window.isExcludedPosition(e.position)))
                 .map(e => String(e.department || '').trim())
@@ -4009,7 +4728,7 @@
             // positions, except the explicit Housekeeper (s) role. Reuse the same
             // exclusion helper already used elsewhere in the dashboard.
             const employeeMatches = e => e &&
-                e.status === 'Active' &&
+                getEffectiveStaffStatus(e) === 'Active' &&
                 (selectedCalendarRowCompany === '__ALL__' || e.company === selectedCalendarRowCompany) &&
                 (selectedCalendarRowDepartments === null || selectedCalendarRowDepartments.includes(String(e.department || '').trim())) &&
                 !(typeof window.isExcludedPosition === 'function' && window.isExcludedPosition(e.position));
@@ -4168,7 +4887,7 @@
                     <tr class="${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/60'} hover:bg-blue-50/40 cursor-pointer" onclick="openModalById('${e.id}')">
                         <td class="border border-slate-200 text-center font-medium sticky z-20 ${stickyBg} px-1" style="left:0; min-width:36px; width:36px;">${idx + 1}</td>
                         <td class="border border-slate-200 text-center font-medium sticky z-20 ${stickyBg} px-1" style="left:36px; min-width:72px; width:72px;">${e.displayId || e.id}</td>
-                        <td class="border border-slate-200 px-2 py-1 sticky z-20 ${stickyBg}" style="left:108px; min-width:160px; width:160px;"><div class="font-semibold text-[10px] sm:text-[11px] text-slate-800 truncate">${e.name}</div><div class="text-[8px] sm:text-[9px] text-slate-400 truncate mt-0.5">${e.position || '-'}${selectedCalendarRowCompany === '__ALL__' ? ` • ${e.company}` : ''}</div></td>
+                        <td class="border border-slate-200 px-2 py-1 sticky z-20 ${stickyBg}" style="left:108px; min-width:160px; width:160px;"><div class="font-semibold text-[10px] sm:text-[11px] text-slate-800 truncate flex items-center gap-1"><span class="truncate">${e.name}</span>${warningInlineIndicatorHtml(e.id,{year:selectedCalendarRowYear})}</div><div class="text-[8px] sm:text-[9px] text-slate-400 truncate mt-0.5">${e.position || '-'}${selectedCalendarRowCompany === '__ALL__' ? ` • ${e.company}` : ''}</div></td>
                         ${dayTds}
                         <td class="border border-slate-200 text-center font-semibold px-1 py-1 min-w-[36px] ${summaryHeaderClass('D')}">${formatVal(totals.D)}</td>
                         <td class="border border-slate-200 text-center font-semibold px-1 py-1 min-w-[36px] ${summaryHeaderClass('UP')}">${formatVal(totals.UP)}</td>
@@ -4192,7 +4911,7 @@
             dailyLeaveRecords.forEach(r=>{
                 let d=new Date(`${r.month} ${r.day}, ${yr}`); d.setHours(12,0,0,0);
                 if(d>=fD && d<=tD) {
-                    let e=allEmployees.find(x=>x.id===r.staffId); if(!e||e.status!=='Active'||!selectedDailyCompanies.includes(e.company))return;
+                    let e=allEmployees.find(x=>x.id===r.staffId); if(!e||!isEmploymentVisible(e)||!selectedDailyCompanies.includes(e.company))return;
                     if(dailySearchQuery && !e.name.toLowerCase().includes(dailySearchQuery) && !e.displayId.toLowerCase().includes(dailySearchQuery)) return;
                     if(r.isPresent&&r.leaves.AL===0&&r.leaves.SL===0&&r.leaves.SP===0&&r.leaves.UP===0&&r.leaves.A===0&&r.leaves.Late5m===0&&r.leaves.Late3m===0&&r.leaves.D===0&&r.leaves.OT===0&&r.leaves.H===0&&!r.isRawD&&!r.isRawH)return;
                     
@@ -4240,12 +4959,12 @@
                 let dC=selectedDailyCompanies.length>0?selectedDailyCompanies:Array.from(companies);
                 
                 let allTot=0, allL=0, allO=0, allLa=0, allG=0, allH=0;
-                dC.forEach(c => { let tot=allEmployees.filter(e=>e.company===c&&e.status==='Active').length; allTot+=tot; let g=grp[c]||[]; allG+=g.length; g.forEach(i=>{allL+=(i.leaves.AL+i.leaves.SL+i.leaves.SP+i.leaves.UP+i.leaves.A); allO+=i.leaves.D; allLa+=(i.leaves.Late5m+i.leaves.Late3m); allH+=i.leaves.H;}); });
+                dC.forEach(c => { let tot=allEmployees.filter(e=>e.company===c&&isEmploymentVisible(e)).length; allTot+=tot; let g=grp[c]||[]; allG+=g.length; g.forEach(i=>{allL+=(i.leaves.AL+i.leaves.SL+i.leaves.SP+i.leaves.UP+i.leaves.A); allO+=i.leaves.D; allLa+=(i.leaves.Late5m+i.leaves.Late3m); allH+=i.leaves.H;}); });
                 let aSp=[]; if(allL>0)aSp.push(`<span class="bg-red-50 text-red-700 px-2 py-1 rounded border border-red-100">${allL} Leave</span>`); if(allO>0)aSp.push(`<span class="bg-slate-700 text-white px-2 py-1 rounded border border-slate-800">${allO} Off</span>`); if(allLa>0)aSp.push(`<span class="bg-orange-50 text-orange-700 px-2 py-1 rounded border">${allLa} Late</span>`); if(allH>0)aSp.push(`<span class="bg-rose-50 text-rose-700 px-2 py-1 rounded border">${allH} Hol</span>`);
                 sH+=`<div class="flex items-center text-xs border border-blue-200 bg-blue-50/50 shadow-sm rounded-lg p-3 pr-4 mr-2"><div class="flex items-center gap-2 border-r border-blue-200 pr-4"><span class="font-bold text-blue-800">All Selected</span><span class="text-blue-500 text-[10px]">${allG}/${allTot} Staff</span></div><div class="pl-4 flex gap-1.5">${aSp.length>0?aSp.join(''):'<span class="bg-emerald-50 text-emerald-700 px-2 py-1 rounded border border-emerald-200 shadow-sm">All Present</span>'}</div></div>`;
 
                 dC.sort().forEach(c=>{
-                    let tot=allEmployees.filter(e=>e.company===c&&e.status==='Active').length, g=grp[c]||[], oL=0,oD=0,oLa=0, oH=0;
+                    let tot=allEmployees.filter(e=>e.company===c&&isEmploymentVisible(e)).length, g=grp[c]||[], oL=0,oD=0,oLa=0, oH=0;
                     g.forEach(i=>{oL+=(i.leaves.AL+i.leaves.SL+i.leaves.SP+i.leaves.UP+i.leaves.A); oD+=i.leaves.D; oLa+=(i.leaves.Late5m+i.leaves.Late3m); oH+=i.leaves.H;});
                     let sp=[]; if(oL>0)sp.push(`<span class="bg-red-50 text-red-700 px-2 py-1 rounded border border-red-100">${oL} Leave</span>`); if(oD>0)sp.push(`<span class="bg-slate-700 text-white px-2 py-1 rounded border border-slate-800">${oD} Off</span>`); if(oLa>0)sp.push(`<span class="bg-orange-50 text-orange-700 px-2 py-1 rounded border">${oLa} Late</span>`); if(oH>0)sp.push(`<span class="bg-rose-50 text-rose-700 px-2 py-1 rounded border">${oH} Hol</span>`);
                     sH+=`<div ${g.length>0?`onclick="openDailyCompanyModal('${c.replace(/'/g,"\\'")}')" class="flex items-center text-xs border bg-white shadow-sm hover:border-blue-400 cursor-pointer rounded-lg p-3 group relative pr-8"`:`class="flex items-center text-xs border bg-slate-50 opacity-60 rounded-lg p-3 pr-3"`}><div class="flex items-center gap-2 border-r pr-4"><span class="font-bold">${getCompanyLogo(c)} ${c}</span><span class="text-slate-400 text-[10px]">${g.length}/${tot} Staff</span></div><div class="pl-4 flex gap-1.5">${sp.length>0?sp.join(''):'<span class="bg-emerald-50 text-emerald-700 px-2 py-1 rounded border">All Present</span>'}</div>${g.length>0?'<i class="fa-solid fa-chevron-right absolute right-3 text-slate-300 group-hover:text-blue-500"></i>':''}</div>`;
@@ -4254,7 +4973,7 @@
 
             if(Object.keys(grp).length===0) { nd.classList.remove('hidden'); return; } nd.classList.add('hidden');
             Object.keys(grp).sort().forEach(c => {
-                let tot=allEmployees.filter(e=>e.company===c&&e.status==='Active').length;
+                let tot=allEmployees.filter(e=>e.company===c&&isEmploymentVisible(e)).length;
                 let hdr=document.createElement('tr'); hdr.className="bg-slate-100/80 border-y"; hdr.innerHTML=`<td colspan="6" class="px-5 py-2.5"><div class="text-sm font-bold flex items-center gap-2">${getCompanyLogo(c)} ${c} <span class="bg-white border text-[10px] px-2 rounded-full ml-2">${grp[c].length}/${tot} Staff</span></div></td>`; tb.appendChild(hdr);
                 grp[c].forEach(i=>{
                     let e=i.emp, t=[], h=i.leaves;
@@ -4282,8 +5001,8 @@
                     }).join('');
 
                     let tr=document.createElement('tr'); tr.className="hover:bg-blue-50/50 border-b transition-colors";
-                    tr.innerHTML=`<td class="px-5 py-3 cursor-pointer align-top" onclick="openModalById('${e.id}')">${e.displayId}</td><td class="px-5 py-3 font-bold cursor-pointer align-top" onclick="openModalById('${e.id}')">${e.name}</td><td class="px-5 py-3 text-xs cursor-pointer align-top" onclick="openModalById('${e.id}')">${e.position}</td><td class="px-5 py-3 cursor-pointer align-top" onclick="openModalById('${e.id}')"><div class="flex gap-1.5 flex-wrap">${t.join('')}</div></td><td class="px-5 py-3 text-xs align-top">${nStr}</td><td class="px-5 py-3 text-xs align-top" onclick="event.stopPropagation()">${reasonInputs}</td>`; tb.appendChild(tr);
-                    if(mc) { let crd=document.createElement('div'); crd.className="bg-white rounded-xl shadow-sm border p-4 cursor-pointer relative overflow-hidden"; crd.onclick=()=>openModal(e); crd.innerHTML=`<div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div><div class="flex gap-3 pl-1"><div class="w-10 h-10 rounded-full bg-slate-50 border flex items-center justify-center font-bold overflow-hidden">${e.photoUrl ? `<img src="${e.photoUrl}" class="w-full h-full object-cover">` : e.name[0]}</div><div class="flex-grow"><h4 class="font-bold text-sm">${e.name}</h4><div class="text-[11px] text-slate-500">${e.displayId} &bull; ${e.position}</div><div class="mt-2 flex flex-wrap gap-1.5">${t.join('')}</div><div class="mt-2 flex flex-col gap-1">${nStr}</div><div class="mt-2 flex flex-col gap-1" onclick="event.stopPropagation()">${reasonInputs}</div></div></div>`; mc.appendChild(crd); }
+                    tr.innerHTML=`<td class="px-5 py-3 cursor-pointer align-top" onclick="openModalById('${e.id}')">${e.displayId}</td><td class="px-5 py-3 font-bold cursor-pointer align-top" onclick="openModalById('${e.id}')"><div class="flex items-center gap-1.5"><span>${e.name}</span>${warningInlineIndicatorHtml(e.id,{year:yr})}</div></td><td class="px-5 py-3 text-xs cursor-pointer align-top" onclick="openModalById('${e.id}')">${e.position}</td><td class="px-5 py-3 cursor-pointer align-top" onclick="openModalById('${e.id}')"><div class="flex gap-1.5 flex-wrap">${t.join('')}</div></td><td class="px-5 py-3 text-xs align-top">${nStr}</td><td class="px-5 py-3 text-xs align-top" onclick="event.stopPropagation()">${reasonInputs}</td>`; tb.appendChild(tr);
+                    if(mc) { let crd=document.createElement('div'); crd.className="bg-white rounded-xl shadow-sm border p-4 cursor-pointer relative overflow-hidden"; crd.onclick=()=>openModal(e); crd.innerHTML=`<div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div><div class="flex gap-3 pl-1"><div class="w-10 h-10 rounded-full bg-slate-50 border flex items-center justify-center font-bold overflow-hidden">${e.photoUrl ? `<img src="${e.photoUrl}" class="w-full h-full object-cover">` : e.name[0]}</div><div class="flex-grow"><h4 class="font-bold text-sm flex items-center gap-1.5">${e.name}${warningInlineIndicatorHtml(e.id,{year:yr})}</h4><div class="text-[11px] text-slate-500">${e.displayId} &bull; ${e.position}</div><div class="mt-2 flex flex-wrap gap-1.5">${t.join('')}</div><div class="mt-2 flex flex-col gap-1">${nStr}</div><div class="mt-2 flex flex-col gap-1" onclick="event.stopPropagation()">${reasonInputs}</div></div></div>`; mc.appendChild(crd); }
                 });
             });
         }
@@ -4292,10 +5011,42 @@
         function openModal(e) {
             let avatarContent = e.photoUrl ? `<img src="${e.photoUrl}" class="w-full h-full object-cover" alt="Avatar">` : e.name[0];
             document.getElementById('modalAvatar').innerHTML = avatarContent;
-            document.getElementById('modalName').innerHTML=`${e.name} ${(e.status==='Resigned'||e.status==='Terminated')?`<span class="text-[9px] bg-red-100 text-red-700 px-1.5 rounded border">${e.status}</span>`:''}`;
+            document.getElementById('modalName').innerHTML=`${e.name} ${isNoticePeriodStaff(e) ? noticePeriodBadgeHtml(e,true) : ((e.status==='Resigned'||e.status==='Terminated')?`<span class="text-[9px] bg-red-100 text-red-700 px-1.5 rounded border">${e.status}</span>`:'')}`;
             document.getElementById('modalId').innerText=e.displayId; document.getElementById('modalCompany').innerHTML=`${getCompanyLogo(e.company)} ${e.company}`;
             document.getElementById('modalPosition').innerText=e.position; document.getElementById('modalJoinDate').innerText=e.joinDate;
-            const rS=document.getElementById('modalResignedSection'); if(e.status!=='Active'){rS.classList.remove('hidden'); document.getElementById('modalResignedDate').innerText=e.resignedDate||'N/A'; document.getElementById('modalResignedReason').innerText=e.resignedReason||'N/A';} else rS.classList.add('hidden');
+            const rS=document.getElementById('modalResignedSection'); if(e.status!=='Active'){rS.classList.remove('hidden'); document.getElementById('modalResignedDate').innerText=isNoticePeriodStaff(e)?`${formatStaffLastDay(e)} (Last Working Day)`: (e.resignedDate||'N/A'); document.getElementById('modalResignedReason').innerText=e.resignedReason||'N/A';} else rS.classList.add('hidden');
+
+            // Show the current warning state inside the employee profile when this staff has warning history.
+            const warningSection = document.getElementById('modalWarningSection');
+            const profileWarningYear = new Date().getFullYear();
+            const warningMeta = getStaffWarningMeta(e.id, profileWarningYear);
+            const warningHistory = getStaffWarningHistory(e.id, profileWarningYear);
+            if (warningSection && (warningMeta.level !== 'normal' || warningHistory.length > 0)) {
+                warningSection.classList.remove('hidden');
+                const badge = document.getElementById('modalWarningBadge');
+                const count = document.getElementById('modalWarningCount');
+                const latest = document.getElementById('modalWarningLatest');
+                const accent = document.getElementById('modalWarningAccent');
+                const editBtn = document.getElementById('modalWarningEditBtn');
+                if (badge) {
+                    badge.className = `staff-warning-badge ${warningMeta.cls}`;
+                    badge.innerHTML = `<i class="fa-solid ${warningMeta.icon}"></i>${warningMeta.label}`;
+                }
+                if (count) count.textContent = `${profileWarningYear} • ${warningMeta.count} warning${warningMeta.count === 1 ? '' : 's'}`;
+                const activeEntry = warningHistory.slice().reverse().find(h => !h.endAt) || warningHistory[warningHistory.length - 1];
+                if (latest) {
+                    const period = activeEntry ? `Since ${warningFormatDateTime(activeEntry.startAt)}` : '';
+                    const note = activeEntry && activeEntry.note ? ` • ${activeEntry.note}` : '';
+                    latest.textContent = `${period}${note}`.trim();
+                }
+                if (accent) {
+                    accent.className = 'h-1 ' + ({ verbal:'bg-yellow-400', written:'bg-orange-500', final:'bg-red-500', normal:'bg-emerald-500' }[warningMeta.level] || 'bg-slate-300');
+                }
+                if (editBtn) editBtn.onclick = (ev) => openWarningEditor(ev, e.id, profileWarningYear);
+            } else if (warningSection) {
+                warningSection.classList.add('hidden');
+            }
+
             const sT=(id,v)=>{let el=document.getElementById(id);if(el)el.innerText=v;}; sT('leave-al-av',e.leaves.available.AL);sT('leave-al-us',e.leaves.used.AL);sT('leave-al-re',e.leaves.remaining.AL);sT('leave-sl-av',e.leaves.available.SL);sT('leave-sl-us',e.leaves.used.SL);sT('leave-sl-re',e.leaves.remaining.SL);sT('leave-sp-av',e.leaves.available.SP);sT('leave-sp-us',e.leaves.used.SP);sT('leave-sp-re',e.leaves.remaining.SP);sT('leave-up',e.leaves.unpaid);sT('leave-a',e.leaves.absences);sT('leave-late5m',e.totalLate5m);sT('leave-late3m',e.totalLate3m);
             const hC=document.getElementById('modalHistoryContainer'); hC.innerHTML=''; let h=leaveHistoryByEmployee[e.id]||{};
             monthNames.forEach(m=>{
@@ -4341,7 +5092,7 @@
         }
         
         window.closeModal=function(){const md=document.getElementById('employeeModal'),co=document.getElementById('modalContent'); md.classList.add('opacity-0');co.classList.add('scale-95'); if(document.getElementById('deptModal').classList.contains('hidden'))document.body.classList.remove('modal-open'); setTimeout(()=>md.classList.add('hidden'),300);};
-        window.openDeptModal=function(c,d){const md=document.getElementById('deptModal'),co=document.getElementById('deptModalContent'),tb=document.getElementById('deptModalTableBody'); document.getElementById('deptModalTitle').innerText=d; document.getElementById('deptModalCompany').innerHTML=`${getCompanyLogo(c)} ${c}`; tb.innerHTML=''; let s=allEmployees.filter(e=>e.company===c&&e.department===d&&e.status==='Active').sort((a,b)=>a.name.localeCompare(b.name)); s.forEach(e=>{let tr=document.createElement('tr'); tr.className="hover:bg-blue-50 cursor-pointer border-b"; tr.onclick=()=>{closeDeptModal();setTimeout(()=>openModal(e),300);}; tr.innerHTML=`<td class="px-4 py-3">${e.displayId}</td><td class="px-4 py-3 font-bold">${e.name}</td><td class="px-4 py-3 text-xs">${e.position}</td>`; tb.appendChild(tr);}); md.classList.remove('hidden'); setTimeout(()=>{md.classList.remove('opacity-0');co.classList.remove('scale-95');document.body.classList.add('modal-open');},10);};
+        window.openDeptModal=function(c,d){const md=document.getElementById('deptModal'),co=document.getElementById('deptModalContent'),tb=document.getElementById('deptModalTableBody'); document.getElementById('deptModalTitle').innerText=d; document.getElementById('deptModalCompany').innerHTML=`${getCompanyLogo(c)} ${c}`; tb.innerHTML=''; let s=allEmployees.filter(e=>e.company===c&&e.department===d&&isEmploymentVisible(e)).sort((a,b)=>a.name.localeCompare(b.name)); s.forEach(e=>{let tr=document.createElement('tr'); tr.className="hover:bg-blue-50 cursor-pointer border-b"; tr.onclick=()=>{closeDeptModal();setTimeout(()=>openModal(e),300);}; tr.innerHTML=`<td class="px-4 py-3">${e.displayId}</td><td class="px-4 py-3 font-bold">${e.name}</td><td class="px-4 py-3 text-xs">${e.position}</td>`; tb.appendChild(tr);}); md.classList.remove('hidden'); setTimeout(()=>{md.classList.remove('opacity-0');co.classList.remove('scale-95');document.body.classList.add('modal-open');},10);};
         window.closeDeptModal=function(){const md=document.getElementById('deptModal'),co=document.getElementById('deptModalContent'); md.classList.add('opacity-0');co.classList.add('scale-95'); document.body.classList.remove('modal-open'); setTimeout(()=>md.classList.add('hidden'),300);};
         
         window.openDailyCompanyModal=function(c){
@@ -4421,7 +5172,7 @@
         const drawAndPanzoom = async () => {
             const canvas = document.getElementById('orgChartCanvas'); if (!canvas || !currentOrgCompany) return;
             const companyName = currentOrgCompany;
-            let staff = companyName === 'LPH & LPL' ? allEmployees.filter(e => (e.company === 'LPH' || e.company === 'LPL') && e.status === 'Active') : allEmployees.filter(e => e.company === companyName && e.status === 'Active');
+            let staff = companyName === 'LPH & LPL' ? allEmployees.filter(e => (e.company === 'LPH' || e.company === 'LPL') && getEffectiveStaffStatus(e) === 'Active') : allEmployees.filter(e => e.company === companyName && getEffectiveStaffStatus(e) === 'Active');
             if (staff.length === 0) { canvas.innerHTML = `<div class="text-slate-400 py-10">No active staff found.</div>`; return; }
 
             let assignedIds = new Set();
@@ -4433,7 +5184,7 @@
                         let match = sList.find(e => !assignedIds.has(e.id) && (e.name.toLowerCase() === cleanName || e.name.toLowerCase().includes(cleanName) || cleanName.includes(e.name.toLowerCase())));
                         if (!match) { let sNode = cleanName.replace(/\s+/g, ''); match = sList.find(e => !assignedIds.has(e.id) && (e.name.toLowerCase().replace(/\s+/g,'') === sNode || e.name.toLowerCase().replace(/\s+/g,'').includes(sNode))); } return match;
                     };
-                    empMatch = findMatch(liveStaff) || findMatch(allEmployees.filter(e => e.status === 'Active'));
+                    empMatch = findMatch(liveStaff) || findMatch(allEmployees.filter(e => getEffectiveStaffStatus(e) === 'Active'));
                     if (!empMatch && node.role) empMatch = liveStaff.find(e => !assignedIds.has(e.id) && e.position.toLowerCase() === node.role.toLowerCase());
                 } else if (node.role) { empMatch = liveStaff.find(e => !assignedIds.has(e.id) && e.position.toLowerCase() === node.role.toLowerCase()); }
                 
@@ -4456,7 +5207,7 @@
                     eCtrls = `<div class="absolute -top-7 left-1/2 transform -translate-x-1/2 flex gap-0.5 bg-slate-800 p-1 rounded z-50 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"><button onclick="event.stopPropagation(); openOrgNodeEdit('${node.nodeId}')" title="Edit box" class="w-6 h-5 text-white hover:text-blue-300 text-[10px]"><i class="fa-solid fa-pencil"></i></button><button onclick="event.stopPropagation(); openOrgConnectEditor('${node.nodeId}')" title="Connect / Reports To" class="w-6 h-5 text-white hover:text-cyan-300 text-[10px]"><i class="fa-solid fa-link"></i></button><button onclick="event.stopPropagation(); addOrgChild('${node.nodeId}')" title="Add direct report" class="w-6 h-5 text-white hover:text-emerald-300 text-[10px]"><i class="fa-solid fa-plus"></i></button><button onclick="event.stopPropagation(); moveOrgNodeLeft('${node.nodeId}')" title="Move left" class="w-6 h-5 text-white hover:text-yellow-300 text-[10px]"><i class="fa-solid fa-arrow-left"></i></button><button onclick="event.stopPropagation(); moveOrgNodeRight('${node.nodeId}')" title="Move right" class="w-6 h-5 text-white hover:text-yellow-300 text-[10px]"><i class="fa-solid fa-arrow-right"></i></button><button onclick="event.stopPropagation(); deleteOrgNode('${node.nodeId}')" title="Delete" class="w-6 h-5 text-white hover:text-red-400 text-[10px]"><i class="fa-solid fa-trash"></i></button></div>`;
                 }
 
-                let html = `<li data-node="${node.nodeId}"><div class="relative flex flex-col items-center mx-0.5 sm:mx-1 z-10 group" ${!isOrgEditMode?click:''} title="${empMatch?empMatch.displayId:''}"><div class="${nodeClass} relative flex flex-col items-center p-1 rounded-lg" ${dAttrs}>${eCtrls}<div class="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 ${rC} shadow-sm flex items-center justify-center bg-white z-10 font-bold text-slate-500 text-[10px] sm:text-xs pointer-events-none">${avatarContent}</div><div class="mt-1 px-1 py-1 rounded ${bC} shadow-sm border text-[7px] sm:text-[8px] w-14 sm:w-20 flex flex-col justify-center min-h-[28px] pointer-events-none"><span class="font-bold ${nC} leading-tight truncate px-0.5">${empMatch ? empMatch.name : node.name}</span><span class="text-[6px] sm:text-[7px] font-medium opacity-80 mt-0.5 leading-[1.1] truncate px-0.5">${empMatch ? empMatch.position : node.role}</span></div></div></div>`;
+                let html = `<li data-node="${node.nodeId}"><div class="relative flex flex-col items-center mx-0.5 sm:mx-1 z-10 group" ${!isOrgEditMode?click:''} title="${empMatch?empMatch.displayId:''}"><div class="${nodeClass} relative flex flex-col items-center p-1 rounded-lg" ${dAttrs}>${eCtrls}<div class="relative"><div class="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 ${rC} shadow-sm flex items-center justify-center bg-white z-10 font-bold text-slate-500 text-[10px] sm:text-xs pointer-events-none">${avatarContent}</div>${empMatch ? warningDotIndicatorHtml(empMatch.id,{year:new Date().getFullYear()}) : ''}</div><div class="mt-1 px-1 py-1 rounded ${bC} shadow-sm border text-[7px] sm:text-[8px] w-14 sm:w-20 flex flex-col justify-center min-h-[28px] pointer-events-none"><span class="font-bold ${nC} leading-tight truncate px-0.5">${empMatch ? empMatch.name : node.name}</span><span class="text-[6px] sm:text-[7px] font-medium opacity-80 mt-0.5 leading-[1.1] truncate px-0.5">${empMatch ? empMatch.position : node.role}</span></div></div></div>`;
                 
                 if (node.children && node.children.length > 0) {
                     let ulClass = '';
@@ -4669,7 +5420,7 @@
             let fD=new Date(fV); fD.setHours(0,0,0,0); let tD=new Date(tV); tD.setHours(23,59,59,999); if(fD>tD){let t=fD;fD=tD;tD=t;}
             let dA=getDates(fD,tD); if(dA.length>31){showAppToast("Max 31 Days allowed.","error");return;}
             let cS=selectedDailyCompanies.length>0&&selectedDailyCompanies.length<companies.size?selectedDailyCompanies.join(', '):'All Companies', dLb=fV===tV?fV:`${fV} to ${tV}`;
-            let rS=allEmployees.filter(e=>e.status==='Active'&&(selectedDailyCompanies.length===0||selectedDailyCompanies.includes(e.company))&&!window.isExcludedPosition(e.position)).sort((a,b)=>{if(a.company!==b.company)return a.company.localeCompare(b.company); return a.name.localeCompare(b.name);}); if(rS.length===0)return;
+            let rS=allEmployees.filter(e=>isEmploymentVisible(e)&&(selectedDailyCompanies.length===0||selectedDailyCompanies.includes(e.company))&&!window.isExcludedPosition(e.position)).sort((a,b)=>{if(a.company!==b.company)return a.company.localeCompare(b.company); return a.name.localeCompare(b.name);}); if(rS.length===0)return;
             let sD=0,sUP=0,sA=0,sL=0,sLp=0,sSL=0,sAL=0,sSP=0, bR=[], cnt=1;
             rS.forEach(e=>{
                 let rO={no:cnt++,id:e.displayId,name:e.name,dys:[],t:{D:0,UP:0,A:0,L5:0,L3:0,SL:0,AL:0,SP:0}};
@@ -4702,7 +5453,7 @@
             
             // Loop through all employees to find ONLY those on leave
             allEmployees.forEach(e => {
-                if (e.status !== 'Active' || (selectedCalendarCompanies.length > 0 && !selectedCalendarCompanies.includes(e.company)) || window.isExcludedPosition(e.position)) return;
+                if (!isEmploymentVisible(e, new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth()+1, 0)) || (selectedCalendarCompanies.length > 0 && !selectedCalendarCompanies.includes(e.company)) || window.isExcludedPosition(e.position)) return;
 
                 let r = dailyLeaveRecords.find(rec => rec.staffId === e.id && rec.month.toLowerCase().startsWith(mName.substring(0,3).toLowerCase()) && rec.day === selectedCalendarDate);
                 if (!r) return; // Completely present / no record
@@ -4736,7 +5487,7 @@
 
             Object.keys(reportGroups).sort().forEach(gName => {
                 let groupComps = reportGroups[gName];
-                let compEntities = [...new Set(allEmployees.filter(e => groupComps.includes(e.company) && e.status === 'Active' && !window.isExcludedPosition(e.position)).map(e => e.entity))].sort();
+                let compEntities = [...new Set(allEmployees.filter(e => groupComps.includes(e.company) && isEmploymentVisible(e) && !window.isExcludedPosition(e.position)).map(e => e.entity))].sort();
 
                 if (compEntities.length === 0) return; // Skip if group has no active valid entities
 
@@ -4786,7 +5537,7 @@
             let yr = fD.getFullYear();
             dailyLeaveRecords.forEach(r=>{
                 let rd=new Date(`${r.month} ${r.day}, ${yr}`); rd.setHours(12,0,0,0);
-                if(rd>=fD && rd<=tD){ let e=allEmployees.find(x=>x.id===r.staffId); if(!e||e.status!=='Active'||window.isExcludedPosition(e.position))return; if(selectedDailyCompanies.length>0&&!selectedDailyCompanies.includes(e.company))return; let h=r.leaves, t=[], isM=(h.AL>0?1:0)+(h.SL>0?1:0)+(h.SP>0?1:0)+(h.UP>0?1:0)+(h.A>0?1:0)>1; 
+                if(rd>=fD && rd<=tD){ let e=allEmployees.find(x=>x.id===r.staffId); if(!e||!isEmploymentVisible(e,rd)||window.isExcludedPosition(e.position))return; if(selectedDailyCompanies.length>0&&!selectedDailyCompanies.includes(e.company))return; let h=r.leaves, t=[], isM=(h.AL>0?1:0)+(h.SL>0?1:0)+(h.SP>0?1:0)+(h.UP>0?1:0)+(h.A>0?1:0)>1; 
                     if(h.AL===0 && h.SL===0 && h.SP===0 && h.UP===0 && h.A===0 && h.Late5m===0 && h.Late3m===0 && h.D===0 && !r.isRawD) return;
                     if(h.AL===0.5)t.push(isM?'AL':'H-AL');else if(h.AL>0)t.push('AL'); if(h.SL===0.5)t.push(isM?'SL':'H-SL');else if(h.SL>0)t.push('SL'); if(h.SP===0.5)t.push(isM?'SP':'H-SP');else if(h.SP>0)t.push('SP'); if(h.UP===0.5)t.push(isM?'UP':'H-UP');else if(h.UP>0)t.push('UP'); if(h.A===0.5)t.push(isM?'A':'H-A');else if(h.A>0)t.push('A'); if(h.Late5m>0)t.push('L(>5m)'); if(h.Late3m>0)t.push("L'(>30m)"); if(h.D===0.5)t.push(isM?'D':'H-D');else if(h.D>0)t.push('D'); if(t.length===0)return; 
                     let cNote = customNotes[`${e.id}_${r.month}_${r.day}_${yr}`] || r.note;
@@ -4820,7 +5571,7 @@
                 eD.push(r); tU+=r.u; tA+=r.a; tL5+=r.l5; tL3+=r.l3; 
                 if(!cC[r.e.company]) { cC[r.e.company] = 0; actGrp[r.e.company] = 0; }
                 cC[r.e.company]++;
-                if(r.e.status === 'Active') actGrp[r.e.company]++;
+                if(isEmploymentVisible(r.e)) actGrp[r.e.company]++;
             });
 
             if(eD.length===0){showAppToast("No deduction data.","error");return;}
@@ -4888,7 +5639,7 @@
             
             // Loop to populate ALL active employees for exact ID matching
             allEmployees.forEach(e => {
-                if(e.status !== 'Active' || window.isExcludedPosition(e.position)) return;
+                if(!isEmploymentVisible(e, fD) || window.isExcludedPosition(e.position)) return;
                 if(selectedDailyCompanies.length > 0 && !selectedDailyCompanies.includes(e.company)) return;
                 allRecs[e.displayId.toUpperCase()] = { e: e, al: 0, sl: 0, sp: 0, up: 0, a: 0, l5: 0, l3: 0, ot: 0, d: 0 };
             });
@@ -5297,17 +6048,22 @@
 
       const statusCol = (row[15] || '').trim().toLowerCase();
       
+      const empId = (row[idIdx] || '').trim();
+      const empName = (row[nameIdx] || '').trim();
+
       if (
         statusCol.includes('terminate') || 
         statusCol.includes('resign') || 
         statusCol.includes('walked out') || 
         statusCol.includes('walk out')
       ) {
-        continue;
+        const scanRefValue = document.getElementById('dateSelect')?.value || '';
+        const scanRefDate = scanRefValue ? new Date(scanRefValue + 'T00:00:00') : new Date();
+        const normalizedMasterId = normalizeId(empId);
+        const linkedEmployee = allEmployees.find(e => e.id === normalizedMasterId) ||
+          allEmployees.find(e => String(e.name || '').trim().toLowerCase() === empName.toLowerCase());
+        if (!linkedEmployee || !isEmploymentVisible(linkedEmployee, scanRefDate)) continue;
       }
-
-      const empId = (row[idIdx] || '').trim();
-      const empName = (row[nameIdx] || '').trim();
       if (!empId && !empName) continue;
 
       const rawShiftVal = (row[shiftIdx] || '').trim().toUpperCase();
@@ -5940,7 +6696,7 @@
               ? `<img src="${staff.photoUrl}" class="staff-photo" alt="${staff.name || 'Staff'}" loading="eager" decoding="async" referrerpolicy="no-referrer" data-photo-fallback="${String(staff.photoFallbackUrl || '').replace(/"/g, '&quot;')}" onclick="event.stopPropagation(); openImagePreview('${String(staff.photoUrl).replace(/'/g, "\\'")}')" onerror="if(this.dataset.photoFallback && this.src !== this.dataset.photoFallback){this.src=this.dataset.photoFallback;}else{this.style.display='none';this.nextElementSibling?.classList.remove('hidden');}">`
               : `<div class="staff-photo-placeholder">${String(staff.name || '?').trim().charAt(0).toUpperCase()}</div>`}
             <div class="min-w-0">
-              <div class="staff-name-main">${staff.name}</div>
+              <div class="staff-name-main flex items-center gap-1">${staff.name}${warningInlineIndicatorHtml(staff.id,{year:new Date(document.getElementById('dateSelect').value+'T00:00:00').getFullYear()})}</div>
               <div class="staff-meta-line">${staff.id || '-'} &nbsp;•&nbsp; ${staff.company || '-'}</div>
             </div>
           </div>
@@ -6134,7 +6890,7 @@
       if (status === 'leave') detail = `<div class="scan-status-detail"><i class="fa-solid fa-calendar-day"></i> Leave: <strong>${leaveTypeHtml}</strong></div>`;
       if (status === 'notScanned') detail = `<div class="scan-status-detail"><i class="fa-solid fa-clock"></i> Missed: <strong>${missedTime}</strong></div>`;
       if (status === 'late' || status === 'late30') detail = `<div class="scan-status-detail"><i class="fa-solid fa-fingerprint"></i> Scan: <strong>${scanTime}</strong></div>`;
-      return `<div class="scan-status-profile" onclick="openScanPanelStaff('${safeId}')">${photo ? `<img src="${photo.src}" class="w-12 h-12 rounded-full object-cover border">` : `<div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500">${initial}</div>`}<div class="min-w-0 flex-1"><div class="font-bold text-slate-800 truncate">${name}</div><div class="text-xs text-slate-500 mt-1 truncate">${meta}</div>${detail}</div></div>`;
+      return `<div class="scan-status-profile" onclick="openScanPanelStaff('${safeId}')">${photo ? `<img src="${photo.src}" class="w-12 h-12 rounded-full object-cover border">` : `<div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500">${initial}</div>`}<div class="min-w-0 flex-1"><div class="font-bold text-slate-800 truncate flex items-center gap-1">${name}${warningInlineIndicatorHtml(id,{year:new Date(document.getElementById('dateSelect').value+'T00:00:00').getFullYear()})}</div><div class="text-xs text-slate-500 mt-1 truncate">${meta}</div>${detail}</div></div>`;
     }).join('') : `<div class="col-span-full text-center text-slate-500 py-10">No staff found in this status.</div>`;
     panel.classList.remove('hidden');
   }
