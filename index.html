@@ -2236,6 +2236,130 @@
         .notice-period-badge.compact { padding:3px 6px; font-size:9px; }
         .mobile-staff-last-day { margin-top:4px; font-size:9px; line-height:1.2; font-weight:700; color:#92400e; display:flex; align-items:center; gap:4px; }
         .mobile-staff-card:has(.notice-period-badge) { border-color:#fde68a; box-shadow:0 1px 3px rgba(146,64,14,.06), inset 0 0 0 1px rgba(254,243,199,.45); }
+
+
+        /* Dashboard yearly report summary */
+        .dashboard-report-summary { background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:14px; margin:0 0 16px; box-shadow:0 1px 2px rgba(15,23,42,.04); }
+        .dashboard-report-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:12px; }
+        .dashboard-report-title { font-size:12px; font-weight:800; color:#1e293b; }
+        .dashboard-report-subtitle { font-size:9px; color:#94a3b8; margin-top:2px; }
+        .dashboard-report-period { font-size:9px; font-weight:800; color:#2563eb; background:#eff6ff; border:1px solid #dbeafe; border-radius:999px; padding:5px 8px; white-space:nowrap; }
+        .dashboard-report-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+        .dashboard-report-card { border:1px solid #e2e8f0; background:#f8fafc; border-radius:12px; padding:10px; min-width:0; }
+        .dashboard-report-card .label { font-size:8px; line-height:1.15; text-transform:uppercase; letter-spacing:.055em; color:#64748b; font-weight:800; }
+        .dashboard-report-card .value { margin-top:4px; font-size:17px; line-height:1; color:#0f172a; font-weight:900; }
+        .dashboard-report-card .hint { margin-top:4px; font-size:8px; color:#94a3b8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .dashboard-report-card.leave-al .value { color:#15803d; }
+        .dashboard-report-card.leave-sl .value { color:#2563eb; }
+        .dashboard-report-card.leave-sp .value { color:#7c3aed; }
+        .dashboard-report-card.unpaid .value { color:#be123c; }
+        .dashboard-report-card.late .value { color:#b45309; }
+        .dashboard-report-card.late30 .value { color:#c2410c; }
+        .dashboard-report-card.warning .value { color:#b45309; }
+        .dashboard-warning-breakdown { display:flex; flex-wrap:wrap; gap:5px; margin-top:6px; }
+        .dashboard-warning-breakdown span { font-size:8px; font-weight:800; border-radius:999px; padding:3px 6px; border:1px solid transparent; }
+        .dashboard-warning-breakdown .verbal { background:#fffbeb; color:#a16207; border-color:#fde68a; }
+        .dashboard-warning-breakdown .written { background:#fff7ed; color:#c2410c; border-color:#fed7aa; }
+        .dashboard-warning-breakdown .final { background:#fef2f2; color:#b91c1c; border-color:#fecaca; }
+        @media (min-width: 768px) { .dashboard-report-summary { padding:16px; margin-bottom:20px; } .dashboard-report-grid { grid-template-columns:repeat(4,minmax(0,1fr)); } .dashboard-report-title { font-size:13px; } }
+        @media (min-width: 1280px) { .dashboard-report-grid { grid-template-columns:repeat(8,minmax(0,1fr)); } }
+
+        /* Compact Dashboard staffing summary */
+        #kpiContainer {
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            gap: 8px !important;
+            margin-bottom: 14px !important;
+            align-items: stretch;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding-bottom: 2px;
+            scrollbar-width: thin;
+        }
+        .staff-summary-total-card,
+        .staff-summary-company-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            box-shadow: 0 1px 2px rgba(15,23,42,.04);
+            display: flex;
+            align-items: center;
+            transition: box-shadow .18s ease, transform .18s ease;
+        }
+        .staff-summary-total-card:hover,
+        .staff-summary-company-card:hover {
+            box-shadow: 0 4px 12px rgba(15,23,42,.06);
+        }
+        .staff-summary-total-card {
+            padding: 10px 13px;
+            min-width: 150px;
+            flex: 0 0 150px;
+        }
+        .staff-summary-company-card {
+            padding: 9px 12px;
+            min-width: 112px;
+            flex: 1 0 112px;
+        }
+        .staff-summary-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+        .staff-summary-total-card .staff-summary-icon {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+        .staff-summary-company-card .staff-summary-icon {
+            background: #f8fafc;
+            color: #475569;
+        }
+        .staff-summary-label {
+            font-size: 11px;
+            line-height: 1.1;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: .025em;
+            white-space: nowrap;
+        }
+        .staff-summary-value {
+            margin-top: 2px;
+            font-size: 22px;
+            line-height: 1;
+            font-weight: 800;
+            color: #0f172a;
+        }
+        .staff-summary-company-card .staff-summary-value {
+            font-size: 19px;
+        }
+        @media (max-width: 767px) {
+            #kpiContainer {
+                display: none !important;
+            }
+            #mobileStaffKpiContainer.mobile-dashboard-kpis {
+                display: flex !important;
+                flex-wrap: wrap;
+                gap: 8px !important;
+            }
+            #mobileStaffKpiContainer .mobile-dashboard-kpi {
+                padding: 10px 11px !important;
+                min-height: 62px !important;
+                flex: 1 1 calc(50% - 8px);
+            }
+            #mobileStaffKpiContainer .mobile-dashboard-kpi-icon {
+                width: 34px !important;
+                height: 34px !important;
+                margin-right: 8px !important;
+            }
+            #mobileStaffKpiContainer .mobile-dashboard-kpi-value {
+                font-size: 20px !important;
+            }
+        }
 </style>
 </head>
 <body class="text-slate-800 h-screen flex flex-col" data-active-tab="daily">
@@ -2293,24 +2417,7 @@
                     <div id="mobileDashboardFilterChips" class="mobile-dashboard-chips"></div>
                 </div>
 
-                <div class="mobile-dashboard-kpis">
-                    <div class="mobile-dashboard-kpi">
-                        <div class="mobile-dashboard-kpi-icon bg-emerald-50 text-emerald-600"><i class="fa-solid fa-user-check"></i></div>
-                        <div><div class="mobile-dashboard-kpi-label">Active</div><div id="mobileKpiActive" class="mobile-dashboard-kpi-value">0</div></div>
-                    </div>
-                    <div class="mobile-dashboard-kpi">
-                        <div class="mobile-dashboard-kpi-icon bg-blue-50 text-blue-600"><i class="fa-solid fa-calendar-day"></i></div>
-                        <div><div class="mobile-dashboard-kpi-label">Leave</div><div id="mobileKpiLeave" class="mobile-dashboard-kpi-value">0</div></div>
-                    </div>
-                    <div class="mobile-dashboard-kpi">
-                        <div class="mobile-dashboard-kpi-icon bg-amber-50 text-amber-600"><i class="fa-solid fa-clock"></i></div>
-                        <div><div class="mobile-dashboard-kpi-label">Late</div><div id="mobileKpiLate" class="mobile-dashboard-kpi-value">0</div></div>
-                    </div>
-                    <div class="mobile-dashboard-kpi">
-                        <div class="mobile-dashboard-kpi-icon bg-rose-50 text-rose-600"><i class="fa-solid fa-user-xmark"></i></div>
-                        <div><div class="mobile-dashboard-kpi-label">Absence</div><div id="mobileKpiAbsence" class="mobile-dashboard-kpi-value">0</div></div>
-                    </div>
-                </div>
+                <div id="mobileStaffKpiContainer" class="mobile-dashboard-kpis"></div>
 
                 <section id="mobileNeedsAttentionSection" class="mobile-dashboard-section">
                     <div class="mobile-dashboard-section-head">
@@ -2357,30 +2464,32 @@
                         </div>
                     </div>
 
+                    <select id="dashboardYearFilter" class="w-full sm:w-auto bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg p-2.5 font-semibold text-slate-700" title="Dashboard Year"></select>
                     <select id="dashboardMonthFilter" class="w-full sm:w-auto bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg p-2.5 font-semibold text-blue-700"><option value="All">All Months (YTD)</option><option value="January">January</option><option value="February">February</option><option value="March">March</option><option value="April">April</option><option value="May">May</option><option value="June">June</option><option value="July">July</option><option value="August">August</option><option value="September">September</option><option value="October">October</option><option value="November">November</option><option value="December">December</option></select>
                     <select id="dashboardLeaveTypeFilter" class="w-full sm:w-auto bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg p-2.5 font-semibold text-indigo-700"><option value="All">All Leave Types</option><option value="AL">Annual Leave (AL)</option><option value="SL">Sick Leave (SL)</option><option value="SP">Special Leave (SP)</option><option value="UP">Unpaid Leave (UP)</option><option value="A">Absence (A)</option><option value="Late">Late (L/L')</option><option value="OT">Overtime (OT)</option><option value="D">Day Off (D)</option></select>
                     <div class="relative w-full sm:w-auto"><div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"><i class="fa-solid fa-magnifying-glass text-slate-400 text-sm"></i></div><input type="text" id="searchInput" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-lg pl-10 p-2.5 sm:min-w-[200px]" placeholder="Search Name or ID..."></div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6" id="kpiContainer">
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5 flex items-center hover:shadow-md transition-shadow">
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-lg sm:text-xl mr-3 sm:mr-4 shrink-0"><i class="fa-solid fa-file-lines"></i></div>
-                    <div><p class="text-xs sm:text-sm text-slate-500 font-medium leading-tight">Total Records</p><h3 class="text-xl sm:text-2xl font-bold text-slate-900" id="kpiTotal">0</h3></div>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6" id="kpiContainer"></div>
+
+            <!-- Year / Month Report Summary -->
+            <section id="dashboardReportSummary" class="dashboard-report-summary">
+                <div class="dashboard-report-head">
+                    <div><div class="dashboard-report-title"><i class="fa-solid fa-chart-pie text-blue-500 mr-1"></i> Report Summary</div><div class="dashboard-report-subtitle">Leave used, lateness, unpaid leave and disciplinary warnings for the selected period.</div></div>
+                    <span id="dashboardReportPeriod" class="dashboard-report-period">YTD</span>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5 flex items-center hover:shadow-md transition-shadow">
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center text-lg sm:text-xl mr-3 sm:mr-4 shrink-0"><i class="fa-solid fa-user-minus"></i></div>
-                    <div><p class="text-xs sm:text-sm text-slate-500 font-medium leading-tight">Total Inactive</p><h3 class="text-xl sm:text-2xl font-bold text-slate-900" id="kpiTerminated">0</h3></div>
+                <div class="dashboard-report-grid">
+                    <div class="dashboard-report-card leave-al"><div class="label">AL Used</div><div id="reportALUsed" class="value">0</div><div class="hint">Annual Leave</div></div>
+                    <div class="dashboard-report-card leave-sl"><div class="label">SL Used</div><div id="reportSLUsed" class="value">0</div><div class="hint">Sick Leave</div></div>
+                    <div class="dashboard-report-card leave-sp"><div class="label">SP Used</div><div id="reportSPUsed" class="value">0</div><div class="hint">Special Leave</div></div>
+                    <div class="dashboard-report-card"><div class="label">Total Paid Leave</div><div id="reportPaidLeaveUsed" class="value">0</div><div class="hint">AL + SL + SP</div></div>
+                    <div class="dashboard-report-card unpaid"><div class="label">Unpaid / UP</div><div id="reportUPUsed" class="value">0</div><div class="hint">Unpaid Leave</div></div>
+                    <div class="dashboard-report-card late"><div class="label">Late</div><div id="reportLate" class="value">0</div><div class="hint">L &gt;5 min</div></div>
+                    <div class="dashboard-report-card late30"><div class="label">Late 30+</div><div id="reportLate30" class="value">0</div><div class="hint">L' &gt;30 min</div></div>
+                    <div class="dashboard-report-card warning"><div class="label">Warnings Issued</div><div id="reportWarningsIssued" class="value">0</div><div class="dashboard-warning-breakdown"><span class="verbal">V <b id="reportWarningVerbal">0</b></span><span class="written">W <b id="reportWarningWritten">0</b></span><span class="final">F <b id="reportWarningFinal">0</b></span></div></div>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5 flex items-center hover:shadow-md transition-shadow">
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center text-lg sm:text-xl mr-3 sm:mr-4 shrink-0"><i class="fa-solid fa-user-check"></i></div>
-                    <div><p class="text-xs sm:text-sm text-slate-500 font-medium leading-tight">Total Active</p><h3 class="text-xl sm:text-2xl font-bold text-slate-900" id="kpiActive">0</h3></div>
-                </div>
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5 flex items-center hover:shadow-md transition-shadow">
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center text-lg sm:text-xl mr-3 sm:mr-4 shrink-0"><i class="fa-solid fa-calendar-check"></i></div>
-                    <div><p class="text-xs sm:text-sm text-slate-500 font-medium leading-tight" id="kpiLeaveLabel">Total Leaves (All)</p><h3 class="text-xl sm:text-2xl font-bold text-slate-900" id="kpiLeaveTotal">0</h3></div>
-                </div>
-            </div>
+            </section>
 
             <!-- Company Summary -->
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6 flex flex-col sm:flex-row sm:items-center gap-4 hidden" id="companySummaryContainer">
@@ -2479,8 +2588,11 @@
                             </div>
                         </div>
                         <div class="mobile-filter-group grid grid-cols-2 gap-2">
+                            <div><label class="mobile-filter-label" for="mobileDashboardYear">Year</label><select id="mobileDashboardYear" class="mobile-filter-select" onchange="mobileDashboardSetYear(this.value)"></select></div>
                             <div><label class="mobile-filter-label" for="mobileDashboardMonth">Month</label><select id="mobileDashboardMonth" class="mobile-filter-select" onchange="mobileDashboardSetMonth(this.value)"></select></div>
-                            <div><label class="mobile-filter-label" for="mobileDashboardLeaveType">Leave Type</label><select id="mobileDashboardLeaveType" class="mobile-filter-select" onchange="mobileDashboardSetLeaveType(this.value)"></select></div>
+                        </div>
+                        <div class="mobile-filter-group">
+                            <label class="mobile-filter-label" for="mobileDashboardLeaveType">Leave Type</label><select id="mobileDashboardLeaveType" class="mobile-filter-select" onchange="mobileDashboardSetLeaveType(this.value)"></select>
                         </div>
                         <div class="mobile-filter-group">
                             <label class="mobile-filter-label" for="mobileDashboardWarning">Warning Status</label>
@@ -3117,7 +3229,7 @@
         let companies = new Set(); let departments = new Set();
         let selectedCompanies = []; let selectedCalendarCompanies = []; let selectedDailyCompanies = []; let selectedCalendarRowCompany = 'ITC'; let selectedCalendarRowDepartments = null; let selectedCalendarRowMonth = new Date().getMonth(); let selectedCalendarRowYear = new Date().getFullYear(); const attendanceDataYear = new Date().getFullYear();
         let selectedDepartments = null; // null = all departments; otherwise array of selected department names
-        let selectedStatuses = ['Active']; let selectedDashboardMonth = 'All'; let selectedDashboardWarning = 'All'; let searchQuery = ''; let dailySearchQuery = '';
+        let selectedStatuses = ['Active']; let selectedDashboardYear = attendanceDataYear; let selectedDashboardMonth = 'All'; let selectedDashboardWarning = 'All'; let searchQuery = ''; let dailySearchQuery = '';
         let currentSortColumn = 'id'; let isSortAscending = true;
         let leaveHistoryByEmployee = {}; let dailyLeaveRecords = []; let currentDailyGroupedData = {}; 
         let currentCalendarDate = new Date(); let selectedCalendarDate = new Date().getDate();
@@ -3298,7 +3410,7 @@
                 });
             }
 
-            ['departmentFilter', 'dashboardMonthFilter', 'dashboardLeaveTypeFilter'].forEach(id => { const el = document.getElementById(id); if(el) el.addEventListener('change', e => { if(id==='departmentFilter') selectedDepartments = e.target.value === 'All' ? null : [e.target.value]; else if(id==='dashboardMonthFilter') selectedDashboardMonth=e.target.value; applyFilters(); }); });
+            ['departmentFilter', 'dashboardYearFilter', 'dashboardMonthFilter', 'dashboardLeaveTypeFilter'].forEach(id => { const el = document.getElementById(id); if(el) el.addEventListener('change', e => { if(id==='departmentFilter') selectedDepartments = e.target.value === 'All' ? null : [e.target.value]; else if(id==='dashboardYearFilter') selectedDashboardYear=Number(e.target.value)||attendanceDataYear; else if(id==='dashboardMonthFilter') selectedDashboardMonth=e.target.value; applyFilters(); }); });
             document.getElementById('searchInput')?.addEventListener('input', e => { searchQuery=e.target.value.toLowerCase(); applyFilters(); });
             document.getElementById('dailySearchInput')?.addEventListener('input', e => { dailySearchQuery=e.target.value.toLowerCase(); renderDailyAttendance(); });
             document.querySelectorAll('th.sortable').forEach(th => th.addEventListener('click', () => handleSort(th.dataset.sort)));
@@ -3748,53 +3860,108 @@
                 : `<span class="notice-period-badge"><i class="fa-solid fa-hourglass-half"></i> ${fullLabel}${last ? ` · Last Day ${last}` : ''}</span>`;
         }
 
-        function applyFilters() {
-            let act=0, inact=0, tot=0, lSum=0, aAl=0, aSl=0, aSp=0, rAl=0, rSl=0, rSp=0, tUp=0, tL5=0, tL3=0;
-            let lType=document.getElementById('dashboardLeaveTypeFilter')?.value||'All';
-            allEmployees.forEach(e => { e.totalLate5m=0; e.totalLate3m=0; let h=leaveHistoryByEmployee[e.id]; if(h) Object.values(h).forEach(hv=>{e.totalLate5m+=(hv.Late5m||0); e.totalLate3m+=(hv.Late3m||0);}); });
 
-            let ninetyDaysAgo = new Date(); ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+        function renderStaffCompanyKpis() {
+            const companyCounts = {};
+            filteredEmployees.forEach(emp => {
+                const company = String(emp.company || 'Unknown').trim() || 'Unknown';
+                companyCounts[company] = (companyCounts[company] || 0) + 1;
+            });
+
+            const companiesSorted = Object.keys(companyCounts).sort((a, b) => a.localeCompare(b));
+            const desktop = document.getElementById('kpiContainer');
+            const mobile = document.getElementById('mobileStaffKpiContainer');
+
+            const totalDesktop = `
+                <div class="staff-summary-total-card">
+                    <div class="staff-summary-icon"><i class="fa-solid fa-users"></i></div>
+                    <div class="min-w-0">
+                        <div class="staff-summary-label">Total Staff</div>
+                        <div class="staff-summary-value">${mobileDashboardFormatNumber(filteredEmployees.length)}</div>
+                    </div>
+                </div>`;
+
+            const companyDesktop = companiesSorted.map(company => `
+                <div class="staff-summary-company-card">
+                    <div class="staff-summary-icon"><i class="fa-solid fa-building"></i></div>
+                    <div class="min-w-0">
+                        <div class="staff-summary-label truncate" title="${warningEscapeHtml(company)}">${warningEscapeHtml(company)}</div>
+                        <div class="staff-summary-value">${mobileDashboardFormatNumber(companyCounts[company])}</div>
+                    </div>
+                </div>`).join('');
+
+            if (desktop) desktop.innerHTML = totalDesktop + companyDesktop;
+
+            const totalMobile = `
+                <div class="mobile-dashboard-kpi">
+                    <div class="mobile-dashboard-kpi-icon bg-blue-50 text-blue-600"><i class="fa-solid fa-users"></i></div>
+                    <div class="min-w-0">
+                        <div class="mobile-dashboard-kpi-label">Total Staff</div>
+                        <div class="mobile-dashboard-kpi-value">${mobileDashboardFormatNumber(filteredEmployees.length)}</div>
+                    </div>
+                </div>`;
+
+            const companyMobile = companiesSorted.map(company => `
+                <div class="mobile-dashboard-kpi">
+                    <div class="mobile-dashboard-kpi-icon bg-slate-50 text-slate-600"><i class="fa-solid fa-building"></i></div>
+                    <div class="min-w-0">
+                        <div class="mobile-dashboard-kpi-label truncate" title="${warningEscapeHtml(company)}">${warningEscapeHtml(company)}</div>
+                        <div class="mobile-dashboard-kpi-value">${mobileDashboardFormatNumber(companyCounts[company])}</div>
+                    </div>
+                </div>`).join('');
+
+            if (mobile) mobile.innerHTML = totalMobile + companyMobile;
+        }
+
+        function applyFilters() {
+            syncDesktopDashboardControlsFromState();
+            syncMobileDashboardFilterUI();
+            let act=0, inact=0, tot=0, lSum=0, aAl=0, aSl=0, aSp=0, rAl=0, rSl=0, rSp=0, tUp=0, tL5=0, tL3=0;
+            const lType=document.getElementById('dashboardLeaveTypeFilter')?.value||'All';
+            const refDate=getDashboardReferenceDate();
+            allEmployees.forEach(e => { const ps=getDashboardPeriodStats(e); e.totalLate5m=ps.Late5m; e.totalLate3m=ps.Late3m; });
+
+            let ninetyDaysAgo = new Date(refDate); ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
             filteredEmployees = allEmployees.filter(e => {
                 if(selectedCompanies.length>0 && !selectedCompanies.includes(e.company)) return false;
                 if(Array.isArray(selectedDepartments) && selectedDepartments.length > 0 && !selectedDepartments.includes(e.department)) return false;
                 if(Array.isArray(selectedDepartments) && selectedDepartments.length === 0) return false;
-                if(selectedStatuses.length > 0 && !selectedStatuses.includes(getEffectiveStaffStatus(e))) return false;
-                const warningLevel = getStaffWarningLevel(e.id);
+                if(selectedStatuses.length > 0 && !selectedStatuses.includes(getEffectiveStaffStatus(e, refDate))) return false;
+                const warningLevel = getStaffWarningLevel(e.id, selectedDashboardYear);
                 if (selectedDashboardWarning === 'AnyWarning' && warningLevel === 'normal') return false;
                 if (!['All','AnyWarning'].includes(selectedDashboardWarning) && warningLevel !== selectedDashboardWarning) return false;
-                let sSum=0, mMatch=true;
-                if(selectedDashboardMonth!=='All') {
-                    let hm=leaveHistoryByEmployee[e.id]?.[selectedDashboardMonth];
-                    if(hm) { mMatch=(hm.AL>0||hm.SL>0||hm.SP>0||hm.UP>0||hm.A>0||hm.Late5m>0||hm.Late3m>0||hm.OT>0||hm.D>0); sSum=lType==='All'?(hm.AL+hm.SL+hm.SP+hm.UP+hm.A+hm.D+hm.OT+hm.Late5m+hm.Late3m):(lType==='Late'?(hm.Late5m+hm.Late3m):(hm[lType]||0)); } else mMatch=false;
-                } else { let ha=leaveHistoryByEmployee[e.id]; if(ha) Object.values(ha).forEach(h=>{ sSum+=lType==='All'?(h.AL+h.SL+h.SP+h.UP+h.A+h.D+h.OT+h.Late5m+h.Late3m):(lType==='Late'?(h.Late5m+h.Late3m):(h[lType]||0));}); }
+
+                const ps=getDashboardPeriodStats(e);
+                const activityTotal=ps.AL+ps.SL+ps.SP+ps.UP+ps.A+ps.D+ps.OT+ps.Late5m+ps.Late3m;
+                const sSum = lType==='All' ? activityTotal : (lType==='Late' ? ps.Late5m+ps.Late3m : Number(ps[lType]||0));
                 if(lType!=='All' && sSum<=0) return false;
+                if(selectedDashboardMonth!=='All' && activityTotal<=0 && lType==='All') return false;
                 if(searchQuery && !e.name.toLowerCase().includes(searchQuery) && !e.displayId.toLowerCase().includes(searchQuery)) return false;
-                if(mMatch) { tot++; lSum+=sSum; aAl+=e.leaves.available.AL; aSl+=e.leaves.available.SL; aSp+=e.leaves.available.SP; rAl+=e.leaves.remaining.AL; rSl+=e.leaves.remaining.SL; rSp+=e.leaves.remaining.SP; tUp+=e.leaves.unpaid; tL5+=e.totalLate5m; tL3+=e.totalLate3m; if(getEffectiveStaffStatus(e)==='Active')act++; else inact++; 
-                    e.isProbation = getEffectiveStaffStatus(e) === 'Active' && !isNoticePeriodStaff(e) && e.sortableJoinDate > ninetyDaysAgo.getTime();
-                    return true; 
-                } return false;
+
+                tot++; lSum+=sSum; aAl+=e.leaves.available.AL; aSl+=e.leaves.available.SL; aSp+=e.leaves.available.SP; rAl+=e.leaves.remaining.AL; rSl+=e.leaves.remaining.SL; rSp+=e.leaves.remaining.SP; tUp+=ps.UP; tL5+=ps.Late5m; tL3+=ps.Late3m;
+                if(getEffectiveStaffStatus(e, refDate)==='Active')act++; else inact++;
+                e.isProbation = getEffectiveStaffStatus(e, refDate) === 'Active' && !isNoticePeriodStaff(e, refDate) && e.sortableJoinDate > ninetyDaysAgo.getTime();
+                return true;
             });
 
-            document.getElementById('kpiTotal').innerText=tot; document.getElementById('kpiActive').innerText=act; document.getElementById('kpiTerminated').innerText=inact;
-            const kl=document.getElementById('kpiLeaveTotal'), klbl=document.getElementById('kpiLeaveLabel');
-            if(kl&&klbl) { kl.innerText=lSum; klbl.innerText=`Total Leaves (${lType} - ${selectedDashboardMonth==='All'?'YTD':selectedDashboardMonth})`; }
-            const st=(id,v)=>{let el=document.getElementById(id);if(el)el.innerText=v;};
+            renderStaffCompanyKpis();
+            const st=(id,v)=>{let el=document.getElementById(id);if(el)el.innerText=mobileDashboardFormatNumber(v);};
             st('totalAvailAL',aAl); st('totalAvailSL',aSl); st('totalAvailSP',aSp); st('totalRemAL',rAl); st('totalRemSL',rSl); st('totalRemSP',rSp); st('totalDashboardUP',tUp); st('totalDashboardLate5m',tL5); st('totalDashboardLate3m',tL3);
-            
+
             let cS={}; filteredEmployees.forEach(e=>{ if(!cS[e.company])cS[e.company]={t:0,d:{}}; cS[e.company].t++; cS[e.company].d[e.department||'Unspecified']=(cS[e.company].d[e.department||'Unspecified']||0)+1; });
             const csC=document.getElementById('companySummaryContainer'), csL=document.getElementById('companySummaryList');
             if(csC&&csL) {
                 if(Object.keys(cS).length>0) {
                     csC.classList.remove('hidden'); let cH='';
                     Object.keys(cS).sort().forEach(c=>{
-                        let sCId=c.replace(/[^a-zA-Z0-9]/g,'-'), s=cS[c], dH='';
-                        Object.keys(s.d).sort((a,b)=>s.d[b]-s.d[a]).forEach(d=>{ dH+=`<div onclick="toggleDeptDropdown(event,'${sCId}','${d.replace(/'/g,"\\'")}')" class="flex justify-between items-center py-2 border-b hover:bg-slate-50 px-3 rounded cursor-pointer group"><span class="text-[11px] truncate mr-3 group-hover:text-blue-600">${d}</span><span class="text-[11px] font-bold bg-slate-100 px-1.5 py-0.5 rounded border">${s.d[d]}</span></div>`;});
-                        cH+=`<div class="relative inline-block w-full sm:w-auto mb-2 sm:mb-0"><button type="button" onclick="document.getElementById('dept-dropdown-${sCId}').classList.toggle('hidden');" class="w-full sm:w-auto bg-white border px-3 py-1.5 rounded-lg flex items-center justify-between sm:justify-start gap-2 text-sm font-bold shadow-sm z-10 relative cursor-pointer"><div class="flex items-center gap-2">${getCompanyLogo(c)} ${c}</div><div class="flex items-center"><span class="bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded text-xs ml-0.5 shadow-sm">${s.t}</span><i class="fa-solid fa-chevron-down text-[10px] text-slate-400 ml-1.5"></i></div></button><div id="dept-dropdown-${sCId}" class="hidden absolute left-0 z-50 mt-1 w-full sm:w-64 rounded-xl bg-white shadow-xl border"><div class="bg-slate-50 px-3 py-2 border-b flex justify-between"><h4 class="text-[10px] font-bold uppercase text-slate-500">${c} Depts</h4><span class="text-[10px] font-bold text-blue-600">${s.t} Staff</span></div><div class="p-1 max-h-60 overflow-y-auto">${dH}</div></div></div>`;
+                        let sCId=c.replace(/[^a-zA-Z0-9]/g,'-'), ss=cS[c], dH='';
+                        Object.keys(ss.d).sort((a,b)=>ss.d[b]-ss.d[a]).forEach(d=>{ dH+=`<div onclick="toggleDeptDropdown(event,'${sCId}','${d.replace(/'/g,"\'")}')" class="flex justify-between items-center py-2 border-b hover:bg-slate-50 px-3 rounded cursor-pointer group"><span class="text-[11px] truncate mr-3 group-hover:text-blue-600">${d}</span><span class="text-[11px] font-bold bg-slate-100 px-1.5 py-0.5 rounded border">${ss.d[d]}</span></div>`;});
+                        cH+=`<div class="relative inline-block w-full sm:w-auto mb-2 sm:mb-0"><button type="button" onclick="document.getElementById('dept-dropdown-${sCId}').classList.toggle('hidden');" class="w-full sm:w-auto bg-white border px-3 py-1.5 rounded-lg flex items-center justify-between sm:justify-start gap-2 text-sm font-bold shadow-sm z-10 relative cursor-pointer"><div class="flex items-center gap-2">${getCompanyLogo(c)} ${c}</div><div class="flex items-center"><span class="bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded text-xs ml-0.5 shadow-sm">${ss.t}</span><i class="fa-solid fa-chevron-down text-[10px] text-slate-400 ml-1.5"></i></div></button><div id="dept-dropdown-${sCId}" class="hidden absolute left-0 z-50 mt-1 w-full sm:w-64 rounded-xl bg-white shadow-xl border"><div class="bg-slate-50 px-3 py-2 border-b flex justify-between"><h4 class="text-[10px] font-bold uppercase text-slate-500">${c} Depts</h4><span class="text-[10px] font-bold text-blue-600">${ss.t} Staff</span></div><div class="p-1 max-h-60 overflow-y-auto">${dH}</div></div></div>`;
                     }); csL.innerHTML=cH;
                 } else csC.classList.add('hidden');
             }
-            sortFilteredData(); renderTable(); renderMobileDashboardUI();
+            sortFilteredData(); renderTable(); renderDashboardReportSummary(); renderMobileDashboardUI();
         }
 
         function handleSort(col) { if(currentSortColumn===col) isSortAscending=!isSortAscending; else {currentSortColumn=col; isSortAscending=true;} document.querySelectorAll('th.sortable').forEach(th => { th.classList.remove('asc','desc'); if(th.dataset.sort===col) th.classList.add(isSortAscending?'asc':'desc'); }); sortFilteredData(); renderTable(); renderMobileDashboardUI(); }
@@ -3807,7 +3974,7 @@
             if(filteredEmployees.length===0){if(nd)nd.classList.remove('hidden'); return;} if(nd)nd.classList.add('hidden');
             filteredEmployees.forEach(e=>{
                 let cB=`<span class="bg-slate-50 border text-[11px] font-bold px-2 py-1 rounded whitespace-nowrap">${getCompanyLogo(e.company)} ${e.company}</span>`;
-                let rA=e.leaves.remaining.AL<=0?'text-red-600':(e.leaves.remaining.AL<=2?'text-orange-600':''), uC=e.leaves.unpaid>0?'text-red-700 bg-red-50':'', l5C=e.totalLate5m>0?'text-yellow-700 bg-yellow-50':'', l3C=e.totalLate3m>0?'text-orange-700 bg-orange-50':'';
+                const periodStats=getDashboardPeriodStats(e); let rA=e.leaves.remaining.AL<=0?'text-red-600':(e.leaves.remaining.AL<=2?'text-orange-600':''), uC=periodStats.UP>0?'text-red-700 bg-red-50':'', l5C=e.totalLate5m>0?'text-yellow-700 bg-yellow-50':'', l3C=e.totalLate3m>0?'text-orange-700 bg-orange-50':'';
                 let tr=document.createElement('tr');
                 
                 let rowColorClass = "hover:bg-slate-50"; let nameBadge = "";
@@ -3817,7 +3984,7 @@
                 else if (e.isProbation) { rowColorClass = "bg-indigo-50/40 hover:bg-indigo-100/50"; nameBadge = `<span class="bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded text-[9px] font-bold border border-indigo-200 shadow-sm ml-2">Probation</span>`; }
                 
                 tr.className=`border-b cursor-pointer text-center ${rowColorClass}`; tr.onclick=()=>openModal(e);
-                tr.innerHTML=`<td class="px-4 py-3 text-left border-r">${e.displayId}</td><td class="px-4 py-3 font-semibold text-left border-r">${e.name} ${nameBadge}</td><td class="px-4 py-3 text-left border-r">${cB}</td><td class="px-4 py-3 text-xs border-r text-left">${e.position}</td><td class="px-4 py-3 text-xs border-r text-left">${e.joinDate}</td><td class="px-3 py-3 border-r bg-green-50/20">${e.leaves.available.AL}</td><td class="px-3 py-3 border-r bg-yellow-50/20">${e.leaves.available.SL}</td><td class="px-3 py-3 border-r bg-purple-50/20">${e.leaves.available.SP}</td><td class="px-3 py-3 border-r font-bold bg-green-50/20 ${rA}">${e.leaves.remaining.AL}</td><td class="px-3 py-3 border-r bg-yellow-50/20">${e.leaves.remaining.SL}</td><td class="px-3 py-3 border-r bg-purple-50/20">${e.leaves.remaining.SP}</td><td class="px-3 py-3 border-r font-bold ${uC}">${e.leaves.unpaid>0?e.leaves.unpaid:'-'}</td><td class="px-3 py-3 border-r font-bold ${l5C}">${e.totalLate5m>0?e.totalLate5m:'-'}</td><td class="px-3 py-3 font-bold ${l3C}">${e.totalLate3m>0?e.totalLate3m:'-'}</td>`; tb.appendChild(tr);
+                tr.innerHTML=`<td class="px-4 py-3 text-left border-r">${e.displayId}</td><td class="px-4 py-3 font-semibold text-left border-r">${e.name} ${nameBadge}</td><td class="px-4 py-3 text-left border-r">${cB}</td><td class="px-4 py-3 text-xs border-r text-left">${e.position}</td><td class="px-4 py-3 text-xs border-r text-left">${e.joinDate}</td><td class="px-3 py-3 border-r bg-green-50/20">${e.leaves.available.AL}</td><td class="px-3 py-3 border-r bg-yellow-50/20">${e.leaves.available.SL}</td><td class="px-3 py-3 border-r bg-purple-50/20">${e.leaves.available.SP}</td><td class="px-3 py-3 border-r font-bold bg-green-50/20 ${rA}">${e.leaves.remaining.AL}</td><td class="px-3 py-3 border-r bg-yellow-50/20">${e.leaves.remaining.SL}</td><td class="px-3 py-3 border-r bg-purple-50/20">${e.leaves.remaining.SP}</td><td class="px-3 py-3 border-r font-bold ${uC}">${periodStats.UP>0?mobileDashboardFormatNumber(periodStats.UP):'-'}</td><td class="px-3 py-3 border-r font-bold ${l5C}">${e.totalLate5m>0?e.totalLate5m:'-'}</td><td class="px-3 py-3 font-bold ${l3C}">${e.totalLate3m>0?e.totalLate3m:'-'}</td>`; tb.appendChild(tr);
             });
         }
 
@@ -3830,16 +3997,59 @@
             return n.toFixed(1).replace(/\.0$/, '');
         }
 
-        function getMobileDashboardPeriodStats(emp) {
+        function getDashboardPeriodStats(emp) {
             const out = {AL:0, SL:0, SP:0, UP:0, A:0, Late5m:0, Late3m:0, OT:0, D:0, H:0};
-            const hist = leaveHistoryByEmployee[emp.id] || {};
-            const rows = selectedDashboardMonth === 'All'
-                ? Object.values(hist)
-                : [hist[selectedDashboardMonth]].filter(Boolean);
-            rows.forEach(h => {
-                Object.keys(out).forEach(k => out[k] += Number(h?.[k] || 0));
+            const monthPrefix = selectedDashboardMonth === 'All' ? null : selectedDashboardMonth.substring(0,3).toLowerCase();
+            dailyLeaveRecords.forEach(r => {
+                if (r.staffId !== emp.id) return;
+                if (Number(r.year || attendanceDataYear) !== Number(selectedDashboardYear)) return;
+                if (monthPrefix && !String(r.month || '').toLowerCase().startsWith(monthPrefix)) return;
+                Object.keys(out).forEach(k => out[k] += Number(r.leaves?.[k] || 0));
             });
             return out;
+        }
+
+        function getMobileDashboardPeriodStats(emp) { return getDashboardPeriodStats(emp); }
+
+        function getDashboardAvailableYears() {
+            const years = new Set([attendanceDataYear, new Date().getFullYear()]);
+            dailyLeaveRecords.forEach(r => { const y=Number(r.year||attendanceDataYear); if(Number.isFinite(y)) years.add(y); });
+            Object.keys(staffWarnings || {}).forEach(id => warningNormalizeRecord(id).history.forEach(h => years.add(warningEntryYear(h))));
+            return Array.from(years).filter(Number.isFinite).sort((a,b)=>b-a);
+        }
+
+        function getDashboardReferenceDate() {
+            const y = Number(selectedDashboardYear) || attendanceDataYear;
+            if (selectedDashboardMonth !== 'All') {
+                const mi = monthNames.indexOf(selectedDashboardMonth);
+                return new Date(y, mi >= 0 ? mi + 1 : 12, 0, 23, 59, 59);
+            }
+            if (y === new Date().getFullYear()) return new Date();
+            return new Date(y, 11, 31, 23, 59, 59);
+        }
+
+        function renderDashboardReportSummary() {
+            const totals = {AL:0,SL:0,SP:0,UP:0,Late5m:0,Late3m:0};
+            filteredEmployees.forEach(e => { const ps=getDashboardPeriodStats(e); Object.keys(totals).forEach(k => totals[k]+=Number(ps[k]||0)); });
+            const monthIndex = selectedDashboardMonth === 'All' ? -1 : monthNames.indexOf(selectedDashboardMonth);
+            let issued=0, verbal=0, written=0, final=0;
+            filteredEmployees.forEach(e => {
+                const hist=getStaffWarningHistory(e.id, selectedDashboardYear);
+                hist.forEach(h => {
+                    if (!['verbal','written','final'].includes(h.level)) return;
+                    if (monthIndex >= 0) {
+                        if (!h.startAt) return;
+                        const d=new Date(h.startAt); if(isNaN(d.getTime()) || d.getMonth()!==monthIndex) return;
+                    }
+                    issued++;
+                });
+                const lvl=getStaffWarningLevel(e.id, selectedDashboardYear);
+                if(lvl==='verbal') verbal++; else if(lvl==='written') written++; else if(lvl==='final') final++;
+            });
+            const set=(id,v)=>{const el=document.getElementById(id); if(el) el.textContent=mobileDashboardFormatNumber(v);};
+            set('reportALUsed',totals.AL); set('reportSLUsed',totals.SL); set('reportSPUsed',totals.SP); set('reportPaidLeaveUsed',totals.AL+totals.SL+totals.SP); set('reportUPUsed',totals.UP); set('reportLate',totals.Late5m); set('reportLate30',totals.Late3m); set('reportWarningsIssued',issued); set('reportWarningVerbal',verbal); set('reportWarningWritten',written); set('reportWarningFinal',final);
+            const period=document.getElementById('dashboardReportPeriod');
+            if(period) period.textContent = `${selectedDashboardMonth==='All'?'Full Year':selectedDashboardMonth} ${selectedDashboardYear}`;
         }
 
         function getMobileDashboardPhoto(emp, sizeClass) {
@@ -3859,6 +4069,7 @@
             const cl = document.getElementById('companyDropdownLabel');
             if (cl) cl.innerText = selectedCompanies.length === companies.size ? 'All Companies' : (selectedCompanies.length === 0 ? 'Select Company' : (selectedCompanies.length === 1 ? selectedCompanies[0] : `${selectedCompanies.length} Companies`));
             const df = document.getElementById('departmentFilter'); if (df) df.value = (!Array.isArray(selectedDepartments) || selectedDepartments.length !== 1) ? 'All' : selectedDepartments[0];
+            const yf = document.getElementById('dashboardYearFilter'); if (yf) { const yrs=getDashboardAvailableYears(); if(!yrs.includes(selectedDashboardYear)) yrs.push(selectedDashboardYear); yrs.sort((a,b)=>b-a); yf.innerHTML=yrs.map(y=>`<option value="${y}">${y}</option>`).join(''); yf.value=String(selectedDashboardYear); }
             const mf = document.getElementById('dashboardMonthFilter'); if (mf) mf.value = selectedDashboardMonth;
             const sf = document.getElementById('searchInput'); if (sf) sf.value = searchQuery;
             document.querySelectorAll('.status-checkbox').forEach(cb => cb.checked = selectedStatuses.includes(cb.value));
@@ -3908,6 +4119,8 @@
             }
             document.querySelectorAll('.mobile-dashboard-status').forEach(cb => cb.checked = selectedStatuses.includes(cb.value));
 
+            const yearSel = document.getElementById('mobileDashboardYear');
+            if (yearSel) { const yrs=getDashboardAvailableYears(); if(!yrs.includes(selectedDashboardYear)) yrs.push(selectedDashboardYear); yrs.sort((a,b)=>b-a); yearSel.innerHTML=yrs.map(y=>`<option value="${y}">${y}</option>`).join(''); yearSel.value=String(selectedDashboardYear); }
             const month = document.getElementById('mobileDashboardMonth');
             if (month) {
                 month.innerHTML = '<option value="All">YTD</option>' + monthNames.map(m => `<option value="${m}">${m}</option>`).join('');
@@ -4282,19 +4495,16 @@
             const cards = document.getElementById('dashboardMobileCards');
             if (!shell || !cards) return;
 
-            let active = 0, leave = 0, late = 0, absence = 0;
+            renderStaffCompanyKpis();
+
             const attention = [];
             filteredEmployees.forEach(e => {
                 const ps = getMobileDashboardPeriodStats(e);
-                if (getEffectiveStaffStatus(e) === 'Active') active++;
-                leave += ps.AL + ps.SL + ps.SP + ps.UP;
-                late += ps.Late5m + ps.Late3m;
-                absence += ps.A;
 
-                if (getEffectiveStaffStatus(e) === 'Active') {
+                if (getEffectiveStaffStatus(e, getDashboardReferenceDate()) === 'Active') {
                     const reasons = [];
                     let score = 0;
-                    const warningMeta = getStaffWarningMeta(e.id);
+                    const warningMeta = getStaffWarningMeta(e.id, selectedDashboardYear);
                     if (warningMeta.level !== 'normal') { reasons.push(warningMeta.label); score += warningMeta.score; }
                     if (ps.A > 0) { reasons.push(`A ${mobileDashboardFormatNumber(ps.A)}`); score += 6 + ps.A; }
                     if (ps.Late3m > 0) { reasons.push(`L30+ ${mobileDashboardFormatNumber(ps.Late3m)}`); score += 5 + ps.Late3m; }
@@ -4305,10 +4515,7 @@
                 }
             });
 
-            const put = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=mobileDashboardFormatNumber(v); };
-            put('mobileKpiActive', active); put('mobileKpiLeave', leave); put('mobileKpiLate', late); put('mobileKpiAbsence', absence);
-
-            const period = selectedDashboardMonth === 'All' ? 'YTD' : selectedDashboardMonth;
+            const period = selectedDashboardMonth === 'All' ? String(selectedDashboardYear) : `${selectedDashboardMonth} ${selectedDashboardYear}`;
             const companyText = selectedCompanies.length === companies.size ? 'All Companies' : (selectedCompanies.length === 1 ? selectedCompanies[0] : `${selectedCompanies.length} Companies`);
             const scope = document.getElementById('mobileDashboardScope');
             const deptText = selectedDepartments === null ? 'All Departments' : (selectedDepartments.length === 0 ? 'No Departments' : (selectedDepartments.length === 1 ? selectedDepartments[0] : `${selectedDepartments.length} Departments`));
@@ -4318,6 +4525,7 @@
             if (selectedCompanies.length !== companies.size) chips.push(companyText);
             if (selectedDepartments !== null) chips.push(deptText);
             if (!(selectedStatuses.length === 1 && selectedStatuses[0] === 'Active')) chips.push(selectedStatuses.length ? selectedStatuses.join(' + ') : 'No Status');
+            chips.push(String(selectedDashboardYear));
             if (selectedDashboardMonth !== 'All') chips.push(selectedDashboardMonth);
             const leaveType = document.getElementById('dashboardLeaveTypeFilter')?.value || 'All';
             if (leaveType !== 'All') chips.push(leaveType === 'Late' ? 'Late only' : `${leaveType} only`);
@@ -4364,7 +4572,7 @@
                 if (isNoticePeriodStaff(e)) flags.push(`<span class="mobile-staff-flag text-amber-800 bg-amber-50 border-amber-200"><i class="fa-solid fa-hourglass-half mr-1"></i>Notice · Last Day ${formatStaffLastDay(e)}</span>`);
                 else if (!isEmploymentVisible(e)) flags.push(`<span class="mobile-staff-flag">${e.status}</span>`);
                 else if (e.isProbation) flags.push('<span class="mobile-staff-flag text-indigo-700 bg-indigo-50 border-indigo-100">Probation</span>');
-                const cardWarningMeta = getStaffWarningMeta(e.id);
+                const cardWarningMeta = getStaffWarningMeta(e.id, selectedDashboardYear);
                 const cardWarningClass = cardWarningMeta.level === 'verbal' ? 'staff-warning-card-verbal' : cardWarningMeta.level === 'written' ? 'staff-warning-card-written' : cardWarningMeta.level === 'final' ? 'staff-warning-card-final' : '';
                 return `<article class="mobile-staff-card ${cardWarningClass}" onclick="openModalById('${String(e.id).replace(/'/g,"\\'")}')">
                     <div class="mobile-staff-card-top">
@@ -4376,7 +4584,7 @@
                             ${isNoticePeriodStaff(e) ? `<div class="mobile-staff-last-day"><i class="fa-regular fa-calendar-xmark"></i> Last Working Day: <strong>${formatStaffLastDay(e)}</strong></div>` : ''}
                             <div class="flex flex-wrap items-center gap-1.5 mt-1">
                                 ${isNoticePeriodStaff(e) ? noticePeriodBadgeHtml(e,true) : ''}
-                                ${(() => { const wm = getStaffWarningMeta(e.id); return `<button type="button" class="staff-warning-badge ${wm.cls}" onclick="openWarningEditor(event,'${String(e.id).replace(/'/g,"\'")}')"><i class="fa-solid ${wm.icon}"></i>${wm.label}<i class="fa-solid fa-pen text-[7px] opacity-60 ml-0.5"></i></button><span class="staff-warning-count"><i class="fa-solid fa-clock-rotate-left"></i>${wm.count}</span>`; })()}
+                                ${(() => { const wm = getStaffWarningMeta(e.id, selectedDashboardYear); return `<button type="button" class="staff-warning-badge ${wm.cls}" onclick="openWarningEditor(event,'${String(e.id).replace(/'/g,"\'")}', selectedDashboardYear)"><i class="fa-solid ${wm.icon}"></i>${wm.label}<i class="fa-solid fa-pen text-[7px] opacity-60 ml-0.5"></i></button><span class="staff-warning-count"><i class="fa-solid fa-clock-rotate-left"></i>${wm.count}</span>`; })()}
                                 <button type="button" class="staff-card-export-btn" onclick="exportEmployeeCard(event,'${String(e.id).replace(/'/g,"\'")}')"><i class="fa-solid fa-file-export"></i> Export</button>
                             </div>
                         </div>
@@ -4444,6 +4652,7 @@
             selectedStatuses = Array.from(document.querySelectorAll('.mobile-dashboard-status:checked')).map(cb=>cb.value);
             syncDesktopDashboardControlsFromState(); applyFilters();
         };
+        window.mobileDashboardSetYear = function(v) { selectedDashboardYear = Number(v)||attendanceDataYear; syncDesktopDashboardControlsFromState(); applyFilters(); };
         window.mobileDashboardSetMonth = function(v) { selectedDashboardMonth = v; syncDesktopDashboardControlsFromState(); applyFilters(); };
         window.mobileDashboardSetLeaveType = function(v) { const d=document.getElementById('dashboardLeaveTypeFilter'); if(d)d.value=v; applyFilters(); };
         window.mobileDashboardSetWarning = function(v) { selectedDashboardWarning = v || 'All'; applyFilters(); };
@@ -4458,6 +4667,7 @@
             selectedCompanies = Array.from(companies).sort();
             selectedDepartments = null;
             selectedStatuses = ['Active'];
+            selectedDashboardYear = attendanceDataYear;
             selectedDashboardMonth = 'All';
             selectedDashboardWarning = 'All';
             searchQuery = '';
@@ -5619,7 +5829,51 @@
             
             let bgC={'ITC':'dae3f3', 'LPH':'e2efda', 'LPT':'dae3f3', 'LPL':'dae3f3', 'TTC':'ffffff'}, cnt=1, cComp='';
             let cS = selectedDailyCompanies.length === 1 ? selectedDailyCompanies[0] + "-" : "";
-            let h=`<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"><style>table{border-collapse:collapse;font-family:Arial;font-size:10pt;}th,td{border:1px solid #000;padding:4px;}</style></head><body><table id="exPaid" data-cols-width="5,15,30,25,12,10,10,10"><tr><td colspan="8" data-f-sz="14" data-f-color="c00000" data-f-bold="true" data-a-h="center" data-b-a-s="none">${cS}Monthly Leave Report (${titleStr})</td></tr><tr><td colspan="5" data-b-a-s="none"></td><td data-t="n" data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${tS}</td><td data-t="n" data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${tA}</td><td data-t="n" data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${tSp}</td></tr><tr><th data-fill-color="92d050" data-b-a-s="thin">No.</th><th data-fill-color="92d050" data-b-a-s="thin">Emp-ID</th><th data-fill-color="92d050" data-b-a-s="thin">Name</th><th data-fill-color="92d050" data-b-a-s="thin">Department</th><th data-fill-color="92d050" data-b-a-s="thin">Company</th><th data-fill-color="ffff00" data-f-bold="true" data-b-a-s="thin">SL</th><th data-fill-color="ffff00" data-f-bold="true" data-b-a-s="thin">AL</th><th data-fill-color="ffff00" data-f-bold="true" data-b-a-s="thin">SP</th></tr>`;
+            let h=`<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"><style>table{border-collapse:collapse;font-family:Arial;font-size:10pt;}th,td{border:1px solid #000;padding:4px;}
+        /* Final desktop staffing-summary override: keep all cards on one row */
+        @media (min-width: 701px) {
+            #mobileStaffKpiContainer.mobile-dashboard-kpis {
+                display: flex !important;
+                flex-wrap: nowrap !important;
+                grid-template-columns: none !important;
+                gap: 8px !important;
+                overflow-x: auto;
+                overflow-y: hidden;
+                margin-bottom: 14px !important;
+                padding-bottom: 2px;
+                scrollbar-width: thin;
+            }
+            #mobileStaffKpiContainer .mobile-dashboard-kpi {
+                min-width: 0 !important;
+                min-height: 66px !important;
+                padding: 10px 12px !important;
+                gap: 9px !important;
+                border-radius: 12px !important;
+                flex: 1 1 0 !important;
+                width: auto !important;
+            }
+            #mobileStaffKpiContainer .mobile-dashboard-kpi:first-child {
+                flex: 1.15 1 0 !important;
+            }
+            #mobileStaffKpiContainer .mobile-dashboard-kpi-icon {
+                width: 34px !important;
+                height: 34px !important;
+                flex: 0 0 34px !important;
+                border-radius: 9px !important;
+                font-size: 13px !important;
+            }
+            #mobileStaffKpiContainer .mobile-dashboard-kpi-label {
+                font-size: 9px !important;
+                line-height: 1.05 !important;
+                letter-spacing: .25px !important;
+            }
+            #mobileStaffKpiContainer .mobile-dashboard-kpi-value {
+                font-size: 22px !important;
+                line-height: 1 !important;
+                margin-top: 3px !important;
+            }
+        }
+</style></head><body><table id="exPaid" data-cols-width="5,15,30,25,12,10,10,10"><tr><td colspan="8" data-f-sz="14" data-f-color="c00000" data-f-bold="true" data-a-h="center" data-b-a-s="none">${cS}Monthly Leave Report (${titleStr})</td></tr><tr><td colspan="5" data-b-a-s="none"></td><td data-t="n" data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${tS}</td><td data-t="n" data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${tA}</td><td data-t="n" data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${tSp}</td></tr><tr><th data-fill-color="92d050" data-b-a-s="thin">No.</th><th data-fill-color="92d050" data-b-a-s="thin">Emp-ID</th><th data-fill-color="92d050" data-b-a-s="thin">Name</th><th data-fill-color="92d050" data-b-a-s="thin">Department</th><th data-fill-color="92d050" data-b-a-s="thin">Company</th><th data-fill-color="ffff00" data-f-bold="true" data-b-a-s="thin">SL</th><th data-fill-color="ffff00" data-f-bold="true" data-b-a-s="thin">AL</th><th data-fill-color="ffff00" data-f-bold="true" data-b-a-s="thin">SP</th></tr>`;
             
             eD.forEach(r=>{ 
                 let b=bgC[r.e.company] || 'ffffff'; 
