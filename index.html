@@ -13,6 +13,8 @@
     <!-- SheetJS / TableToExcel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@linways/table-to-excel@1.0.4/dist/tableToExcel.min.js"></script>
+    <!-- jsPDF: direct staff-profile PDF download (no popup/print preview) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- Flatpickr -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -2126,6 +2128,7 @@
         .warning-history-list { display:flex; flex-direction:column; gap:8px; max-height:230px; overflow:auto; padding-right:2px; }
         .warning-history-item { position:relative; border:1px solid #e2e8f0; border-radius:12px; padding:10px 11px 10px 14px; background:#fff; }
         .warning-history-item::before { content:''; position:absolute; left:0; top:10px; bottom:10px; width:3px; border-radius:0 4px 4px 0; background:#94a3b8; }
+        .warning-history-item.normal::before { background:#10b981; }
         .warning-history-item.verbal::before { background:#eab308; }
         .warning-history-item.written::before { background:#f97316; }
         .warning-history-item.final::before { background:#ef4444; }
@@ -3143,7 +3146,7 @@
                 <div class="mt-4">
                     <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Stage Note / Reason</label>
                     <textarea id="warningEditNote" rows="3" class="w-full border border-slate-300 rounded-xl p-3 text-sm bg-white outline-none focus:border-blue-500 resize-y" placeholder="Reason, improvement required, follow-up details..."></textarea>
-                    <p class="text-[10px] text-slate-400 mt-1">Changing level closes the previous stage and starts a new dated stage. Saving the same level updates its current note.</p>
+                    <p class="text-[10px] text-slate-400 mt-1">Each save creates a new dated timeline entry. If another stage is active, it is closed at this start time. This allows multiple Verbal Warnings and multiple Written Warnings.</p>
                 </div>
                 </div>
                 <div class="border-t pt-4">
@@ -3171,14 +3174,14 @@
         <div id="warningHistoryEditModalContent" class="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden transform scale-95 transition-transform duration-300 max-h-[92vh] flex flex-col">
             <div class="p-4 border-b flex justify-between items-center relative shrink-0">
                 <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500"></div>
-                <div><h3 class="font-bold text-slate-900 text-lg">Edit Warning Stage</h3><p class="text-xs text-slate-500 mt-0.5">Dates, stage, note and issuer can be corrected here.</p></div>
+                <div><h3 class="font-bold text-slate-900 text-lg">Edit Warning Stage</h3><p class="text-xs text-slate-500 mt-0.5">Change the stage to Normal, correct its details, or remove this timeline entry.</p></div>
                 <button onclick="closeWarningHistoryEntryEditor()" class="text-slate-400 hover:bg-slate-100 w-8 h-8 rounded-full"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="p-4 sm:p-5 overflow-y-auto">
                 <input type="hidden" id="warningHistoryEditStaffId">
                 <input type="hidden" id="warningHistoryEditIndex">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2">Stage</label><select id="warningHistoryEditLevel" class="w-full border border-slate-300 rounded-xl p-3 text-sm font-bold bg-white"><option value="verbal">🟡 Verbal Warning</option><option value="written">🟠 Written Warning</option><option value="final">🔴 Final Warning</option></select></div>
+                    <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2">Stage</label><select id="warningHistoryEditLevel" class="w-full border border-slate-300 rounded-xl p-3 text-sm font-bold bg-white"><option value="normal">🟢 Normal</option><option value="verbal">🟡 Verbal Warning</option><option value="written">🟠 Written Warning</option><option value="final">🔴 Final Warning</option></select></div>
                     <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2">Issued / Updated By</label><input id="warningHistoryEditIssuer" type="text" class="w-full border border-slate-300 rounded-xl p-3 text-sm font-semibold bg-white"></div>
                     <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2">Start Date / Time</label><input id="warningHistoryEditStartAt" type="datetime-local" class="w-full border border-slate-300 rounded-xl p-3 text-sm font-semibold bg-white"></div>
                     <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2">End Date / Time</label><input id="warningHistoryEditEndAt" type="datetime-local" class="w-full border border-slate-300 rounded-xl p-3 text-sm font-semibold bg-white"><p class="text-[10px] text-slate-400 mt-1">Leave blank if this is the current active stage.</p></div>
@@ -3186,7 +3189,7 @@
                 <div class="mt-4"><label class="block text-xs font-bold text-slate-500 uppercase mb-2">Note / Reason</label><textarea id="warningHistoryEditNote" rows="4" class="w-full border border-slate-300 rounded-xl p-3 text-sm bg-white resize-y"></textarea></div>
                 <div id="warningHistoryEditError" class="hidden mt-3 text-xs font-semibold text-red-600 bg-red-50 border border-red-200 rounded-lg p-2.5"></div>
             </div>
-            <div class="p-4 border-t flex justify-end gap-3 bg-slate-50 shrink-0"><button onclick="closeWarningHistoryEntryEditor()" class="px-4 py-2 text-sm font-bold text-slate-600 bg-white border rounded-lg">Cancel</button><button onclick="saveWarningHistoryEntry()" class="px-5 py-2 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg"><i class="fa-solid fa-floppy-disk mr-1.5"></i>Save Changes</button></div>
+            <div class="p-4 border-t flex flex-wrap items-center justify-between gap-3 bg-slate-50 shrink-0"><button id="warningRemoveEntryBtn" type="button" onclick="removeWarningHistoryEntry(this)" class="px-4 py-2 text-sm font-bold text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 rounded-lg"><i class="fa-solid fa-trash-can mr-1.5"></i>Remove Entry</button><div class="flex justify-end gap-3 ml-auto"><button onclick="closeWarningHistoryEntryEditor()" class="px-4 py-2 text-sm font-bold text-slate-600 bg-white border rounded-lg">Cancel</button><button onclick="saveWarningHistoryEntry()" class="px-5 py-2 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg"><i class="fa-solid fa-floppy-disk mr-1.5"></i>Save Changes</button></div></div>
         </div>
     </div>
 
@@ -3637,9 +3640,42 @@
                             let emp = allEmployees.find(e => { let eName = e.name.replace(/(Mr\.|Ms\.|Mrs\.)\s*/gi, '').replace(/\s+/g, '').toLowerCase(); return eName === cleanName || eName.includes(cleanName) || cleanName.includes(eName); });
                             if(emp) {
                                 let finalUrl = urlMatch.trim();
-                                if(finalUrl.includes('drive.google.com/file/d/')) { let m = finalUrl.match(/\/d\/([^\/]+)/); if(m) finalUrl = `https://drive.google.com/thumbnail?id=${m[1]}&sz=w400`; }
-                                else if (finalUrl.includes('drive.google.com/open?id=')) { let m = finalUrl.match(/id=([^&]+)/); if(m) finalUrl = `https://drive.google.com/thumbnail?id=${m[1]}&sz=w400`; }
+                                let photoFallbackUrl = '';
+                                if(finalUrl.includes('drive.google.com/file/d/')) {
+                                    let m = finalUrl.match(/\/d\/([^\/]+)/);
+                                    if(m) {
+                                        const driveId = m[1];
+                                        finalUrl = `https://drive.google.com/thumbnail?id=${driveId}&sz=w400`;
+                                        photoFallbackUrl = `https://lh3.googleusercontent.com/d/${driveId}=w800`;
+                                    }
+                                }
+                                else if (finalUrl.includes('drive.google.com/open?id=')) {
+                                    let m = finalUrl.match(/id=([^&]+)/);
+                                    if(m) {
+                                        const driveId = m[1];
+                                        finalUrl = `https://drive.google.com/thumbnail?id=${driveId}&sz=w400`;
+                                        photoFallbackUrl = `https://lh3.googleusercontent.com/d/${driveId}=w800`;
+                                    }
+                                }
+                                else {
+                                    let m = finalUrl.match(/[?&]id=([^&]+)/);
+                                    if (m) photoFallbackUrl = `https://lh3.googleusercontent.com/d/${m[1]}=w800`;
+                                }
                                 emp.photoUrl = finalUrl;
+                                emp.photoFallbackUrl = photoFallbackUrl;
+                                emp.photoSourceUrl = urlMatch.trim();
+                                emp.photoFileId = pdfExtractDriveFileId(urlMatch.trim()) || pdfExtractDriveFileId(finalUrl) || '';
+                                // Keep the visible dashboard photo exactly as before, but pre-build
+                                // CORS-safe variants specifically for jsPDF export.
+                                if (emp.photoFileId) {
+                                    const pdfSafe = pdfPhotoProxyUrls(`https://lh3.googleusercontent.com/d/${emp.photoFileId}=w1200`);
+                                    emp.photoPdfUrl = pdfSafe[0] || '';
+                                    emp.photoPdfFallbackUrl = pdfSafe[1] || '';
+                                } else {
+                                    const pdfSafe = pdfPhotoProxyUrls(finalUrl);
+                                    emp.photoPdfUrl = pdfSafe[0] || '';
+                                    emp.photoPdfFallbackUrl = pdfSafe[1] || '';
+                                }
                                 break;
                             }
                         }
@@ -3928,7 +3964,7 @@
                 if(Array.isArray(selectedDepartments) && selectedDepartments.length > 0 && !selectedDepartments.includes(e.department)) return false;
                 if(Array.isArray(selectedDepartments) && selectedDepartments.length === 0) return false;
                 if(selectedStatuses.length > 0 && !selectedStatuses.includes(getEffectiveStaffStatus(e, refDate))) return false;
-                const warningLevel = getStaffWarningLevel(e.id, selectedDashboardYear);
+                const warningLevel = getStaffWarningHighestLevel(e.id, selectedDashboardYear);
                 if (selectedDashboardWarning === 'AnyWarning' && warningLevel === 'normal') return false;
                 if (!['All','AnyWarning'].includes(selectedDashboardWarning) && warningLevel !== selectedDashboardWarning) return false;
 
@@ -4043,7 +4079,7 @@
                     }
                     issued++;
                 });
-                const lvl=getStaffWarningLevel(e.id, selectedDashboardYear);
+                const lvl=getStaffWarningHighestLevel(e.id, selectedDashboardYear);
                 if(lvl==='verbal') verbal++; else if(lvl==='written') written++; else if(lvl==='final') final++;
             });
             const set=(id,v)=>{const el=document.getElementById(id); if(el) el.textContent=mobileDashboardFormatNumber(v);};
@@ -4164,7 +4200,7 @@
             }
             const level = ['normal','verbal','written','final'].includes(String(raw.level || '').toLowerCase()) ? String(raw.level).toLowerCase() : 'normal';
             const history = Array.isArray(raw.history) ? raw.history.map(h => ({
-                level: ['verbal','written','final'].includes(String(h.level || '').toLowerCase()) ? String(h.level).toLowerCase() : 'verbal',
+                level: ['normal','verbal','written','final'].includes(String(h.level || '').toLowerCase()) ? String(h.level).toLowerCase() : 'verbal',
                 year: warningEntryYear(h),
                 startAt: h.startAt || null,
                 endAt: h.endAt || null,
@@ -4198,6 +4234,28 @@
         }
         function getStaffWarningMeta(staffId, year = new Date().getFullYear()) {
             const level = getStaffWarningLevel(staffId, year);
+            const map = {
+                normal:  { label:'Normal', icon:'fa-circle-check', cls:'warning-normal', score:0 },
+                verbal:  { label:'Verbal Warning', icon:'fa-comment-dots', cls:'warning-verbal', score:18 },
+                written: { label:'Written Warning', icon:'fa-file-circle-exclamation', cls:'warning-written', score:35 },
+                final:   { label:'Final Warning', icon:'fa-triangle-exclamation', cls:'warning-final', score:60 }
+            };
+            return { level, year:Number(year)||new Date().getFullYear(), count:getStaffWarningCount(staffId, year), ...map[level] };
+        }
+        // Dashboard/profile status uses the HIGHEST warning level recorded in the selected year.
+        // Severity: Final > Written > Verbal > Normal. This intentionally does not depend
+        // on which warning was added last, so Verbal + Written + Verbal still displays Written.
+        function getStaffWarningHighestLevel(staffId, year = new Date().getFullYear()) {
+            const severity = { normal:0, verbal:1, written:2, final:3 };
+            let highest = 'normal';
+            getStaffWarningHistory(staffId, year).forEach(h => {
+                const level = String(h?.level || 'normal').toLowerCase();
+                if ((severity[level] || 0) > (severity[highest] || 0)) highest = level;
+            });
+            return highest;
+        }
+        function getStaffWarningHighestMeta(staffId, year = new Date().getFullYear()) {
+            const level = getStaffWarningHighestLevel(staffId, year);
             const map = {
                 normal:  { label:'Normal', icon:'fa-circle-check', cls:'warning-normal', score:0 },
                 verbal:  { label:'Verbal Warning', icon:'fa-comment-dots', cls:'warning-verbal', score:18 },
@@ -4267,22 +4325,23 @@
             const summary = document.getElementById('warningHistorySummary');
             if (!list) return;
             renderWarningYearSelector(staffId);
-            const history = getStaffWarningHistory(staffId, selectedWarningHistoryYear).map(h => {
-                const full = warningNormalizeRecord(staffId).history;
-                return {...h,_index:full.findIndex(x => x === h || (x.level===h.level && x.startAt===h.startAt && x.endAt===h.endAt && x.note===h.note && warningEntryYear(x)===selectedWarningHistoryYear))};
-            }).sort((a,b) => {
-                const at = a.startAt ? new Date(a.startAt).getTime() : 0;
-                const bt = b.startAt ? new Date(b.startAt).getTime() : 0;
-                return bt - at;
-            });
-            const count = history.length;
+            const fullHistory = warningNormalizeRecord(staffId).history;
+            const history = fullHistory
+                .map((h, index) => ({...h, _index:index}))
+                .filter(h => warningEntryYear(h) === selectedWarningHistoryYear)
+                .sort((a,b) => {
+                    const at = a.startAt ? new Date(a.startAt).getTime() : 0;
+                    const bt = b.startAt ? new Date(b.startAt).getTime() : 0;
+                    return bt - at;
+                });
+            const warningCount = history.filter(h => ['verbal','written','final'].includes(h.level)).length;
             const meta = getStaffWarningMeta(staffId, selectedWarningHistoryYear);
-            if (summary) summary.textContent = `${selectedWarningHistoryYear} • ${count} warning stage${count===1?'':'s'} • Current: ${meta.label}`;
-            if (!count) {
+            if (summary) summary.textContent = `${selectedWarningHistoryYear} • ${warningCount} warning${warningCount===1?'':'s'} • Current: ${meta.label}`;
+            if (!history.length) {
                 list.innerHTML = `<div class="text-center py-7 text-xs text-slate-400 bg-slate-50 border border-dashed rounded-xl"><i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i>No warning history in ${selectedWarningHistoryYear}. Employee starts this year in normal standing.</div>`;
                 return;
             }
-            const labels = { verbal:'Verbal Warning', written:'Written Warning', final:'Final Warning' };
+            const labels = { normal:'Normal', verbal:'Verbal Warning', written:'Written Warning', final:'Final Warning' };
             list.innerHTML = history.map(h => {
                 const end = h.endAt ? warningFormatDateTime(h.endAt) : 'Year end / Current';
                 const isCurrent = meta.level === h.level && !h.endAt && history[0] === h;
@@ -4309,14 +4368,17 @@
         }
         window.showWarningStageForm = function() {
             const id = document.getElementById('warningEditStaffId').value;
-            const record = warningNormalizeRecord(id);
             const yearHistory = getStaffWarningHistory(id, selectedWarningHistoryYear);
             const currentLevel = getStaffWarningLevel(id, selectedWarningHistoryYear);
-            const current = yearHistory.slice().reverse().find(h => !h.endAt && h.level === currentLevel);
+            const current = yearHistory.slice().sort((a,b) => {
+                const at = a.startAt ? new Date(a.startAt).getTime() : 0;
+                const bt = b.startAt ? new Date(b.startAt).getTime() : 0;
+                return bt - at;
+            }).find(h => !h.endAt);
             document.getElementById('warningEditLevel').value = currentLevel;
-            document.getElementById('warningEditNote').value = current ? current.note || '' : '';
+            document.getElementById('warningEditNote').value = '';
             document.getElementById('warningEditIssuer').value = current ? current.issuer || '' : '';
-            let defaultDate = current && current.startAt ? new Date(current.startAt) : new Date();
+            let defaultDate = new Date();
             if (selectedWarningHistoryYear !== defaultDate.getFullYear()) defaultDate = new Date(selectedWarningHistoryYear, 0, 1, 9, 0, 0);
             document.getElementById('warningEditStartAt').value = warningToLocalInput(defaultDate);
             setWarningEditorMode('edit');
@@ -4355,40 +4417,44 @@
             if (!id || !chosenStart) { showAppToast('Please choose a valid warning start date/time.', 'error'); return; }
             const startDate = new Date(chosenStart);
             if (startDate.getFullYear() !== selectedWarningHistoryYear) { showAppToast(`Warning date must be within ${selectedWarningHistoryYear}.`, 'error'); return; }
+            if (!['normal','verbal','written','final'].includes(level)) { showAppToast('Please choose a valid warning stage.', 'error'); return; }
+
             const record = warningNormalizeRecord(id);
             let history = record.history.map(h => ({...h, year:warningEntryYear(h)}));
-            const yearIndexes = history.map((h,i)=>({h,i})).filter(x => warningEntryYear(x.h) === selectedWarningHistoryYear);
-            const currentLevel = getStaffWarningLevel(id, selectedWarningHistoryYear);
+            const yearIndexes = history
+                .map((h,i)=>({h,i}))
+                .filter(x => warningEntryYear(x.h) === selectedWarningHistoryYear)
+                .sort((a,b) => {
+                    const at = a.h.startAt ? new Date(a.h.startAt).getTime() : 0;
+                    const bt = b.h.startAt ? new Date(b.h.startAt).getTime() : 0;
+                    return at - bt;
+                });
+            const latest = yearIndexes.length ? yearIndexes[yearIndexes.length - 1] : null;
             const activeIndex = [...yearIndexes].reverse().find(x => !x.h.endAt);
 
-            if (level === currentLevel) {
-                if (level !== 'normal') {
-                    if (activeIndex) {
-                        const previousClosed = yearIndexes.filter(x=>x.i!==activeIndex.i && x.h.endAt).map(x=>x.h).sort((a,b)=>new Date(b.endAt||0)-new Date(a.endAt||0))[0];
-                        if (previousClosed && new Date(chosenStart) < new Date(previousClosed.endAt)) { showAppToast('Start date overlaps the previous warning stage.', 'error'); return; }
-                        history[activeIndex.i].note = note;
-                        history[activeIndex.i].issuer = issuer;
-                        history[activeIndex.i].startAt = chosenStart;
-                        history[activeIndex.i].year = selectedWarningHistoryYear;
-                    } else {
-                        history.push({ level, year:selectedWarningHistoryYear, startAt:chosenStart, endAt:null, note, issuer });
-                    }
+            if (latest) {
+                const latestStart = latest.h.startAt ? new Date(latest.h.startAt) : null;
+                const latestEnd = latest.h.endAt ? new Date(latest.h.endAt) : null;
+                if (latestStart && startDate <= latestStart) {
+                    showAppToast('New warning entries must start after the latest timeline entry. Adjust the start time or edit the existing entry instead.', 'error');
+                    return;
                 }
-            } else {
-                if (activeIndex) {
-                    const activeStart = history[activeIndex.i].startAt ? new Date(history[activeIndex.i].startAt) : null;
-                    if (activeStart && new Date(chosenStart) < activeStart) { showAppToast('New stage cannot start before the current stage began.', 'error'); return; }
-                    history[activeIndex.i].endAt = chosenStart;
+                if (latestEnd && startDate < latestEnd) {
+                    showAppToast('Start date overlaps the latest timeline entry.', 'error');
+                    return;
                 }
-                if (level !== 'normal') history.push({ level, year:selectedWarningHistoryYear, startAt:chosenStart, endAt:null, note, issuer });
             }
+
+            if (activeIndex) history[activeIndex.i].endAt = chosenStart;
+            history.push({ level, year:selectedWarningHistoryYear, startAt:chosenStart, endAt:null, note, issuer });
+
             staffWarnings[id] = { level:getStaffWarningLevelFromHistory(history, new Date().getFullYear()), history };
             await window.saveCustomNotes();
             renderWarningHistory(id);
             renderMobileDashboardUI();
             setWarningEditorMode('timeline');
             const meta = getStaffWarningMeta(id, selectedWarningHistoryYear);
-            showAppToast(`${selectedWarningHistoryYear} warning stage saved: ${meta.label}`, 'info');
+            showAppToast(`${selectedWarningHistoryYear} timeline entry added: ${meta.label}`, 'info');
         };
 
         function getStaffWarningLevelFromHistory(history, year) {
@@ -4418,10 +4484,12 @@
             selectedWarningHistoryYear = warningEntryYear(h);
             renderWarningYearSelector(id);
             const err = document.getElementById('warningHistoryEditError'); if (err) { err.classList.add('hidden'); err.textContent=''; }
+            resetWarningRemoveButton();
             const md = document.getElementById('warningHistoryEditModal'); const co = document.getElementById('warningHistoryEditModalContent');
             md.classList.remove('hidden'); setTimeout(()=>{ md.classList.remove('opacity-0'); co.classList.remove('scale-95'); },10);
         };
         window.closeWarningHistoryEntryEditor = function() {
+            resetWarningRemoveButton();
             const md = document.getElementById('warningHistoryEditModal'); const co = document.getElementById('warningHistoryEditModalContent');
             if (!md || !co) return; md.classList.add('opacity-0'); co.classList.add('scale-95'); setTimeout(()=>md.classList.add('hidden'),250);
         };
@@ -4436,6 +4504,7 @@
             const err = document.getElementById('warningHistoryEditError');
             const fail = msg => { if (err) { err.textContent=msg; err.classList.remove('hidden'); } };
             if (!id || !startAt) return fail('A valid start date/time is required.');
+            if (!['normal','verbal','written','final'].includes(level)) return fail('Please choose a valid stage.');
             if (new Date(startAt).getFullYear() !== selectedWarningHistoryYear) return fail(`Start date must be within ${selectedWarningHistoryYear}.`);
             if (endAt && new Date(endAt).getFullYear() !== selectedWarningHistoryYear) return fail(`End date must be within ${selectedWarningHistoryYear}.`);
             if (endAt && new Date(endAt) <= new Date(startAt)) return fail('End date/time must be after the start date/time.');
@@ -4447,13 +4516,14 @@
             for (let i=0;i<history.length;i++) {
                 if (i===index) continue;
                 const h=history[i];
+                if (warningEntryYear(h) !== selectedWarningHistoryYear) continue;
                 const hs = h.startAt ? new Date(h.startAt).getTime() : -Infinity;
                 const he = h.endAt ? new Date(h.endAt).getTime() : Infinity;
                 if (candidateStart < he && candidateEnd > hs) return fail('These dates overlap another warning stage. Adjust the start/end dates first.');
             }
             history[index] = { level, year:selectedWarningHistoryYear, startAt, endAt:endAt||null, note, issuer };
-            const active = history.filter(h=>!h.endAt);
-            if (active.length > 1) return fail('Only one warning stage can be active at a time. Add an end date to the other active stage.');
+            const active = history.filter(h => warningEntryYear(h) === selectedWarningHistoryYear && !h.endAt);
+            if (active.length > 1) return fail('Only one timeline stage can be active at a time in this year. Add an end date to the other active stage.');
             const currentLevel = getStaffWarningLevelFromHistory(history, new Date().getFullYear());
             staffWarnings[id] = { level:currentLevel, history };
             await window.saveCustomNotes();
@@ -4463,31 +4533,675 @@
             showAppToast('Warning timeline entry updated.', 'info');
         };
 
+        let warningRemoveConfirmKey = '';
+        let warningRemoveConfirmTimer = null;
+
+        function resetWarningRemoveButton() {
+            if (warningRemoveConfirmTimer) { clearTimeout(warningRemoveConfirmTimer); warningRemoveConfirmTimer = null; }
+            warningRemoveConfirmKey = '';
+            const btn = document.getElementById('warningRemoveEntryBtn');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-trash-can mr-1.5"></i>Remove Entry';
+                btn.classList.remove('bg-red-600','text-white','border-red-600');
+                btn.classList.add('text-red-600','bg-red-50','border-red-200');
+            }
+        }
+
+        window.removeWarningHistoryEntry = async function(button) {
+            const id = document.getElementById('warningHistoryEditStaffId').value;
+            const index = Number(document.getElementById('warningHistoryEditIndex').value);
+            if (!id || !Number.isInteger(index)) { showAppToast('This timeline entry could not be found.', 'error'); return; }
+
+            const record = warningNormalizeRecord(id);
+            let history = record.history.map(h => ({...h}));
+            const entry = history[index];
+            if (!entry) { showAppToast('This timeline entry could not be found.', 'error'); return; }
+
+            const label = ({normal:'Normal', verbal:'Verbal Warning', written:'Written Warning', final:'Final Warning'})[entry.level] || 'timeline entry';
+            const confirmKey = `${id}::${index}::${entry.startAt || ''}::${entry.level || ''}`;
+            const btn = button || document.getElementById('warningRemoveEntryBtn');
+
+            // Google Sites can sandbox native alert/confirm dialogs. Use a reliable two-click confirmation instead.
+            if (warningRemoveConfirmKey !== confirmKey) {
+                warningRemoveConfirmKey = confirmKey;
+                if (warningRemoveConfirmTimer) clearTimeout(warningRemoveConfirmTimer);
+                if (btn) {
+                    btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-1.5"></i>Click Again to Remove';
+                    btn.classList.remove('text-red-600','bg-red-50','border-red-200');
+                    btn.classList.add('bg-red-600','text-white','border-red-600');
+                }
+                showAppToast(`Click Remove Entry again to confirm deleting this ${label}.`, 'error');
+                warningRemoveConfirmTimer = setTimeout(resetWarningRemoveButton, 5000);
+                return;
+            }
+
+            if (warningRemoveConfirmTimer) { clearTimeout(warningRemoveConfirmTimer); warningRemoveConfirmTimer = null; }
+            warningRemoveConfirmKey = '';
+            if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i>Removing...'; }
+
+            history.splice(index, 1);
+            const currentLevel = getStaffWarningLevelFromHistory(history, new Date().getFullYear());
+            if (history.length) staffWarnings[id] = { level:currentLevel, history };
+            else delete staffWarnings[id];
+
+            await window.saveCustomNotes();
+            renderWarningHistory(id);
+            renderMobileDashboardUI();
+            closeWarningHistoryEntryEditor();
+            showAppToast(`${label} entry removed.`, 'info');
+        };
+
         window.exportWarningEmployeeFromEditor = function() {
             const id = document.getElementById('warningEditStaffId').value;
-            if (id) exportEmployeeCard(null, id);
+            if (id) exportEmployeeCard(null, id, selectedWarningHistoryYear);
         };
-        window.exportEmployeeCard = function(event, staffId) {
+
+        function pdfSafeFileName(value) {
+            return String(value || 'staff-profile').trim().replace(/[\\/:*?"<>|]+/g, '-').replace(/\s+/g, '_').slice(0, 90) || 'staff-profile';
+        }
+        function pdfFormatValue(value, fallback = '-') {
+            const s = String(value ?? '').trim();
+            return s || fallback;
+        }
+        function pdfServiceLength(emp) {
+            const start = Number(emp?.sortableJoinDate || 0) ? new Date(Number(emp.sortableJoinDate)) : new Date(emp?.joinDate || '');
+            if (isNaN(start.getTime())) return '-';
+            const end = (emp.status !== 'Active' && emp.resignedDate) ? new Date(emp.resignedDate) : new Date();
+            const stop = isNaN(end.getTime()) ? new Date() : end;
+            let months = (stop.getFullYear() - start.getFullYear()) * 12 + (stop.getMonth() - start.getMonth());
+            if (stop.getDate() < start.getDate()) months--;
+            months = Math.max(0, months);
+            const years = Math.floor(months / 12), rem = months % 12;
+            if (years && rem) return `${years}y ${rem}m`;
+            if (years) return `${years} year${years===1?'':'s'}`;
+            return `${rem} month${rem===1?'':'s'}`;
+        }
+        function pdfExtractDriveFileId(value) {
+            let u = String(value || '').trim();
+            if (!u) return '';
+            // Photo-PDF URLs may contain the Google image URL URL-encoded inside a
+            // CORS-safe image proxy. Decode a few times so we can still recover the Drive id.
+            const candidates = [u];
+            for (let i = 0; i < 3; i++) {
+                try {
+                    const decoded = decodeURIComponent(candidates[candidates.length - 1]);
+                    if (decoded === candidates[candidates.length - 1]) break;
+                    candidates.push(decoded);
+                } catch(e) { break; }
+            }
+            const patterns = [
+                /drive\.google\.com\/file\/d\/([^/?#&]+)/i,
+                /drive\.google\.com\/(?:open|uc|thumbnail)[^#]*[?&]id=([^&#]+)/i,
+                /[?&]id=([^&#]+)/i,
+                /lh3\.googleusercontent\.com\/d\/([^/?=#&]+)/i,
+                /drive\.usercontent\.google\.com\/download[^#]*[?&]id=([^&#]+)/i
+            ];
+            for (const text of candidates) {
+                for (const re of patterns) {
+                    const m = text.match(re);
+                    if (m && m[1]) {
+                        try { return decodeURIComponent(m[1]); } catch(e) { return m[1]; }
+                    }
+                }
+            }
+            // Also accept a raw Drive id when the caller already extracted it from the CSV.
+            if (/^[A-Za-z0-9_-]{20,}$/.test(u)) return u;
+            return '';
+        }
+        function pdfPhotoCandidateUrls(...values) {
+            const out = [];
+            const add = (u) => {
+                u = String(u || '').trim();
+                if (u && !out.includes(u)) out.push(u);
+            };
+
+            // Include the exact URL currently displayed by the dashboard first.
+            values.forEach(add);
+
+            // Build several public Google image forms from a Drive file id.
+            values.forEach(raw => {
+                const id = pdfExtractDriveFileId(raw);
+                if (!id) return;
+                const eid = encodeURIComponent(id);
+                add(`https://lh3.googleusercontent.com/d/${id}=s1200`);
+                add(`https://lh3.googleusercontent.com/d/${id}=w1200`);
+                add(`https://lh3.googleusercontent.com/d/${id}`);
+                add(`https://drive.google.com/thumbnail?id=${eid}&sz=w1200`);
+                add(`https://drive.google.com/uc?export=view&id=${eid}`);
+                add(`https://drive.usercontent.google.com/download?id=${eid}&export=view&authuser=0`);
+            });
+            return out;
+        }
+
+        function pdfFindDisplayedPhotoUrls(...knownValues) {
+            const result = [];
+            const ids = new Set(knownValues.map(pdfExtractDriveFileId).filter(Boolean));
+            const known = new Set(knownValues.map(v => String(v || '').trim()).filter(Boolean));
+            const add = (u) => {
+                u = String(u || '').trim();
+                if (u && !result.includes(u)) result.push(u);
+            };
+            document.querySelectorAll('img').forEach(img => {
+                try {
+                    if (!img.complete || !(img.naturalWidth || img.width)) return;
+                    const u = String(img.currentSrc || img.src || '').trim();
+                    if (!u) return;
+                    const id = pdfExtractDriveFileId(u);
+                    if ((id && ids.has(id)) || known.has(u)) add(u);
+                } catch(e) {}
+            });
+            return result;
+        }
+
+        function pdfPhotoProxyUrls(url) {
+            url = String(url || '').trim();
+            if (!url || /^data:image\//i.test(url)) return [];
+            const driveId = pdfExtractDriveFileId(url);
+            // For Drive photos, proxy the public googleusercontent image directly. This is
+            // more reliable than asking an image proxy to follow the Drive thumbnail redirect.
+            const upstream = driveId
+                ? `lh3.googleusercontent.com/d/${driveId}=w1200`
+                : url.replace(/^https?:\/\//i, '');
+            const encoded = encodeURIComponent(upstream);
+            return [
+                `https://images.weserv.nl/?url=${encoded}&output=jpg&q=92&w=1200&h=1200&fit=inside`,
+                `https://wsrv.nl/?url=${encoded}&output=jpg&q=92&w=1200&h=1200&fit=inside`
+            ];
+        }
+
+        function pdfImageElementToJpegDataUrl(img) {
+            try {
+                if (!img) return null;
+                const naturalW = img.naturalWidth || img.width;
+                const naturalH = img.naturalHeight || img.height;
+                if (!naturalW || !naturalH) return null;
+                const maxSide = 900;
+                const scale = Math.min(1, maxSide / Math.max(naturalW, naturalH));
+                const w = Math.max(1, Math.round(naturalW * scale));
+                const h = Math.max(1, Math.round(naturalH * scale));
+                const canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                if (!ctx) return null;
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, w, h);
+                ctx.drawImage(img, 0, 0, w, h);
+                return canvas.toDataURL('image/jpeg', 0.9);
+            } catch (e) {
+                // A SecurityError here means the remote image displayed normally but the
+                // browser did not allow reading its pixels. The native print fallback below
+                // is specifically designed for that situation.
+                return null;
+            }
+        }
+
+        async function pdfLoadImageElementData(url, timeoutMs = 4500) {
+            url = String(url || '').trim();
+            if (!url) return null;
+            if (/^data:image\//i.test(url)) return url;
+            return await new Promise(resolve => {
+                let finished = false;
+                const done = (value) => { if (finished) return; finished = true; clearTimeout(timer); resolve(value || null); };
+                const img = new Image();
+                // Image loading is allowed by img-src in environments where JS fetch/connect-src
+                // can be restricted (notably embedded Google Sites). Try this route first.
+                img.crossOrigin = 'anonymous';
+                img.referrerPolicy = 'no-referrer';
+                img.onload = () => done(pdfImageElementToJpegDataUrl(img));
+                img.onerror = () => done(null);
+                const timer = setTimeout(() => done(null), timeoutMs);
+                try { img.src = url; } catch(e) { done(null); }
+            });
+        }
+
+        async function pdfBlobToJpegDataUrl(blob) {
+            if (!blob || !blob.size) return null;
+            const objectUrl = URL.createObjectURL(blob);
+            try {
+                const img = await new Promise((resolve, reject) => {
+                    const el = new Image();
+                    el.onload = () => resolve(el);
+                    el.onerror = () => reject(new Error('photo decode failed'));
+                    el.src = objectUrl;
+                });
+                return pdfImageElementToJpegDataUrl(img);
+            } finally {
+                URL.revokeObjectURL(objectUrl);
+            }
+        }
+
+        const STAFF_PHOTO_PROXY_STORAGE_KEY = 'lphStaffPhotoProxyUrl';
+
+        function pdfGetStaffPhotoProxyUrl() {
+            try { return String(localStorage.getItem(STAFF_PHOTO_PROXY_STORAGE_KEY) || '').trim(); }
+            catch (e) { return ''; }
+        }
+
+        window.configureStaffPhotoProxy = function() {
+            const current = pdfGetStaffPhotoProxyUrl();
+            const value = window.prompt(
+                'Paste the deployed Staff Photo Proxy Apps Script Web App URL. This is saved only in this browser.',
+                current
+            );
+            if (value === null) return false;
+            const url = String(value || '').trim();
+            if (!/^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec(?:[?#].*)?$/i.test(url)) {
+                showAppToast('That does not look like an Apps Script Web App /exec URL.', 'error');
+                return false;
+            }
+            try { localStorage.setItem(STAFF_PHOTO_PROXY_STORAGE_KEY, url); } catch (e) {}
+            showAppToast('Staff photo PDF connection saved.', 'info');
+            return true;
+        };
+
+        function pdfBase64ToJpegDataUrl(mime, base64) {
+            mime = String(mime || 'image/jpeg').toLowerCase();
+            base64 = String(base64 || '').trim();
+            if (!base64) return null;
+            // jsPDF can accept JPEG/PNG data URLs. Other common image formats are decoded
+            // through an Image element and converted to JPEG before use.
+            const dataUrl = `data:${mime};base64,${base64}`;
+            if (mime.includes('jpeg') || mime.includes('jpg') || mime.includes('png')) return dataUrl;
+            return dataUrl;
+        }
+
+        async function pdfLoadPhotoFromAppsScript(fileId, timeoutMs = 20000) {
+            const endpoint = pdfGetStaffPhotoProxyUrl();
+            fileId = String(fileId || '').trim();
+            if (!endpoint || !fileId) return null;
+
+            return await new Promise(resolve => {
+                const callbackName = `__lphPhotoProxy_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+                const script = document.createElement('script');
+                let finished = false;
+                let timer = null;
+                const finish = (value) => {
+                    if (finished) return;
+                    finished = true;
+                    if (timer) clearTimeout(timer);
+                    try { delete window[callbackName]; } catch (e) { window[callbackName] = undefined; }
+                    try { script.remove(); } catch (e) {}
+                    resolve(value || null);
+                };
+                window[callbackName] = payload => {
+                    try {
+                        if (!payload || payload.ok !== true || !payload.base64) return finish(null);
+                        finish(pdfBase64ToJpegDataUrl(payload.mimeType, payload.base64));
+                    } catch (e) { finish(null); }
+                };
+                script.onerror = () => finish(null);
+                const join = endpoint.includes('?') ? '&' : '?';
+                script.src = `${endpoint}${join}mode=photo&id=${encodeURIComponent(fileId)}&callback=${encodeURIComponent(callbackName)}&t=${Date.now()}`;
+                script.async = true;
+                document.head.appendChild(script);
+                timer = setTimeout(() => finish(null), timeoutMs);
+            });
+        }
+
+        async function pdfLoadPhotoData(...urls) {
+            const displayed = pdfFindDisplayedPhotoUrls(...urls);
+            const candidates = pdfPhotoCandidateUrls(...displayed, ...urls).slice(0, 12);
+
+            // Route 0 (reliable for Google Drive): Apps Script reads the Drive file server-side
+            // with the owner's authorization and returns its bytes through JSONP. This avoids
+            // Google Drive canvas/CORS restrictions inside Google Sites.
+            const driveId = [...displayed, ...urls].map(pdfExtractDriveFileId).find(Boolean) || '';
+            if (driveId && pdfGetStaffPhotoProxyUrl()) {
+                const proxiedData = await pdfLoadPhotoFromAppsScript(driveId);
+                if (proxiedData) {
+                    if (/^data:image\/(?:jpeg|jpg|png);base64,/i.test(proxiedData)) return proxiedData;
+                    const converted = await pdfLoadImageElementData(proxiedData, 12000);
+                    if (converted) return converted;
+                }
+            }
+
+            // Route 1: direct CORS-capable image sources.
+            for (const url of candidates) {
+                if (/^data:image\//i.test(url)) return url;
+                const data = await pdfLoadImageElementData(url, 5000);
+                if (data) return data;
+            }
+
+            // Route 2: same public photo through an image proxy that supplies CORS headers.
+            // This keeps the final result as a real jsPDF file instead of a print dialog.
+            const proxied = [];
+            for (const url of candidates) {
+                for (const p of pdfPhotoProxyUrls(url)) if (!proxied.includes(p)) proxied.push(p);
+            }
+            for (const url of proxied.slice(0, 16)) {
+                const data = await pdfLoadImageElementData(url, 7000);
+                if (data) return data;
+            }
+
+            // Route 3: fetch bytes directly when connect-src/CORS permits it.
+            for (const url of [...candidates, ...proxied].slice(0, 24)) {
+                try {
+                    const response = await fetch(url, {
+                        mode:'cors',
+                        cache:'no-store',
+                        redirect:'follow',
+                        referrerPolicy:'no-referrer'
+                    });
+                    if (!response.ok) continue;
+                    const blob = await response.blob();
+                    const jpeg = await pdfBlobToJpegDataUrl(blob);
+                    if (jpeg) return jpeg;
+                } catch (e) {}
+            }
+            return null;
+        }
+
+        function pdfPrintEscape(value) {
+            return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
+        }
+
+        function exportEmployeeProfilePhotoSafePrint(e, exportYear, wm, yearStats, allHistory) {
+            // Browser printing can render a remote authenticated <img> even when JavaScript is
+            // forbidden from reading that image's pixels into a canvas. This is the reliable
+            // fallback for Drive photos inside Google Sites.
+            const primaryPhoto = String(e.photoUrl || '').trim();
+            const fallbackPhoto = String(e.photoFallbackUrl || '').trim();
+            const initials = pdfPrintEscape(String(e.name || '?').trim().charAt(0).toUpperCase());
+            const photoHtml = primaryPhoto
+                ? `<div class="photo-wrap"><img id="staffProfilePrintPhoto" class="photo" src="${pdfPrintEscape(primaryPhoto)}" data-fallback="${pdfPrintEscape(fallbackPhoto)}" onerror="if(this.dataset.fallback && this.src!==this.dataset.fallback){this.src=this.dataset.fallback;}else{this.style.display='none';document.getElementById('staffProfilePrintInitial').style.display='flex';}"><div id="staffProfilePrintInitial" class="photo initial" style="display:none">${initials}</div></div>`
+                : `<div class="photo-wrap"><div class="photo initial">${initials}</div></div>`;
+
+            const leaveRows = [
+                ['Annual Leave (AL)', e.leaves.available.AL, e.leaves.used.AL, e.leaves.remaining.AL],
+                ['Sick Leave (SL)', e.leaves.available.SL, e.leaves.used.SL, e.leaves.remaining.SL],
+                ['Special Leave (SP)', e.leaves.available.SP, e.leaves.used.SP, e.leaves.remaining.SP]
+            ].map(r => `<tr><td>${pdfPrintEscape(r[0])}</td><td>${pdfPrintEscape(mobileDashboardFormatNumber(r[1]))}</td><td>${pdfPrintEscape(mobileDashboardFormatNumber(r[2]))}</td><td>${pdfPrintEscape(mobileDashboardFormatNumber(r[3]))}</td></tr>`).join('');
+
+            const metrics = [
+                ['Unpaid Leave',yearStats.UP],['Absence',yearStats.A],['Late',yearStats.Late5m],['Late 30+',yearStats.Late3m],
+                ['AL Used',yearStats.AL],['SL Used',yearStats.SL],['SP Used',yearStats.SP],['Overtime',yearStats.OT],
+                ['Day Off',yearStats.D],['Holiday',yearStats.H],['Warnings',wm.count],['Highest Warning',pdfWarningLabel(wm.level)]
+            ].map(m => `<div class="metric"><div class="mlabel">${pdfPrintEscape(m[0])}</div><div class="mvalue">${pdfPrintEscape(typeof m[1] === 'number' ? mobileDashboardFormatNumber(m[1]) : m[1])}</div></div>`).join('');
+
+            const warningHistoryHtml = allHistory.length ? allHistory.map(h => {
+                const level = String(h.level || 'normal');
+                const title = level === 'normal' ? 'Normal / Cleared' : pdfWarningLabel(level);
+                return `<div class="warning ${pdfPrintEscape(level)}"><div class="whead"><b>${pdfPrintEscape(title)}</b><span>${pdfPrintEscape(warningEntryYear(h))}</span></div><div class="wperiod">${pdfPrintEscape(warningFormatDateTime(h.startAt))} → ${pdfPrintEscape(h.endAt ? warningFormatDateTime(h.endAt) : 'Current / Open')}</div>${h.issuer ? `<div class="wperiod">Issued / Updated by: ${pdfPrintEscape(h.issuer)}</div>` : ''}<div class="wnote">${pdfPrintEscape(h.note || 'No note recorded.')}</div></div>`;
+            }).join('') : '<div class="empty">No warning history recorded.</div>';
+
+            const exitReason = e.status !== 'Active' && e.resignedReason ? `<div class="info full"><span>Inactive / Exit Reason</span><b>${pdfPrintEscape(e.resignedReason)}</b></div>` : '';
+            const fileTitle = `${pdfSafeFileName(e.displayId || e.name)}_Employee_Profile_${exportYear}`;
+            const html = `<!doctype html><html><head><meta charset="utf-8"><title>${pdfPrintEscape(fileTitle)}</title><style>
+                *{box-sizing:border-box} @page{size:A4;margin:12mm} html,body{margin:0;padding:0;background:#fff;color:#0f172a;font-family:Arial,Helvetica,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}.page{width:100%;max-width:190mm;margin:0 auto}.hero{display:flex;gap:16px;align-items:center;background:#f8fafc;border-radius:14px;padding:16px;margin-bottom:18px}.photo-wrap{width:32mm;height:32mm;flex:0 0 32mm}.photo{width:32mm;height:32mm;border-radius:50%;object-fit:cover;background:#dbeafe}.initial{display:flex;align-items:center;justify-content:center;color:#2563eb;font-size:24px;font-weight:800}.name{font-size:23px;font-weight:800;color:#0f2b4a}.sub{font-size:11px;color:#475569;margin-top:3px}.position{font-size:12px;font-weight:700;margin-top:6px}.badge{display:inline-block;margin-top:9px;padding:5px 14px;border-radius:999px;color:#fff;font-size:10px;font-weight:800}.badge.normal{background:#059669}.badge.verbal{background:#a16207}.badge.written{background:#c2410c}.badge.final{background:#b91c1c}.section{margin-top:15px;break-inside:avoid}.section-title{font-size:12px;font-weight:800;color:#334155;text-transform:uppercase;border-bottom:1px solid #dbe3ec;padding-bottom:6px;margin-bottom:9px}.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px 24px}.info span{display:block;font-size:8px;color:#64748b;text-transform:uppercase;font-weight:700}.info b{display:block;font-size:10px;margin-top:2px}.info.full{grid-column:1/-1}.leave{width:100%;border-collapse:collapse;font-size:10px}.leave th,.leave td{border:1px solid #dbe3ec;padding:7px;text-align:center}.leave th{background:#f1f5f9;color:#475569;font-size:8px}.leave th:first-child,.leave td:first-child{text-align:left}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.metric{border:1px solid #dbe3ec;background:#f8fafc;border-radius:9px;padding:8px;min-height:47px}.mlabel{font-size:7px;color:#64748b;text-transform:uppercase;font-weight:700}.mvalue{font-size:14px;font-weight:800;margin-top:5px}.warning{border:1px solid #e2e8f0;border-left:4px solid #94a3b8;border-radius:9px;padding:9px;margin-bottom:7px;break-inside:avoid}.warning.verbal{border-left-color:#eab308}.warning.written{border-left-color:#f97316}.warning.final{border-left-color:#ef4444}.warning.normal{border-left-color:#10b981}.whead{display:flex;justify-content:space-between;font-size:10px}.wperiod{font-size:8px;color:#64748b;margin-top:3px}.wnote{font-size:9px;background:#f8fafc;border-radius:6px;padding:6px;margin-top:5px;white-space:pre-wrap}.empty{font-size:10px;color:#94a3b8;padding:10px;border:1px dashed #cbd5e1;border-radius:8px}.foot{font-size:7px;color:#94a3b8;text-align:right;margin-top:14px}@media print{.page{max-width:none}}
+            </style></head><body><div class="page"><div class="hero">${photoHtml}<div><div class="name">${pdfPrintEscape(e.name)}</div><div class="sub">${pdfPrintEscape(e.displayId)} • ${pdfPrintEscape(e.company)} • ${pdfPrintEscape(e.department || 'Unspecified')}</div><div class="position">${pdfPrintEscape(e.position || 'Position not specified')}</div><div class="sub">Joined: ${pdfPrintEscape(e.joinDate)} • Service: ${pdfPrintEscape(pdfServiceLength(e))} • Status: ${pdfPrintEscape(e.status)}</div><div class="badge ${pdfPrintEscape(wm.level)}">${pdfPrintEscape(wm.level === 'normal' ? 'NORMAL' : `${pdfWarningLabel(wm.level).toUpperCase()} (${wm.count})`)}</div></div></div>
+            <div class="section"><div class="section-title">Employment Information</div><div class="info-grid"><div class="info"><span>Staff ID</span><b>${pdfPrintEscape(e.displayId)}</b></div><div class="info"><span>Company / Entity</span><b>${pdfPrintEscape(`${pdfFormatValue(e.company)}${e.entity && e.entity !== e.company ? ' / ' + e.entity : ''}`)}</b></div><div class="info"><span>Department</span><b>${pdfPrintEscape(e.department || 'Unspecified')}</b></div><div class="info"><span>Position</span><b>${pdfPrintEscape(e.position)}</b></div><div class="info"><span>Join Date</span><b>${pdfPrintEscape(e.joinDate)}</b></div><div class="info"><span>Service Length</span><b>${pdfPrintEscape(pdfServiceLength(e))}</b></div><div class="info"><span>Employment Status</span><b>${pdfPrintEscape(e.status)}</b></div><div class="info"><span>Last Working Day</span><b>${pdfPrintEscape(e.status === 'Active' ? '-' : (e.resignedDate || '-'))}</b></div>${exitReason}</div></div>
+            <div class="section"><div class="section-title">Leave Balances</div><table class="leave"><thead><tr><th>Leave Type</th><th>Available</th><th>Used</th><th>Remaining</th></tr></thead><tbody>${leaveRows}</tbody></table></div>
+            <div class="section"><div class="section-title">Attendance & Other Leave Usage — ${pdfPrintEscape(exportYear)}</div><div class="metrics">${metrics}</div></div>
+            <div class="section"><div class="section-title">Warning History</div>${warningHistoryHtml}</div><div class="foot">Generated ${pdfPrintEscape(new Date().toLocaleString())}</div></div></body></html>`;
+
+            // Google Sites often blocks window.open(), so use a same-page off-screen iframe.
+            // The browser can render the remote employee photo in the print document even when
+            // CORS prevents JavaScript from converting that photo to canvas/base64 for jsPDF.
+            const oldFrame = document.getElementById('employeeProfilePrintFrame');
+            if (oldFrame) oldFrame.remove();
+
+            const frame = document.createElement('iframe');
+            frame.id = 'employeeProfilePrintFrame';
+            frame.setAttribute('aria-hidden', 'true');
+            frame.style.cssText = 'position:fixed;left:-12000px;top:0;width:210mm;height:297mm;border:0;opacity:0;pointer-events:none;background:#fff;';
+            document.body.appendChild(frame);
+
+            let printed = false;
+            let cleanupTimer = null;
+            const cleanup = () => {
+                if (cleanupTimer) clearTimeout(cleanupTimer);
+                cleanupTimer = setTimeout(() => {
+                    try { frame.remove(); } catch (e) {}
+                }, 1500);
+            };
+
+            const printFrame = () => {
+                if (printed || !frame.contentWindow) return;
+                printed = true;
+                try {
+                    frame.contentWindow.addEventListener('afterprint', cleanup, { once:true });
+                    frame.contentWindow.focus();
+                    frame.contentWindow.print();
+                    showAppToast('PDF print dialog opened. Choose “Save as PDF”. The staff photo is included from the displayed profile image.', 'info');
+                    // Safety cleanup if afterprint is not emitted by the browser.
+                    cleanupTimer = setTimeout(() => { try { frame.remove(); } catch (e) {} }, 60000);
+                } catch (err) {
+                    try { frame.remove(); } catch (e) {}
+                    showAppToast('Could not open the PDF print dialog. Please try Export again.', 'error');
+                }
+            };
+
+            frame.onload = () => {
+                try {
+                    const fd = frame.contentDocument;
+                    const img = fd && fd.getElementById('staffProfilePrintPhoto');
+                    if (img && !img.complete) {
+                        let settled = false;
+                        const ready = () => {
+                            if (settled) return;
+                            settled = true;
+                            setTimeout(printFrame, 250);
+                        };
+                        img.addEventListener('load', ready, { once:true });
+                        img.addEventListener('error', ready, { once:true });
+                        // Do not wait forever for a slow/blocked image endpoint.
+                        setTimeout(ready, 3500);
+                    } else {
+                        setTimeout(printFrame, 300);
+                    }
+                } catch (e) {
+                    setTimeout(printFrame, 400);
+                }
+            };
+
+            // srcdoc keeps everything inside the current Google Sites embed; no popup/new tab is used.
+            frame.srcdoc = html;
+            // Fallback in case the browser does not emit iframe load for a remote photo redirect.
+            setTimeout(printFrame, 5000);
+            return true;
+        }
+        function pdfWarningLabel(level) {
+            return ({normal:'Normal', verbal:'Verbal Warning', written:'Written Warning', final:'Final Warning'})[level] || pdfFormatValue(level);
+        }
+        function pdfWarningRgb(level) {
+            return ({normal:[5,150,105], verbal:[161,98,7], written:[194,65,12], final:[185,28,28]})[level] || [71,85,105];
+        }
+
+        window.exportEmployeeCard = async function(event, staffId, requestedYear = null) {
             if (event) event.stopPropagation();
             const key = warningNormalizeKey(staffId);
             const e = allEmployees.find(x => x.id === key || normalizeId(x.displayId) === key);
-            if (!e) { showAppToast('Employee not found for export.', 'error'); return; }
-            const ps = getMobileDashboardPeriodStats(e);
-            const exportWarningYear = selectedWarningHistoryYear || new Date().getFullYear();
-            const wm = getStaffWarningMeta(e.id, exportWarningYear);
-            const history = getStaffWarningHistory(e.id, exportWarningYear);
-            const levelLabels = { verbal:'Verbal Warning', written:'Written Warning', final:'Final Warning' };
-            const historyHtml = history.length ? history.map(h => `<div class="hist ${h.level}"><div class="hrow"><b>${levelLabels[h.level] || h.level}</b><span>${h.endAt ? 'Closed' : 'Current'}</span></div><div class="period">${warningEscapeHtml(warningFormatDateTime(h.startAt))} → ${warningEscapeHtml(h.endAt ? warningFormatDateTime(h.endAt) : 'Current')}</div>${h.issuer ? `<div class="period">By: ${warningEscapeHtml(h.issuer)}</div>` : ''}<div class="note">${warningEscapeHtml(h.note || 'No note recorded.')}</div></div>`).join('') : '<div class="empty">No warning history recorded.</div>';
-            const photo = e.photoUrl ? `<img src="${warningEscapeHtml(e.photoUrl)}" class="photo">` : `<div class="avatar">${warningEscapeHtml((e.name||'?')[0])}</div>`;
-            const html = `<!doctype html><html><head><meta charset="utf-8"><title>${warningEscapeHtml(e.name)} - Employee Summary</title><style>
-                *{box-sizing:border-box} body{font-family:Arial,sans-serif;color:#0f172a;margin:0;background:#f8fafc}.page{max-width:900px;margin:24px auto;background:#fff;padding:28px;border:1px solid #e2e8f0;border-radius:16px}.head{display:flex;gap:16px;align-items:center;border-bottom:2px solid #e2e8f0;padding-bottom:18px}.photo,.avatar{width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid #e2e8f0}.avatar{display:flex;align-items:center;justify-content:center;background:#eff6ff;color:#2563eb;font-size:28px;font-weight:bold}.name{font-size:24px;font-weight:800}.meta{color:#64748b;font-size:12px;margin-top:4px}.badge{display:inline-block;margin-top:8px;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:800;border:1px solid #cbd5e1}.normal{background:#ecfdf5;color:#047857}.verbal{background:#fefce8;color:#a16207}.written{background:#fff7ed;color:#c2410c}.final{background:#fef2f2;color:#b91c1c}.section{margin-top:22px}.section h2{font-size:14px;margin:0 0 10px;text-transform:uppercase;color:#475569}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.box{border:1px solid #e2e8f0;border-radius:10px;padding:10px}.box .label{font-size:10px;color:#64748b;text-transform:uppercase;font-weight:700}.box .val{font-size:18px;font-weight:800;margin-top:3px}.leave{width:100%;border-collapse:collapse;font-size:12px}.leave th,.leave td{border:1px solid #e2e8f0;padding:8px;text-align:center}.leave th:first-child,.leave td:first-child{text-align:left}.hist{border:1px solid #e2e8f0;border-left:4px solid #94a3b8;border-radius:10px;padding:10px;margin-bottom:8px}.hist.verbal{border-left-color:#eab308}.hist.written{border-left-color:#f97316}.hist.final{border-left-color:#ef4444}.hrow{display:flex;justify-content:space-between;font-size:12px}.period{font-size:10px;color:#64748b;margin-top:3px}.note{margin-top:6px;background:#f8fafc;padding:7px;border-radius:7px;font-size:11px;white-space:pre-wrap}.empty{color:#94a3b8;font-size:12px;padding:10px;border:1px dashed #cbd5e1;border-radius:10px}.foot{margin-top:22px;font-size:9px;color:#94a3b8;text-align:right}@media print{body{background:white}.page{border:0;margin:0;max-width:none;padding:18px}@page{margin:12mm}}
-            </style></head><body><div class="page"><div class="head">${photo}<div><div class="name">${warningEscapeHtml(e.name)}</div><div class="meta">${warningEscapeHtml(e.displayId)} • ${warningEscapeHtml(e.company)} • ${warningEscapeHtml(e.department || 'Unspecified')}</div><div class="meta">${warningEscapeHtml(e.position || '')}</div><div class="badge ${wm.level}">${warningEscapeHtml(wm.label)} • ${wm.count} warning stage${wm.count===1?'':'s'}</div></div></div>
-            <div class="section"><h2>Leave Summary</h2><table class="leave"><tr><th>Leave</th><th>Available</th><th>Used</th><th>Remaining</th></tr><tr><td>Annual Leave (AL)</td><td>${mobileDashboardFormatNumber(e.leaves.available.AL)}</td><td>${mobileDashboardFormatNumber(e.leaves.used.AL)}</td><td>${mobileDashboardFormatNumber(e.leaves.remaining.AL)}</td></tr><tr><td>Sick Leave (SL)</td><td>${mobileDashboardFormatNumber(e.leaves.available.SL)}</td><td>${mobileDashboardFormatNumber(e.leaves.used.SL)}</td><td>${mobileDashboardFormatNumber(e.leaves.remaining.SL)}</td></tr><tr><td>Special Leave (SP)</td><td>${mobileDashboardFormatNumber(e.leaves.available.SP)}</td><td>${mobileDashboardFormatNumber(e.leaves.used.SP)}</td><td>${mobileDashboardFormatNumber(e.leaves.remaining.SP)}</td></tr></table></div>
-            <div class="section"><h2>Attendance Exceptions</h2><div class="grid"><div class="box"><div class="label">Unpaid Leave</div><div class="val">${mobileDashboardFormatNumber(ps.UP)}</div></div><div class="box"><div class="label">Absence</div><div class="val">${mobileDashboardFormatNumber(ps.A)}</div></div><div class="box"><div class="label">Late</div><div class="val">${mobileDashboardFormatNumber(ps.Late5m)}</div></div><div class="box"><div class="label">Late 30+</div><div class="val">${mobileDashboardFormatNumber(ps.Late3m)}</div></div></div></div>
-            <div class="section"><h2>Warning Timeline (${exportWarningYear})</h2>${historyHtml}</div><div class="foot">Generated ${warningEscapeHtml(new Date().toLocaleString())}</div></div><script>window.onload=()=>setTimeout(()=>window.print(),250)<\/script></body></html>`;
-            const w = window.open('', '_blank', 'noopener,noreferrer');
-            if (!w) { showAppToast('Please allow pop-ups to export the employee card.', 'error'); return; }
-            w.document.open(); w.document.write(html); w.document.close();
+            if (!e) { showAppToast('Employee not found for PDF export.', 'error'); return; }
+            if (!window.jspdf || !window.jspdf.jsPDF) { showAppToast('PDF library is still loading. Please try Export again.', 'error'); return; }
+
+            const exportYear = Number(requestedYear) || Number(selectedDashboardYear) || new Date().getFullYear();
+            const wm = getStaffWarningHighestMeta(e.id, exportYear);
+            const yearStats = (() => {
+                const oldYear = selectedDashboardYear, oldMonth = selectedDashboardMonth;
+                selectedDashboardYear = exportYear; selectedDashboardMonth = 'All';
+                const result = getDashboardPeriodStats(e);
+                selectedDashboardYear = oldYear; selectedDashboardMonth = oldMonth;
+                return result;
+            })();
+            const allHistory = warningNormalizeRecord(e.id).history.slice().sort((a,b) => {
+                const ay = warningEntryYear(a), by = warningEntryYear(b);
+                if (ay !== by) return by - ay;
+                return new Date(b.startAt || 0) - new Date(a.startAt || 0);
+            });
+
+            showAppToast(`Preparing ${e.name}'s staff profile PDF...`, 'info');
+            // The published staff-photo CSV gives us the Drive file id. Try the
+            // dedicated CORS-safe PDF URLs first, while preserving the normal dashboard photo.
+            let photoData = await pdfLoadPhotoData(
+                e.photoPdfUrl,
+                e.photoPdfFallbackUrl,
+                e.photoSourceUrl,
+                e.photoUrl,
+                e.photoFallbackUrl,
+                e.photoFileId
+            );
+            if ((e.photoUrl || e.photoFallbackUrl) && !photoData && !pdfGetStaffPhotoProxyUrl()) {
+                const shouldSetup = window.confirm('This staff photo is stored in Google Drive. Direct PDF export needs the one-time Staff Photo Proxy connection so the PDF can read the image. Set it up now?');
+                if (shouldSetup && window.configureStaffPhotoProxy()) {
+                    photoData = await pdfLoadPhotoData(
+                        e.photoPdfUrl,
+                        e.photoPdfFallbackUrl,
+                        e.photoSourceUrl,
+                        e.photoUrl,
+                        e.photoFallbackUrl,
+                        e.photoFileId
+                    );
+                }
+            }
+            if ((e.photoUrl || e.photoFallbackUrl) && !photoData) {
+                showAppToast('Photo could not be embedded. Set the Staff Photo Proxy Web App URL once, then export again.', 'error');
+            }
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4', compress:true });
+            const pageW = doc.internal.pageSize.getWidth();
+            const pageH = doc.internal.pageSize.getHeight();
+            const M = 14;
+            const usableW = pageW - M * 2;
+            let y = M;
+
+            const addPage = () => { doc.addPage(); y = M; };
+            const ensure = (need = 12) => { if (y + need > pageH - 14) addPage(); };
+            const line = (yy, color=[226,232,240]) => { doc.setDrawColor(...color); doc.line(M, yy, pageW-M, yy); };
+            const section = (title) => {
+                ensure(13);
+                y += 3;
+                doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(71,85,105);
+                doc.text(String(title).toUpperCase(), M, y);
+                y += 3; line(y); y += 5;
+            };
+            const textRow = (label, value, x, yy, w) => {
+                doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(100,116,139); doc.text(label.toUpperCase(), x, yy);
+                doc.setFont('helvetica','normal'); doc.setFontSize(9.5); doc.setTextColor(15,23,42);
+                const lines = doc.splitTextToSize(pdfFormatValue(value), w);
+                doc.text(lines, x, yy + 4);
+                return 4 + lines.length * 4.2;
+            };
+            const cell = (x, yy, w, h, label, value) => {
+                doc.setFillColor(248,250,252); doc.setDrawColor(226,232,240); doc.roundedRect(x, yy, w, h, 2, 2, 'FD');
+                doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(100,116,139); doc.text(label.toUpperCase(), x+3, yy+4.5);
+                doc.setFontSize(12); doc.setTextColor(15,23,42); doc.text(String(value), x+3, yy+10.5);
+            };
+
+            // Header / CV-style identity block
+            doc.setFillColor(248,250,252); doc.roundedRect(M, y, usableW, 40, 3, 3, 'F');
+            const photoX = M + 6, photoY = y + 5, photoSize = 30;
+            let photoAdded = false;
+            if (photoData) {
+                try {
+                    const photoFormat = /^data:image\/png/i.test(photoData) ? 'PNG' : 'JPEG';
+                    doc.addImage(photoData, photoFormat, photoX, photoY, photoSize, photoSize, undefined, 'FAST');
+                    photoAdded = true;
+                } catch(e2) { photoAdded = false; }
+            }
+            if (!photoAdded) {
+                doc.setFillColor(219,234,254); doc.circle(photoX+15, photoY+15, 15, 'F');
+                doc.setFont('helvetica','bold'); doc.setFontSize(17); doc.setTextColor(37,99,235);
+                doc.text(String(e.name || '?').trim().charAt(0).toUpperCase(), photoX+15, photoY+17, {align:'center'});
+            }
+            const tx = photoX + photoSize + 7;
+            doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(15,43,74); doc.text(pdfFormatValue(e.name), tx, y+10);
+            doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(71,85,105);
+            doc.text(`${pdfFormatValue(e.displayId)}  •  ${pdfFormatValue(e.company)}  •  ${pdfFormatValue(e.department,'Unspecified')}`, tx, y+16);
+            doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(30,41,59); doc.text(pdfFormatValue(e.position,'Position not specified'), tx, y+22);
+            doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(100,116,139); doc.text(`Joined: ${pdfFormatValue(e.joinDate)}  •  Service: ${pdfServiceLength(e)}  •  Status: ${pdfFormatValue(e.status)}`, tx, y+28);
+            const wc = pdfWarningRgb(wm.level); doc.setFillColor(...wc); doc.roundedRect(tx, y+31, 44, 6, 3, 3, 'F');
+            doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(255,255,255); doc.text(wm.level === 'normal' ? 'NORMAL' : `${pdfWarningLabel(wm.level).toUpperCase()} (${wm.count})`, tx+22, y+35, {align:'center'});
+            y += 46;
+
+            section('Employment Information');
+            const colGap = 8, colW = (usableW - colGap) / 2;
+            let h1 = textRow('Staff ID', e.displayId, M, y, colW-2);
+            let h2 = textRow('Company / Entity', `${pdfFormatValue(e.company)}${e.entity && e.entity !== e.company ? ' / ' + e.entity : ''}`, M+colW+colGap, y, colW-2);
+            y += Math.max(h1,h2) + 2;
+            h1 = textRow('Department', e.department || 'Unspecified', M, y, colW-2);
+            h2 = textRow('Position', e.position, M+colW+colGap, y, colW-2);
+            y += Math.max(h1,h2) + 2;
+            h1 = textRow('Join Date', e.joinDate, M, y, colW-2);
+            h2 = textRow('Service Length', pdfServiceLength(e), M+colW+colGap, y, colW-2);
+            y += Math.max(h1,h2) + 2;
+            h1 = textRow('Employment Status', e.status, M, y, colW-2);
+            h2 = textRow('Last Working Day', e.status === 'Active' ? '-' : (e.resignedDate || '-'), M+colW+colGap, y, colW-2);
+            y += Math.max(h1,h2) + 2;
+            if (e.status !== 'Active' && e.resignedReason) { y += textRow('Inactive / Exit Reason', e.resignedReason, M, y, usableW) + 1; }
+
+            section('Leave Balances');
+            const tableX=M, labelW=54, numW=(usableW-labelW)/3;
+            doc.setFillColor(241,245,249); doc.rect(tableX,y,usableW,8,'F');
+            const headers=['Leave Type','Available','Used','Remaining'];
+            const hx=[tableX+3, tableX+labelW+numW/2, tableX+labelW+numW*1.5, tableX+labelW+numW*2.5];
+            doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(71,85,105);
+            doc.text(headers[0],hx[0],y+5); for(let i=1;i<4;i++) doc.text(headers[i],hx[i],y+5,{align:'center'});
+            y += 8;
+            const leaveRows=[
+                ['Annual Leave (AL)',e.leaves.available.AL,e.leaves.used.AL,e.leaves.remaining.AL],
+                ['Sick Leave (SL)',e.leaves.available.SL,e.leaves.used.SL,e.leaves.remaining.SL],
+                ['Special Leave (SP)',e.leaves.available.SP,e.leaves.used.SP,e.leaves.remaining.SP]
+            ];
+            leaveRows.forEach((r,ri)=>{
+                doc.setDrawColor(226,232,240); doc.rect(tableX,y,usableW,8);
+                doc.setFont('helvetica',ri===0?'bold':'normal'); doc.setFontSize(8.5); doc.setTextColor(30,41,59); doc.text(r[0],tableX+3,y+5.2);
+                doc.setFont('helvetica','bold');
+                [1,2,3].forEach(i=>doc.text(String(mobileDashboardFormatNumber(r[i])),hx[i],y+5.2,{align:'center'}));
+                y += 8;
+            });
+
+            section(`Attendance & Other Leave Usage — ${exportYear}`);
+            const metricGap=3, metricW=(usableW-metricGap*3)/4, metricH=17;
+            const metrics=[
+                ['Unpaid Leave',yearStats.UP],['Absence',yearStats.A],['Late',yearStats.Late5m],['Late 30+',yearStats.Late3m],
+                ['AL Used',yearStats.AL],['SL Used',yearStats.SL],['SP Used',yearStats.SP],['Overtime',yearStats.OT],
+                ['Day Off',yearStats.D],['Holiday',yearStats.H],['Warnings',wm.count],["Highest Warning",pdfWarningLabel(wm.level)]
+            ];
+            for(let i=0;i<metrics.length;i++){
+                if(i%4===0){ ensure(metricH+3); }
+                const row=Math.floor(i/4), col=i%4;
+                cell(M+col*(metricW+metricGap), y+row*(metricH+3), metricW, metricH, metrics[i][0], typeof metrics[i][1]==='number' ? mobileDashboardFormatNumber(metrics[i][1]) : metrics[i][1]);
+            }
+            y += Math.ceil(metrics.length/4)*(metricH+3);
+
+            section('Warning History');
+            if (!allHistory.length) {
+                doc.setFont('helvetica','italic'); doc.setFontSize(9); doc.setTextColor(100,116,139); doc.text('No warning history recorded.', M, y); y += 7;
+            } else {
+                for (const h of allHistory) {
+                    const year = warningEntryYear(h), level = String(h.level || 'normal');
+                    const title = level === 'normal' ? 'Normal / Cleared' : pdfWarningLabel(level);
+                    const period = `${warningFormatDateTime(h.startAt)}  →  ${h.endAt ? warningFormatDateTime(h.endAt) : 'Current / Open'}`;
+                    const noteLines = doc.splitTextToSize(pdfFormatValue(h.note,'No note recorded.'), usableW-10);
+                    const issuerLines = h.issuer ? doc.splitTextToSize(`Issued / Updated by: ${h.issuer}`, usableW-10) : [];
+                    const boxH = 17 + noteLines.length*3.7 + issuerLines.length*3.5;
+                    ensure(boxH + 4);
+                    const rgb=pdfWarningRgb(level);
+                    doc.setDrawColor(226,232,240); doc.setFillColor(255,255,255); doc.roundedRect(M,y,usableW,boxH,2,2,'FD');
+                    doc.setFillColor(...rgb); doc.rect(M,y,1.5,boxH,'F');
+                    doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(...rgb); doc.text(`${title} • ${year}`,M+5,y+5.5);
+                    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(100,116,139); doc.text(period,M+5,y+10);
+                    let ty=y+14;
+                    if(issuerLines.length){ doc.text(issuerLines,M+5,ty); ty += issuerLines.length*3.5; }
+                    doc.setFontSize(8.3); doc.setTextColor(51,65,85); doc.text(noteLines,M+5,ty+1);
+                    y += boxH + 4;
+                }
+            }
+
+            // Footer on every page.
+            const pages = doc.getNumberOfPages();
+            for (let p=1;p<=pages;p++) {
+                doc.setPage(p);
+                doc.setDrawColor(226,232,240); doc.line(M,pageH-10,pageW-M,pageH-10);
+                doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(148,163,184);
+                doc.text(`Employee HR Profile • ${pdfFormatValue(e.displayId)} • Generated ${new Date().toLocaleString()}`,M,pageH-6);
+                doc.text(`Page ${p} of ${pages}`,pageW-M,pageH-6,{align:'right'});
+            }
+
+            const fileName = `${pdfSafeFileName(e.displayId)}_${pdfSafeFileName(e.name)}_Staff_Profile.pdf`;
+            doc.save(fileName);
+            showAppToast('Staff profile PDF exported.', 'info');
         };
 
         function renderMobileDashboardUI() {
@@ -4504,7 +5218,7 @@
                 if (getEffectiveStaffStatus(e, getDashboardReferenceDate()) === 'Active') {
                     const reasons = [];
                     let score = 0;
-                    const warningMeta = getStaffWarningMeta(e.id, selectedDashboardYear);
+                    const warningMeta = getStaffWarningHighestMeta(e.id, selectedDashboardYear);
                     if (warningMeta.level !== 'normal') { reasons.push(warningMeta.label); score += warningMeta.score; }
                     if (ps.A > 0) { reasons.push(`A ${mobileDashboardFormatNumber(ps.A)}`); score += 6 + ps.A; }
                     if (ps.Late3m > 0) { reasons.push(`L30+ ${mobileDashboardFormatNumber(ps.Late3m)}`); score += 5 + ps.Late3m; }
@@ -4572,7 +5286,7 @@
                 if (isNoticePeriodStaff(e)) flags.push(`<span class="mobile-staff-flag text-amber-800 bg-amber-50 border-amber-200"><i class="fa-solid fa-hourglass-half mr-1"></i>Notice · Last Day ${formatStaffLastDay(e)}</span>`);
                 else if (!isEmploymentVisible(e)) flags.push(`<span class="mobile-staff-flag">${e.status}</span>`);
                 else if (e.isProbation) flags.push('<span class="mobile-staff-flag text-indigo-700 bg-indigo-50 border-indigo-100">Probation</span>');
-                const cardWarningMeta = getStaffWarningMeta(e.id, selectedDashboardYear);
+                const cardWarningMeta = getStaffWarningHighestMeta(e.id, selectedDashboardYear);
                 const cardWarningClass = cardWarningMeta.level === 'verbal' ? 'staff-warning-card-verbal' : cardWarningMeta.level === 'written' ? 'staff-warning-card-written' : cardWarningMeta.level === 'final' ? 'staff-warning-card-final' : '';
                 return `<article class="mobile-staff-card ${cardWarningClass}" onclick="openModalById('${String(e.id).replace(/'/g,"\\'")}')">
                     <div class="mobile-staff-card-top">
@@ -4584,8 +5298,8 @@
                             ${isNoticePeriodStaff(e) ? `<div class="mobile-staff-last-day"><i class="fa-regular fa-calendar-xmark"></i> Last Working Day: <strong>${formatStaffLastDay(e)}</strong></div>` : ''}
                             <div class="flex flex-wrap items-center gap-1.5 mt-1">
                                 ${isNoticePeriodStaff(e) ? noticePeriodBadgeHtml(e,true) : ''}
-                                ${(() => { const wm = getStaffWarningMeta(e.id, selectedDashboardYear); return `<button type="button" class="staff-warning-badge ${wm.cls}" onclick="openWarningEditor(event,'${String(e.id).replace(/'/g,"\'")}', selectedDashboardYear)"><i class="fa-solid ${wm.icon}"></i>${wm.label}<i class="fa-solid fa-pen text-[7px] opacity-60 ml-0.5"></i></button><span class="staff-warning-count"><i class="fa-solid fa-clock-rotate-left"></i>${wm.count}</span>`; })()}
-                                <button type="button" class="staff-card-export-btn" onclick="exportEmployeeCard(event,'${String(e.id).replace(/'/g,"\'")}')"><i class="fa-solid fa-file-export"></i> Export</button>
+                                ${(() => { const wm = getStaffWarningHighestMeta(e.id, selectedDashboardYear); return `<button type="button" class="staff-warning-badge ${wm.cls}" onclick="openWarningEditor(event,'${String(e.id).replace(/'/g,"\'")}', selectedDashboardYear)"><i class="fa-solid ${wm.icon}"></i>${wm.label}<i class="fa-solid fa-pen text-[7px] opacity-60 ml-0.5"></i></button><span class="staff-warning-count"><i class="fa-solid fa-clock-rotate-left"></i>${wm.count}</span>`; })()}
+                                <button type="button" class="staff-card-export-btn" onclick="exportEmployeeCard(event,'${String(e.id).replace(/'/g,"\'")}')"><i class="fa-solid fa-file-pdf"></i> PDF</button>
                             </div>
                         </div>
                     </div>
@@ -5226,10 +5940,10 @@
             document.getElementById('modalPosition').innerText=e.position; document.getElementById('modalJoinDate').innerText=e.joinDate;
             const rS=document.getElementById('modalResignedSection'); if(e.status!=='Active'){rS.classList.remove('hidden'); document.getElementById('modalResignedDate').innerText=isNoticePeriodStaff(e)?`${formatStaffLastDay(e)} (Last Working Day)`: (e.resignedDate||'N/A'); document.getElementById('modalResignedReason').innerText=e.resignedReason||'N/A';} else rS.classList.add('hidden');
 
-            // Show the current warning state inside the employee profile when this staff has warning history.
+            // Show the highest warning level recorded for the year inside the employee profile.
             const warningSection = document.getElementById('modalWarningSection');
             const profileWarningYear = new Date().getFullYear();
-            const warningMeta = getStaffWarningMeta(e.id, profileWarningYear);
+            const warningMeta = getStaffWarningHighestMeta(e.id, profileWarningYear);
             const warningHistory = getStaffWarningHistory(e.id, profileWarningYear);
             if (warningSection && (warningMeta.level !== 'normal' || warningHistory.length > 0)) {
                 warningSection.classList.remove('hidden');
@@ -5243,9 +5957,9 @@
                     badge.innerHTML = `<i class="fa-solid ${warningMeta.icon}"></i>${warningMeta.label}`;
                 }
                 if (count) count.textContent = `${profileWarningYear} • ${warningMeta.count} warning${warningMeta.count === 1 ? '' : 's'}`;
-                const activeEntry = warningHistory.slice().reverse().find(h => !h.endAt) || warningHistory[warningHistory.length - 1];
+                const activeEntry = warningHistory.slice().sort((a,b)=>(new Date(b.startAt||0))-(new Date(a.startAt||0)))[0];
                 if (latest) {
-                    const period = activeEntry ? `Since ${warningFormatDateTime(activeEntry.startAt)}` : '';
+                    const period = activeEntry ? `Latest record: ${warningFormatDateTime(activeEntry.startAt)}` : '';
                     const note = activeEntry && activeEntry.note ? ` • ${activeEntry.note}` : '';
                     latest.textContent = `${period}${note}`.trim();
                 }
@@ -5669,10 +6383,16 @@
                 if (!r) return; // Completely present / no record
                 
                 let h = r.leaves;
-                // Skip if they only have OT (or are fully present) because they are functionally 'present' for reports
-                if(h.AL===0 && h.SL===0 && h.SP===0 && h.UP===0 && h.A===0 && h.Late5m===0 && h.Late3m===0 && h.D===0 && h.H===0 && !r.isRawD && !r.isRawH) return;
-                
-                if(activeLeaveFilter && h[activeLeaveFilter] <= 0) return;
+                // Calendar export intentionally excludes Late and OT statuses.
+                // Export the employee only when they have an exportable leave/attendance status.
+                // If a record is Late-only, OT-only, or Late+OT only, it is not included.
+                const hasExportableStatus = h.AL>0 || h.SL>0 || h.SP>0 || h.UP>0 || h.A>0 || h.D>0 || h.H>0 || r.isRawD || r.isRawH;
+                if(!hasExportableStatus) return;
+
+                // Respect the Calendar filter only for statuses that are allowed in this export.
+                // Late / OT filters must never cause Late or OT rows to be exported.
+                const exportableFilters = ['AL','SL','SP','UP','A','D','H'];
+                if(activeLeaveFilter && exportableFilters.includes(activeLeaveFilter) && h[activeLeaveFilter] <= 0) return;
 
                 if(!gD[e.company]) gD[e.company] = [];
                 let cNote = customNotes[`${e.id}_${r.month}_${r.day}_${yr}`] || r.note;
@@ -5720,7 +6440,8 @@
                         let iF = true;
                         let rS = sL.length;
                         sL.forEach(i => {
-                            let t=[]; if(i.h.AL>0)t.push('Annual Leave'); if(i.h.SL>0)t.push('Sick Leave'); if(i.h.SP>0)t.push('Special Leave'); if(i.h.Late5m>0)t.push('Late (>5m)'); if(i.h.Late3m>0)t.push('Late (>30m)'); if(i.h.UP>0)t.push('Unpaid Leave'); if(i.h.A>0)t.push('Absent'); if(i.h.D>0)t.push('Day Off'); if(i.h.H>0)t.push('Holiday');
+                            // Late and OT are deliberately omitted from the exported Type column.
+                            let t=[]; if(i.h.AL>0)t.push('Annual Leave'); if(i.h.SL>0)t.push('Sick Leave'); if(i.h.SP>0)t.push('Special Leave'); if(i.h.UP>0)t.push('Unpaid Leave'); if(i.h.A>0)t.push('Absent'); if(i.h.D>0)t.push('Day Off'); if(i.h.H>0)t.push('Holiday');
                             let typeStr = t.length > 0 ? t.join(', ') : '';
                             let noteStr = i.n ? i.n : '';
                             
