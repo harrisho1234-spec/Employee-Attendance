@@ -2103,15 +2103,18 @@
         .staff-warning-badge.warning-verbal { background:#fefce8; color:#a16207; border-color:#fde68a; }
         .staff-warning-badge.warning-written { background:#fff7ed; color:#c2410c; border-color:#fdba74; }
         .staff-warning-badge.warning-final { background:#fef2f2; color:#b91c1c; border-color:#fca5a5; }
+        .staff-warning-badge.warning-fic { background:#eef2ff; color:#4338ca; border-color:#c7d2fe; }
         .mobile-attention-badge.warning-verbal { background:#fefce8; color:#a16207; border-color:#fde68a; }
         .mobile-attention-badge.warning-written { background:#fff7ed; color:#c2410c; border-color:#fdba74; }
         .mobile-attention-badge.warning-final { background:#fef2f2; color:#b91c1c; border-color:#fca5a5; }
+        .mobile-attention-badge.warning-fic { background:#eef2ff; color:#4338ca; border-color:#c7d2fe; }
         .staff-warning-count { display:inline-flex; align-items:center; gap:3px; margin-left:5px; font-size:9px; font-weight:800; color:#64748b; background:#f8fafc; border:1px solid #e2e8f0; border-radius:999px; padding:2px 6px; vertical-align:middle; }
         .warning-count-breakdown { display:inline-flex; align-items:center; gap:4px; flex-wrap:wrap; }
         .warning-count-pill { display:inline-flex; align-items:center; justify-content:center; gap:3px; min-width:26px; height:20px; padding:0 6px; border-radius:999px; border:1px solid transparent; font-size:8px; line-height:1; font-weight:900; white-space:nowrap; }
         .warning-count-pill.verbal { background:#fefce8; color:#a16207; border-color:#fde68a; }
         .warning-count-pill.written { background:#fff7ed; color:#c2410c; border-color:#fdba74; }
         .warning-count-pill.final { background:#fef2f2; color:#b91c1c; border-color:#fca5a5; }
+        .warning-count-pill.fic { background:#eef2ff; color:#4338ca; border-color:#c7d2fe; }
         .warning-count-pill .count { font-size:9px; }
 
 
@@ -2131,9 +2134,15 @@
             background:linear-gradient(135deg, rgba(254,242,242,.82) 0%, #fff 34%);
             box-shadow:0 0 0 1px rgba(239,68,68,.09), 0 4px 15px rgba(185,28,28,.08);
         }
+        .mobile-staff-card.staff-warning-card-fic {
+            border-color:#c7d2fe !important;
+            background:linear-gradient(135deg, rgba(238,242,255,.88) 0%, #fff 34%);
+            box-shadow:0 0 0 1px rgba(99,102,241,.10), 0 4px 15px rgba(67,56,202,.08);
+        }
         .mobile-staff-card.staff-warning-card-verbal:hover { border-color:#facc15 !important; }
         .mobile-staff-card.staff-warning-card-written:hover { border-color:#fb923c !important; }
         .mobile-staff-card.staff-warning-card-final:hover { border-color:#f87171 !important; }
+        .mobile-staff-card.staff-warning-card-fic:hover { border-color:#818cf8 !important; }
         .warning-history-list { display:flex; flex-direction:column; gap:8px; max-height:230px; overflow:auto; padding-right:2px; }
         .warning-history-item { position:relative; border:1px solid #e2e8f0; border-radius:12px; padding:10px 11px 10px 14px; background:#fff; }
         .warning-history-item::before { content:''; position:absolute; left:0; top:10px; bottom:10px; width:3px; border-radius:0 4px 4px 0; background:#94a3b8; }
@@ -2141,6 +2150,7 @@
         .warning-history-item.verbal::before { background:#eab308; }
         .warning-history-item.written::before { background:#f97316; }
         .warning-history-item.final::before { background:#ef4444; }
+        .warning-history-item.fic::before { background:#6366f1; }
         .warning-history-stage { display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:11px; font-weight:800; color:#0f172a; }
         .warning-history-period { margin-top:3px; font-size:9px; color:#64748b; font-weight:600; }
         .warning-history-note { margin-top:6px; font-size:10px; line-height:1.45; color:#334155; background:#f8fafc; border-radius:8px; padding:6px 8px; white-space:pre-wrap; }
@@ -2150,10 +2160,12 @@
         .warning-inline-indicator.warning-verbal { background:#fefce8; color:#a16207; border-color:#fde68a; }
         .warning-inline-indicator.warning-written { background:#fff7ed; color:#c2410c; border-color:#fdba74; }
         .warning-inline-indicator.warning-final { background:#fef2f2; color:#b91c1c; border-color:#fca5a5; }
+        .warning-inline-indicator.warning-fic { background:#eef2ff; color:#4338ca; border-color:#c7d2fe; }
         .warning-dot-indicator { position:absolute; top:-3px; right:-4px; width:12px; height:12px; border-radius:999px; border:2px solid #fff; box-shadow:0 1px 3px rgba(15,23,42,.18); cursor:pointer; z-index:20; }
         .warning-dot-indicator.warning-verbal { background:#eab308; }
         .warning-dot-indicator.warning-written { background:#f97316; }
         .warning-dot-indicator.warning-final { background:#ef4444; }
+        .warning-dot-indicator.warning-fic { background:#6366f1; }
         .staff-card-export-btn { display:inline-flex; align-items:center; gap:4px; border:1px solid #dbe3ec; background:#fff; color:#475569; border-radius:8px; padding:4px 7px; font-size:9px; line-height:1; font-weight:800; cursor:pointer; transition:.15s ease; }
         .staff-card-export-btn:hover { background:#eff6ff; color:#2563eb; border-color:#bfdbfe; }
 
@@ -2349,6 +2361,32 @@
         .staff-summary-company-card .staff-summary-value {
             font-size: 19px;
         }
+        .staff-summary-total-card,
+        .staff-summary-company-card,
+        #mobileStaffKpiContainer .mobile-dashboard-kpi {
+            cursor: pointer;
+        }
+        .staff-summary-total-card.is-active,
+        .staff-summary-company-card.is-active {
+            border-color: #93c5fd;
+            background: #eff6ff;
+            box-shadow: 0 0 0 2px rgba(37,99,235,.10), 0 4px 12px rgba(37,99,235,.08);
+        }
+        .staff-summary-company-card.is-active .staff-summary-icon {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+        #mobileStaffKpiContainer .mobile-dashboard-kpi.is-active {
+            border-color: #93c5fd;
+            background: #eff6ff;
+            box-shadow: 0 0 0 2px rgba(37,99,235,.10);
+        }
+        .staff-summary-total-card:focus-visible,
+        .staff-summary-company-card:focus-visible,
+        #mobileStaffKpiContainer .mobile-dashboard-kpi:focus-visible {
+            outline: 3px solid rgba(37,99,235,.22);
+            outline-offset: 2px;
+        }
         @media (max-width: 767px) {
             #kpiContainer {
                 display: none !important;
@@ -2392,12 +2430,19 @@
 
     <!-- Top Navigation Tabs -->
     <div class="bg-white border-b border-slate-200 px-4 sm:px-6 pt-4 flex-shrink-0 z-20">
-        <div class="flex space-x-4 sm:space-x-6 overflow-x-auto custom-scrollbar">
+        <div class="flex items-center justify-between gap-3">
+            <div class="flex space-x-4 sm:space-x-6 overflow-x-auto custom-scrollbar min-w-0">
             <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-inactive pb-3 px-2 transition-all whitespace-nowrap text-sm sm:text-base">Dashboard View</button>
             <button onclick="switchTab('calendar')" id="tab-calendar" class="tab-inactive pb-3 px-2 transition-all whitespace-nowrap text-sm sm:text-base">Calendar View</button>
             <button onclick="switchTab('daily')" id="tab-daily" class="tab-active pb-3 px-2 transition-all whitespace-nowrap text-sm sm:text-base border-b-2 border-blue-600 text-blue-600">Daily Attendance</button>
             <button onclick="switchTab('org')" id="tab-org" class="tab-inactive pb-3 px-2 transition-all whitespace-nowrap text-sm sm:text-base">Org Chart <span class="bg-blue-100 text-blue-700 text-[10px] px-1.5 py-0.5 rounded ml-1 font-bold">NEW</span></button>
             <button onclick="switchTab('scan')" id="tab-scan" class="tab-inactive pb-3 px-2 transition-all whitespace-nowrap text-sm sm:text-base">Scan Activity</button>
+            </div>
+            <div class="hidden sm:flex items-center gap-2 pb-3 shrink-0 text-[10px] text-slate-400">
+                <i class="fa-solid fa-arrows-rotate text-emerald-500"></i>
+                <span>Auto 5 min</span>
+                <span id="globalLastUpdated" class="font-semibold">Updated —</span>
+            </div>
         </div>
     </div>
 
@@ -2415,7 +2460,16 @@
                             <h1 class="text-[18px] leading-tight font-extrabold text-slate-900">Attendance Dashboard</h1>
                             <p id="mobileDashboardScope" class="text-[10px] text-slate-500 mt-1 truncate">All Companies • YTD</p>
                         </div>
-                        <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-chart-line text-sm"></i></div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <button id="mobileDashboardRefreshBtn" type="button" onclick="refreshAllTabs(this)" class="w-9 h-9 rounded-xl bg-white border border-slate-200 text-blue-600 flex items-center justify-center shadow-sm hover:bg-blue-50" title="Refresh Dashboard">
+                                <i class="fa-solid fa-rotate text-xs"></i>
+                            </button>
+                            <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center"><i class="fa-solid fa-chart-line text-sm"></i></div>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between gap-2 mb-2">
+                        <span id="mobileDashboardRefreshStatus" class="text-[9px] text-slate-400">Auto refresh every 5 min</span>
+                        <span id="mobileDashboardLastUpdated" class="text-[9px] font-semibold text-slate-400">Updated —</span>
                     </div>
                     <div class="mobile-dashboard-search-row">
                         <div class="relative min-w-0">
@@ -2448,9 +2502,16 @@
                 <div>
                     <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Attendance Dashboard</h1>
                     <p class="text-xs sm:text-sm text-slate-500 mt-1">Live data feed from Google Sheets</p>
+                    <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                        <span class="text-[10px] font-semibold text-emerald-600"><i class="fa-solid fa-arrows-rotate mr-1"></i>Auto refresh every 5 min</span>
+                        <span id="dashboardLastUpdated" class="text-[10px] text-slate-400">Updated —</span>
+                    </div>
                 </div>
                 
                 <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 w-full xl:w-auto">
+                    <button id="dashboardRefreshBtn" type="button" onclick="refreshAllTabs(this)" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 border border-blue-600 text-white text-sm font-bold rounded-lg px-3.5 py-2.5 flex items-center justify-center gap-2 shadow-sm transition-colors" title="Refresh Dashboard">
+                        <i class="fa-solid fa-rotate"></i><span>Refresh</span>
+                    </button>
                     <div class="relative filter-dropdown w-full sm:w-auto">
                         <button id="companyDropdownBtn" class="w-full sm:w-auto bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg p-2.5 min-w-[160px] flex justify-between items-center cursor-pointer hover:bg-slate-100 transition-colors">
                             <span id="companyDropdownLabel">All Companies</span><i class="fa-solid fa-chevron-down text-xs ml-2 text-slate-400"></i>
@@ -2479,14 +2540,15 @@
                     <select id="dashboardYearFilter" class="w-full sm:w-auto bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg p-2.5 font-semibold text-slate-700" title="Dashboard Year"></select>
                     <select id="dashboardMonthFilter" class="w-full sm:w-auto bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg p-2.5 font-semibold text-blue-700"><option value="All">All Months (YTD)</option><option value="January">January</option><option value="February">February</option><option value="March">March</option><option value="April">April</option><option value="May">May</option><option value="June">June</option><option value="July">July</option><option value="August">August</option><option value="September">September</option><option value="October">October</option><option value="November">November</option><option value="December">December</option></select>
                     <select id="dashboardLeaveTypeFilter" class="w-full sm:w-auto bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg p-2.5 font-semibold text-indigo-700"><option value="All">All Leave Types</option><option value="AL">Annual Leave (AL)</option><option value="SL">Sick Leave (SL)</option><option value="SP">Special Leave (SP)</option><option value="UP">Unpaid Leave (UP)</option><option value="A">Absence (A)</option><option value="Late">Late (L/L')</option><option value="OT">Overtime (OT)</option><option value="D">Day Off (D)</option></select>
-                    <select id="dashboardWarningFilter" class="w-full sm:w-auto bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg p-2.5 font-semibold text-amber-700" title="Warning History Filter">
-                        <option value="All">All Warning History</option>
+                    <select id="dashboardWarningFilter" class="w-full sm:w-auto bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg p-2.5 font-semibold text-amber-700" title="Performance / Warning History Filter">
+                        <option value="All">All Performance / Warning History</option>
                         <option value="AnyWarning">⚠ Any Warning — Selected Year</option>
                         <option value="EverWarning">⚠ Ever Had Warning — Any Year</option>
                         <option value="NoWarning">🟢 No Warning — Selected Year</option>
                         <option value="HasVerbal">🟡 Has Verbal Warning</option>
                         <option value="HasWritten">🟠 Has Written Warning</option>
                         <option value="HasFinal">🔴 Has Final Warning</option>
+                        <option value="HasFIC">🟣 Has FIC</option>
                     </select>
                     <div class="relative w-full sm:w-auto"><div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"><i class="fa-solid fa-magnifying-glass text-slate-400 text-sm"></i></div><input type="text" id="searchInput" class="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-lg pl-10 p-2.5 sm:min-w-[200px]" placeholder="Search Name or ID..."></div>
                 </div>
@@ -2616,15 +2678,16 @@
                             <label class="mobile-filter-label" for="mobileDashboardLeaveType">Leave Type</label><select id="mobileDashboardLeaveType" class="mobile-filter-select" onchange="mobileDashboardSetLeaveType(this.value)"></select>
                         </div>
                         <div class="mobile-filter-group">
-                            <label class="mobile-filter-label" for="mobileDashboardWarning">Warning Status</label>
+                            <label class="mobile-filter-label" for="mobileDashboardWarning">Performance / Warning</label>
                             <select id="mobileDashboardWarning" class="mobile-filter-select" onchange="mobileDashboardSetWarning(this.value)">
-                                <option value="All">All Warning History</option>
+                                <option value="All">All Performance / Warning History</option>
                                 <option value="AnyWarning">⚠ Any Warning — Selected Year</option>
                                 <option value="EverWarning">⚠ Ever Had Warning — Any Year</option>
                                 <option value="NoWarning">🟢 No Warning — Selected Year</option>
                                 <option value="HasVerbal">🟡 Has Verbal Warning</option>
                                 <option value="HasWritten">🟠 Has Written Warning</option>
                                 <option value="HasFinal">🔴 Has Final Warning</option>
+                        <option value="HasFIC">🟣 Has FIC</option>
                             </select>
                         </div>
                         <div class="mobile-filter-group">
@@ -2652,7 +2715,10 @@
                         </div>
                         <span class="text-xl sm:text-2xl font-bold text-slate-800" id="calendarYearText">2026</span>
                     </div>
-                    <div class="flex space-x-1.5 w-full sm:w-auto justify-end">
+                    <div class="flex items-center gap-1.5 w-full sm:w-auto justify-end">
+                        <button id="calendarRefreshBtn" onclick="refreshAllTabs(this)" class="h-8 sm:h-10 px-3 sm:px-4 rounded-lg bg-blue-600 hover:bg-blue-700 border border-blue-600 text-white flex items-center justify-center gap-1.5 text-xs sm:text-sm font-bold shadow-sm transition-colors" title="Refresh Calendar Data">
+                            <i class="fa-solid fa-rotate"></i><span>Refresh</span>
+                        </button>
                         <button onclick="changeMonth(-1)" class="w-8 sm:w-10 h-8 sm:h-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-600 shadow-sm hover:shadow"><i class="fa-solid fa-chevron-left"></i></button>
                         <button onclick="changeMonth(1)" class="w-8 sm:w-10 h-8 sm:h-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-600 shadow-sm hover:shadow"><i class="fa-solid fa-chevron-right"></i></button>
                     </div>
@@ -2807,7 +2873,7 @@
                         </div>
                         <button onclick="shiftDailyDates(1)" class="w-7 h-7 sm:w-8 sm:h-8 rounded bg-white border border-slate-200 text-slate-600 shadow-sm hover:bg-slate-100 flex items-center justify-center shrink-0" title="Next Day/Range"><i class="fa-solid fa-chevron-right text-xs"></i></button>
                     </div>
-                    <button onclick="refreshDailyAttendance()" class="w-full sm:w-auto mt-2 sm:mt-0 bg-blue-600 hover:bg-blue-700 border border-blue-600 text-white text-sm font-bold rounded-lg p-2 sm:px-4 shadow-sm flex items-center justify-center gap-1.5 transition-colors" title="Refresh Daily Attendance">
+                    <button onclick="refreshAllTabs(this)" class="w-full sm:w-auto mt-2 sm:mt-0 bg-blue-600 hover:bg-blue-700 border border-blue-600 text-white text-sm font-bold rounded-lg p-2 sm:px-4 shadow-sm flex items-center justify-center gap-1.5 transition-colors" title="Refresh Daily Attendance">
                         <i class="fa-solid fa-rotate"></i> Refresh
                     </button>
                     <div class="relative filter-dropdown w-full sm:w-auto mt-2 sm:mt-0 ml-0 sm:ml-1">
@@ -2851,6 +2917,7 @@
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6 bg-white p-6 rounded-xl shadow-sm border border-slate-200 sticky top-0 z-40">
                 <div><h1 class="text-2xl font-bold text-slate-900">Organization Chart</h1><p class="text-sm text-slate-500 mt-1">Interactive company hierarchy structure.</p></div>
                 <div class="flex items-center gap-2 sm:gap-3 w-full sm:w-auto flex-wrap">
+                    <button id="orgRefreshBtn" type="button" onclick="refreshAllTabs(this)" class="bg-blue-600 border border-blue-600 text-white hover:bg-blue-700 text-sm rounded-lg px-3 sm:px-4 py-2 font-bold shadow-sm flex items-center gap-2"><i class="fa-solid fa-rotate"></i> <span>Refresh</span></button>
                     <button id="orgEditToggleBtn" onclick="toggleOrgEditMode()" class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 text-sm rounded-lg px-3 sm:px-4 py-2 font-bold shadow-sm flex items-center gap-2"><i class="fa-solid fa-pen-to-square"></i> <span class="hidden sm:inline">Edit Structure</span><span class="sm:hidden">Edit</span></button>
                     <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg p-1 shadow-inner">
                         <button onclick="undoOrgChange()" title="Undo Last Change (Ctrl+Z)" class="bg-white border border-slate-200 text-slate-600 hover:bg-blue-50 text-sm rounded px-2.5 py-1.5 shadow-sm"><i class="fa-solid fa-reply"></i></button>
@@ -2907,7 +2974,7 @@
       <button id="scanShowAllBtn" class="refresh-btn scan-toggle-btn" onclick="toggleScanStaffView()">
         <i class="fa-solid fa-users"></i> Show All
       </button>
-      <button class="refresh-btn" onclick="fetchLiveData()">
+      <button class="refresh-btn" onclick="refreshAllTabs(this)">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
         Refresh
       </button>
@@ -3135,7 +3202,7 @@
             <div class="p-4 border-b flex justify-between items-center relative shrink-0">
                 <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 via-amber-400 to-red-500"></div>
                 <div>
-                    <h3 class="font-bold text-slate-900 text-lg flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation text-amber-500"></i> Warning History</h3>
+                    <h3 class="font-bold text-slate-900 text-lg flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation text-amber-500"></i> Performance & Disciplinary History</h3>
                     <p id="warningEditStaffName" class="text-xs text-slate-500 mt-0.5">Staff</p>
                 </div>
                 <button onclick="closeWarningEditor()" class="text-slate-400 hover:bg-slate-100 w-8 h-8 rounded-full"><i class="fa-solid fa-xmark"></i></button>
@@ -3146,11 +3213,12 @@
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-2">New / Current Level</label>
-                        <select id="warningEditLevel" class="w-full border border-slate-300 rounded-xl p-3 text-sm font-bold bg-white outline-none focus:border-blue-500">
+                        <select id="warningEditLevel" onchange="updateNewWarningAttachmentVisibility()" class="w-full border border-slate-300 rounded-xl p-3 text-sm font-bold bg-white outline-none focus:border-blue-500">
                             <option value="normal">🟢 Normal</option>
                             <option value="verbal">🟡 Verbal Warning</option>
                             <option value="written">🟠 Written Warning</option>
                             <option value="final">🔴 Final Warning</option>
+                            <option value="fic">🟣 FIC — Final Improvement Commitment</option>
                         </select>
                     </div>
                     <div>
@@ -3167,13 +3235,29 @@
                     <textarea id="warningEditNote" rows="3" class="w-full border border-slate-300 rounded-xl p-3 text-sm bg-white outline-none focus:border-blue-500 resize-y" placeholder="Reason, improvement required, follow-up details..."></textarea>
                     <p class="text-[10px] text-slate-400 mt-1">Each save creates a new dated timeline entry. If another stage is active, it is closed at this start time. This allows multiple Verbal Warnings and multiple Written Warnings.</p>
                 </div>
+
+                <div id="newWarningAttachmentSection" class="hidden mt-4 rounded-xl border border-indigo-200 bg-indigo-50/60 p-3.5">
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <div class="text-xs font-extrabold text-slate-700 uppercase tracking-wide"><i class="fa-solid fa-paperclip mr-1.5 text-indigo-500"></i>Signed Form / Attachments</div>
+                            <div class="text-[10px] text-slate-500 mt-1">Attach the signed form now. Files will upload automatically when you click <strong>Save Stage</strong>.</div>
+                        </div>
+                        <span id="newWarningAttachmentCount" class="text-[9px] font-extrabold text-indigo-700 bg-white border border-indigo-200 rounded-full px-2 py-1">0 files</span>
+                    </div>
+                    <div class="mt-3">
+                        <input id="newWarningAttachmentInput" type="file" multiple accept="application/pdf,image/jpeg,image/png"
+                            onchange="updateNewWarningAttachmentCount()"
+                            class="block w-full text-xs text-slate-600 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-100 file:text-indigo-700 hover:file:bg-indigo-200">
+                    </div>
+                    <div class="text-[9px] text-slate-400 mt-1.5">Available for Written Warning, Final Warning and FIC • PDF, JPG or PNG • maximum 10 MB per file.</div>
+                </div>
                 </div>
                 <div class="border-t pt-4">
                     <div class="flex items-center justify-between mb-3">
-                        <div><h4 class="text-xs font-extrabold text-slate-700 uppercase tracking-wide">Warning Timeline</h4><p id="warningHistorySummary" class="text-[10px] text-slate-400 mt-0.5"></p></div>
+                        <div><h4 class="text-xs font-extrabold text-slate-700 uppercase tracking-wide">Action Timeline</h4><p id="warningHistorySummary" class="text-[10px] text-slate-400 mt-0.5"></p></div>
                         <div class="flex items-center gap-2 flex-wrap justify-end">
                             <select id="warningHistoryYearSelect" onchange="changeWarningHistoryYear(this.value)" class="text-[10px] font-bold text-slate-700 bg-white border border-slate-200 px-2.5 py-1.5 rounded-lg outline-none focus:border-blue-400"></select>
-                            <button id="warningAddChangeBtn" type="button" onclick="showWarningStageForm()" class="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1.5 rounded-lg hover:bg-amber-100"><i class="fa-solid fa-plus mr-1"></i>Add / Change Warning</button>
+                            <button id="warningAddChangeBtn" type="button" onclick="showWarningStageForm()" class="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1.5 rounded-lg hover:bg-amber-100"><i class="fa-solid fa-plus mr-1"></i>Add Action / Status</button>
                             <button type="button" onclick="exportWarningEmployeeFromEditor()" class="text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-100 px-2.5 py-1.5 rounded-lg hover:bg-blue-100"><i class="fa-solid fa-file-export mr-1"></i>Export Staff</button>
                         </div>
                     </div>
@@ -3193,14 +3277,14 @@
         <div id="warningHistoryEditModalContent" class="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden transform scale-95 transition-transform duration-300 max-h-[92vh] flex flex-col">
             <div class="p-4 border-b flex justify-between items-center relative shrink-0">
                 <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500"></div>
-                <div><h3 class="font-bold text-slate-900 text-lg">Edit Warning Stage</h3><p class="text-xs text-slate-500 mt-0.5">Change the stage to Normal, correct its details, or remove this timeline entry.</p></div>
+                <div><h3 class="font-bold text-slate-900 text-lg">Edit Performance / Warning Entry</h3><p class="text-xs text-slate-500 mt-0.5">Change the stage to Normal, correct its details, or remove this timeline entry.</p></div>
                 <button onclick="closeWarningHistoryEntryEditor()" class="text-slate-400 hover:bg-slate-100 w-8 h-8 rounded-full"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="p-4 sm:p-5 overflow-y-auto">
                 <input type="hidden" id="warningHistoryEditStaffId">
                 <input type="hidden" id="warningHistoryEditIndex">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2">Stage</label><select id="warningHistoryEditLevel" onchange="updateWarningAttachmentVisibility()" class="w-full border border-slate-300 rounded-xl p-3 text-sm font-bold bg-white"><option value="normal">🟢 Normal</option><option value="verbal">🟡 Verbal Warning</option><option value="written">🟠 Written Warning</option><option value="final">🔴 Final Warning</option></select></div>
+                    <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2">Stage</label><select id="warningHistoryEditLevel" onchange="updateWarningAttachmentVisibility()" class="w-full border border-slate-300 rounded-xl p-3 text-sm font-bold bg-white"><option value="normal">🟢 Normal</option><option value="verbal">🟡 Verbal Warning</option><option value="written">🟠 Written Warning</option><option value="final">🔴 Final Warning</option><option value="fic">🟣 FIC — Final Improvement Commitment</option></select></div>
                     <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2">Issued / Updated By</label><input id="warningHistoryEditIssuer" type="text" class="w-full border border-slate-300 rounded-xl p-3 text-sm font-semibold bg-white"></div>
                     <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2">Start Date / Time</label><input id="warningHistoryEditStartAt" type="datetime-local" class="w-full border border-slate-300 rounded-xl p-3 text-sm font-semibold bg-white"></div>
                     <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2">End Date / Time</label><input id="warningHistoryEditEndAt" type="datetime-local" class="w-full border border-slate-300 rounded-xl p-3 text-sm font-semibold bg-white"><p class="text-[10px] text-slate-400 mt-1">Leave blank if this is the current active stage.</p></div>
@@ -3211,7 +3295,7 @@
                     <div class="flex items-start justify-between gap-3">
                         <div>
                             <div class="text-xs font-extrabold text-slate-700 uppercase tracking-wide"><i class="fa-solid fa-paperclip mr-1.5 text-blue-500"></i>Signed Form / Attachments</div>
-                            <div id="warningAttachmentHelp" class="text-[10px] text-slate-400 mt-1">Written and Final warnings can store signed forms, scans, photos and supporting PDFs.</div>
+                            <div id="warningAttachmentHelp" class="text-[10px] text-slate-400 mt-1">Written Warning, Final Warning and FIC can store signed forms, scans, photos and supporting PDFs.</div>
                         </div>
                         <span id="warningAttachmentCount" class="text-[9px] font-extrabold text-slate-500 bg-white border border-slate-200 rounded-full px-2 py-1">0 files</span>
                     </div>
@@ -3486,7 +3570,10 @@
 
             document.addEventListener('keydown', (e) => { if (e.ctrlKey && e.key === 'z' && document.getElementById('orgView').classList.contains('hidden') === false && isOrgEditMode) { e.preventDefault(); undoOrgChange(); } });
 
-            fetchData();
+            fetchData().then(() => {
+                updateGlobalRefreshTimestamp();
+                startGlobalAutoRefresh();
+            });
         });
         
         window.handleDailyLeaveCheck = function() {
@@ -3538,9 +3625,235 @@
             renderDailyAttendance();
         };
 
-        window.refreshDailyAttendance = function() {
-            fetchData();
+        let globalRefreshInProgress = false;
+        let globalAutoRefreshTimer = null;
+        const GLOBAL_AUTO_REFRESH_MS = 5 * 60 * 1000;
+
+        function updateGlobalRefreshTimestamp() {
+            const stamp = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            ['dashboardLastUpdated','mobileDashboardLastUpdated','globalLastUpdated'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = `Updated ${stamp}`;
+            });
+        }
+
+        function captureAllTabRefreshState() {
+            return {
+                activeTab: document.body.dataset.activeTab || 'daily',
+
+                dashCompanies: [...selectedCompanies],
+                dashDepartments: Array.isArray(selectedDepartments) ? [...selectedDepartments] : null,
+                dashStatuses: [...selectedStatuses],
+                dashYear: selectedDashboardYear,
+                dashMonth: selectedDashboardMonth,
+                dashWarning: selectedDashboardWarning,
+                dashSearch: searchQuery,
+                dashLeaveType: document.getElementById('dashboardLeaveTypeFilter')?.value || 'All',
+                dashSortColumn: currentSortColumn,
+                dashSortAscending: isSortAscending,
+
+                calCompanies: [...selectedCalendarCompanies],
+                calRowCompany: selectedCalendarRowCompany,
+                calRowDepartments: Array.isArray(selectedCalendarRowDepartments) ? [...selectedCalendarRowDepartments] : null,
+                calRowMonth: selectedCalendarRowMonth,
+                calRowYear: selectedCalendarRowYear,
+                calDate: new Date(currentCalendarDate.getTime()),
+                calSelectedDate: selectedCalendarDate,
+                calLeaveFilter: activeLeaveFilter,
+
+                dailyCompanies: [...selectedDailyCompanies],
+                dailyLeaveTypes: [...(window.selectedDailyLeaveTypes || window.allLeaveTypeKeys || [])],
+                dailySearch: dailySearchQuery,
+                dailyFrom: document.getElementById('dailyFilterFrom')?.value || '',
+                dailyTo: document.getElementById('dailyFilterTo')?.value || '',
+                dailyPreset: document.getElementById('dailyRangePreset')?.value || 'custom',
+                dailyYear: document.getElementById('dailyYearFilter')?.value || '',
+
+                orgCompany: (typeof currentOrgCompany !== 'undefined' && currentOrgCompany) ? currentOrgCompany : null,
+                scanDate: document.getElementById('dateSelect')?.value || ''
+            };
+        }
+
+        function restoreCompanyCheckboxState(type, selected) {
+            const cfg = {
+                main: { list:'#companyCheckboxList input[type="checkbox"]', all:'selectAllCompanies', label:'companyDropdownLabel' },
+                cal: { list:'#calCompanyCheckboxList input[type="checkbox"]', all:'calSelectAllCompanies', label:'calCompanyDropdownLabel' },
+                daily: { list:'#dailyCompanyCheckboxList input[type="checkbox"]', all:'dailySelectAllCompanies', label:'dailyCompanyDropdownLabel' }
+            }[type];
+            if (!cfg) return;
+
+            document.querySelectorAll(cfg.list).forEach(cb => { cb.checked = selected.includes(cb.value); });
+            const all = document.getElementById(cfg.all);
+            if (all) {
+                all.checked = companies.size > 0 && selected.length === companies.size;
+                all.indeterminate = selected.length > 0 && selected.length < companies.size;
+            }
+            const label = document.getElementById(cfg.label);
+            if (label) {
+                label.innerText = selected.length === companies.size ? 'All Companies'
+                    : selected.length === 1 ? selected[0]
+                    : selected.length ? `${selected.length} Companies`
+                    : 'No Companies';
+            }
+        }
+
+        function restoreAllTabRefreshState(keep) {
+            const availableCompanies = Array.from(companies);
+            const availableDepartments = Array.from(departments);
+
+            // Dashboard
+            const dashCompanies = keep.dashCompanies.filter(c => availableCompanies.includes(c));
+            selectedCompanies = dashCompanies.length || keep.dashCompanies.length === 0 ? dashCompanies : [...availableCompanies];
+            selectedDepartments = keep.dashDepartments === null
+                ? null
+                : keep.dashDepartments.filter(d => availableDepartments.includes(d));
+            selectedStatuses = [...keep.dashStatuses];
+            selectedDashboardYear = keep.dashYear;
+            selectedDashboardMonth = keep.dashMonth;
+            selectedDashboardWarning = keep.dashWarning;
+            searchQuery = keep.dashSearch;
+            currentSortColumn = keep.dashSortColumn;
+            isSortAscending = keep.dashSortAscending;
+
+            const dashLeave = document.getElementById('dashboardLeaveTypeFilter');
+            if (dashLeave && Array.from(dashLeave.options).some(o => o.value === keep.dashLeaveType)) dashLeave.value = keep.dashLeaveType;
+            const dashSearch = document.getElementById('searchInput');
+            if (dashSearch) dashSearch.value = searchQuery;
+            const mobileDashSearch = document.getElementById('mobileDashboardSearch');
+            if (mobileDashSearch) mobileDashSearch.value = searchQuery;
+            syncDesktopDashboardControlsFromState();
+            syncMobileDashboardFilterUI();
+
+            // Calendar
+            const calCompanies = keep.calCompanies.filter(c => availableCompanies.includes(c));
+            selectedCalendarCompanies = calCompanies.length || keep.calCompanies.length === 0 ? calCompanies : [...availableCompanies];
+            currentCalendarDate = new Date(keep.calDate.getTime());
+            selectedCalendarDate = keep.calSelectedDate;
+            activeLeaveFilter = keep.calLeaveFilter;
+            selectedCalendarRowCompany =
+                keep.calRowCompany === '__ALL__' || availableCompanies.includes(keep.calRowCompany)
+                    ? keep.calRowCompany : '__ALL__';
+            selectedCalendarRowMonth = keep.calRowMonth;
+            selectedCalendarRowYear = keep.calRowYear;
+            selectedCalendarRowDepartments = keep.calRowDepartments;
+            initializeCalendarRowPeriodFilters();
+            initializeCalendarRowDepartmentFilter(false);
+            updateCalendarRowCompanyLabel();
+
+            // Daily Attendance
+            const dailyCompanies = keep.dailyCompanies.filter(c => availableCompanies.includes(c));
+            selectedDailyCompanies = dailyCompanies.length || keep.dailyCompanies.length === 0 ? dailyCompanies : [...availableCompanies];
+            window.selectedDailyLeaveTypes = [...keep.dailyLeaveTypes];
+            dailySearchQuery = keep.dailySearch;
+
+            const dailySearch = document.getElementById('dailySearchInput');
+            if (dailySearch) dailySearch.value = keep.dailySearch;
+            const preset = document.getElementById('dailyRangePreset');
+            if (preset && Array.from(preset.options).some(o => o.value === keep.dailyPreset)) preset.value = keep.dailyPreset;
+            const yearFilter = document.getElementById('dailyYearFilter');
+            if (yearFilter && keep.dailyYear && Array.from(yearFilter.options).some(o => o.value === keep.dailyYear)) yearFilter.value = keep.dailyYear;
+
+            if (window.fpFrom && keep.dailyFrom) window.fpFrom.setDate(keep.dailyFrom, false);
+            else if (document.getElementById('dailyFilterFrom')) document.getElementById('dailyFilterFrom').value = keep.dailyFrom;
+            if (window.fpTo && keep.dailyTo) window.fpTo.setDate(keep.dailyTo, false);
+            else if (document.getElementById('dailyFilterTo')) document.getElementById('dailyFilterTo').value = keep.dailyTo;
+
+            document.querySelectorAll('.daily-leave-checkbox').forEach(cb => {
+                cb.checked = window.selectedDailyLeaveTypes.includes(cb.value);
+            });
+            const dailyAllLeaves = document.getElementById('dailySelectAllLeaves');
+            if (dailyAllLeaves) {
+                dailyAllLeaves.checked = window.selectedDailyLeaveTypes.length === window.allLeaveTypeKeys.length;
+                dailyAllLeaves.indeterminate = window.selectedDailyLeaveTypes.length > 0 &&
+                    window.selectedDailyLeaveTypes.length < window.allLeaveTypeKeys.length;
+            }
+
+            restoreCompanyCheckboxState('main', selectedCompanies);
+            restoreCompanyCheckboxState('cal', selectedCalendarCompanies);
+            restoreCompanyCheckboxState('daily', selectedDailyCompanies);
+
+            // Scan date
+            const scanDate = document.getElementById('dateSelect');
+            if (scanDate && keep.scanDate) scanDate.value = keep.scanDate;
+
+            // Re-render all data-driven tabs immediately.
+            applyFilters();
+            renderCalendar();
+            renderDailyAttendance();
+
+            if (keep.orgCompany && availableCompanies.includes(keep.orgCompany) && typeof window.renderOrgChart === 'function') {
+                window.renderOrgChart(keep.orgCompany, true);
+            }
+        }
+
+        function setGlobalRefreshButtonsLoading(isLoading) {
+            const refreshButtons = document.querySelectorAll('button[onclick*="refreshAllTabs"]');
+            refreshButtons.forEach(button => {
+                if (isLoading) {
+                    if (!button.dataset.refreshOriginal) button.dataset.refreshOriginal = button.innerHTML;
+                    button.disabled = true;
+                    button.classList.add('opacity-70','cursor-wait');
+                    const mobileOnly = button.id === 'mobileDashboardRefreshBtn';
+                    button.innerHTML = mobileOnly
+                        ? '<i class="fa-solid fa-rotate fa-spin text-xs"></i>'
+                        : '<i class="fa-solid fa-rotate fa-spin"></i><span>Refreshing...</span>';
+                } else {
+                    button.disabled = false;
+                    button.classList.remove('opacity-70','cursor-wait');
+                    if (button.dataset.refreshOriginal) button.innerHTML = button.dataset.refreshOriginal;
+                }
+            });
+
+            const mobileStatus = document.getElementById('mobileDashboardRefreshStatus');
+            if (mobileStatus) mobileStatus.textContent = isLoading ? 'Refreshing all tabs…' : 'Auto refresh every 5 min';
+        }
+
+        window.refreshAllTabs = async function(btn = null, silent = false) {
+            if (globalRefreshInProgress) return;
+            globalRefreshInProgress = true;
+
+            const keep = captureAllTabRefreshState();
+            setGlobalRefreshButtonsLoading(true);
+
+            try {
+                // Shared employee + attendance sources feed Dashboard, Calendar, Daily and Org.
+                await fetchData();
+                restoreAllTabRefreshState(keep);
+
+                // Scan Activity has a separate live source, refresh it too.
+                if (typeof window.fetchLiveData === 'function') {
+                    try { await window.fetchLiveData(); }
+                    catch (scanErr) { console.warn('Scan Activity refresh failed', scanErr); }
+                }
+
+                // Stay on the tab the user was using.
+                switchTab(keep.activeTab);
+                updateGlobalRefreshTimestamp();
+
+                if (!silent) showAppToast('All tabs refreshed with the latest data.', 'info');
+            } catch (e) {
+                console.error('Global refresh failed', e);
+                if (!silent) showAppToast('Could not refresh the latest data.', 'error');
+            } finally {
+                setGlobalRefreshButtonsLoading(false);
+                globalRefreshInProgress = false;
+            }
         };
+
+        // Compatibility: old refresh entry points now refresh the whole app.
+        window.refreshDashboardView = function(btn, silent = false) { return refreshAllTabs(btn, silent); };
+        window.refreshCalendarView = function(btn) { return refreshAllTabs(btn, false); };
+        window.refreshDailyAttendance = function(btn) { return refreshAllTabs(btn, false); };
+
+        function startGlobalAutoRefresh() {
+            if (globalAutoRefreshTimer) clearInterval(globalAutoRefreshTimer);
+            globalAutoRefreshTimer = setInterval(() => {
+                // Refresh every five minutes regardless of which tab is open.
+                // Do not interrupt the user while an edit/modal flow is open.
+                if (document.body.classList.contains('modal-open')) return;
+                refreshAllTabs(null, true);
+            }, GLOBAL_AUTO_REFRESH_MS);
+        }
 
         window.setDailyDateRange = function() {
             if(!window.fpFrom || !window.fpTo) return;
@@ -3754,8 +4067,13 @@
                                         let cp=tp.replace(/[^A-Z]/g,''); if(cp==='AL')al+=1;else if(cp==='HAL')al+=0.5;else if(cp==='SL')sl+=1;else if(cp==='HSL')sl+=0.5;else if(cp==='SP')sp+=1;else if(cp==='HSP')sp+=0.5;else if(cp==='UP')up+=1;else if(cp==='HUP')up+=0.5;else if(cp==='A')a+=1;else if(cp==='HA')a+=0.5;else if(cp==='D'||cp==='DAYOFF'){d+=1;isRawD=true;}else if(cp==='HD'||cp==='HALFDAYOFF'){d+=0.5;isRawD=true;}else if(cp==='OT')ot+=1;else if(cp==='HOT')ot+=0.5;else if(cp==='H'||cp==='HOLIDAY'){h+=1;isRawH=true;}else if(cp==='HH'||cp==='HALFHOLIDAY'){h+=0.5;isRawH=true;}
                                     }
                                 });
+                                const recordDate = new Date(attendanceDataYear, monthNames.indexOf(mg.month), parseInt(day));
+                                const isPreJoin = isBeforeEmployeeJoinDate(emp, recordDate);
+                                // Some attendance source sheets use A as a visual placeholder before a new employee's join date.
+                                // Treat that pre-join A as blank/not applicable, while normal A after the join date still counts.
+                                if (isPreJoin) a = 0;
                                 if(al>0||sl>0||sp>0||up>0||a>0||d>0||h>0||l5>0||l3>0||ot>0||pres) {
-                                    dailyLeaveRecords.push({year:attendanceDataYear, month:mg.month, day:parseInt(day), staffId:id, isPresent:pres, isRawD:isRawD, isRawH:isRawH, leaves:{AL:al,SL:sl,SP:sp,UP:up,A:a,Late5m:l5,Late3m:l3,OT:ot,D:d,H:h}, note:tNote});
+                                    dailyLeaveRecords.push({year:attendanceDataYear, month:mg.month, day:parseInt(day), staffId:id, isPresent:pres, isRawD:isRawD, isRawH:isRawH, isPreJoin:isPreJoin, leaves:{AL:al,SL:sl,SP:sp,UP:up,A:a,Late5m:l5,Late3m:l3,OT:ot,D:d,H:h}, note:tNote});
                                     if(!leaveHistoryByEmployee[id]) leaveHistoryByEmployee[id]={}; if(!leaveHistoryByEmployee[id][mg.month]) leaveHistoryByEmployee[id][mg.month]={AL:0,SL:0,SP:0,UP:0,A:0,Late5m:0,Late3m:0,OT:0,D:0,H:0};
                                     let mh=leaveHistoryByEmployee[id][mg.month]; mh.AL+=al; mh.SL+=sl; mh.SP+=sp; mh.UP+=up; mh.A+=a; mh.D+=d; mh.H+=h; mh.Late5m+=l5; mh.Late3m+=l3; mh.OT+=ot;
                                 }
@@ -3933,54 +4251,109 @@
         }
 
 
+        function getCompanyKpiEligibleEmployees() {
+            const lType = document.getElementById('dashboardLeaveTypeFilter')?.value || 'All';
+            const refDate = getDashboardReferenceDate();
+            return allEmployees.filter(e => {
+                if (Array.isArray(selectedDepartments) && selectedDepartments.length > 0 && !selectedDepartments.includes(e.department)) return false;
+                if (Array.isArray(selectedDepartments) && selectedDepartments.length === 0) return false;
+                if (selectedStatuses.length > 0 && !selectedStatuses.includes(getEffectiveStaffStatus(e, refDate))) return false;
+
+                const warningHistory = getStaffWarningHistory(e.id, selectedDashboardYear).filter(h => ['verbal','written','final'].includes(String(h?.level || '').toLowerCase()));
+                const allWarningHistory = warningNormalizeRecord(e.id).history.filter(h => ['verbal','written','final'].includes(String(h?.level || '').toLowerCase()));
+                if (selectedDashboardWarning === 'AnyWarning' && warningHistory.length === 0) return false;
+                if (selectedDashboardWarning === 'EverWarning' && allWarningHistory.length === 0) return false;
+                if (selectedDashboardWarning === 'NoWarning' && warningHistory.length > 0) return false;
+                if (selectedDashboardWarning === 'HasVerbal' && !warningHistory.some(h => h.level === 'verbal')) return false;
+                if (selectedDashboardWarning === 'HasWritten' && !warningHistory.some(h => h.level === 'written')) return false;
+                if (selectedDashboardWarning === 'HasFinal' && !warningHistory.some(h => h.level === 'final')) return false;
+                if (selectedDashboardWarning === 'HasFIC' && !warningHistory.some(h => h.level === 'fic')) return false;
+
+                const ps = getDashboardPeriodStats(e);
+                const activityTotal = ps.AL + ps.SL + ps.SP + ps.UP + ps.A + ps.D + ps.OT + ps.Late5m + ps.Late3m;
+                const sSum = lType === 'All' ? activityTotal : (lType === 'Late' ? ps.Late5m + ps.Late3m : Number(ps[lType] || 0));
+                if (lType !== 'All' && sSum <= 0) return false;
+                if (selectedDashboardMonth !== 'All' && activityTotal <= 0 && lType === 'All') return false;
+                if (searchQuery && !e.name.toLowerCase().includes(searchQuery) && !e.displayId.toLowerCase().includes(searchQuery)) return false;
+                return true;
+            });
+        }
+
+        window.filterDashboardByCompanyCard = function(company = null) {
+            const allCompanyNames = Array.from(companies).filter(Boolean).sort((a,b)=>a.localeCompare(b));
+            if (!company) {
+                selectedCompanies = [...allCompanyNames];
+            } else {
+                const onlyThisCompanySelected = selectedCompanies.length === 1 && selectedCompanies[0] === company;
+                selectedCompanies = onlyThisCompanySelected ? [...allCompanyNames] : [company];
+            }
+            applyFilters();
+        };
+
         function renderStaffCompanyKpis() {
+            // Company cards intentionally ignore only the company selection itself, so every company
+            // remains visible and can be used to switch filters while all other dashboard filters stay applied.
+            const kpiEmployees = getCompanyKpiEligibleEmployees();
             const companyCounts = {};
-            filteredEmployees.forEach(emp => {
+            kpiEmployees.forEach(emp => {
                 const company = String(emp.company || 'Unknown').trim() || 'Unknown';
                 companyCounts[company] = (companyCounts[company] || 0) + 1;
             });
 
-            const companiesSorted = Object.keys(companyCounts).sort((a, b) => a.localeCompare(b));
+            const knownCompanies = Array.from(companies).filter(Boolean);
+            Object.keys(companyCounts).forEach(c => { if (!knownCompanies.includes(c)) knownCompanies.push(c); });
+            const companiesSorted = knownCompanies.sort((a, b) => a.localeCompare(b));
             const desktop = document.getElementById('kpiContainer');
             const mobile = document.getElementById('mobileStaffKpiContainer');
+            const allSelected = selectedCompanies.length === companies.size || selectedCompanies.length === 0;
 
             const totalDesktop = `
-                <div class="staff-summary-total-card">
+                <button type="button" class="staff-summary-total-card ${allSelected ? 'is-active' : ''}" onclick="filterDashboardByCompanyCard(null)" aria-label="Show all companies" aria-pressed="${allSelected}">
                     <div class="staff-summary-icon"><i class="fa-solid fa-users"></i></div>
-                    <div class="min-w-0">
+                    <div class="min-w-0 text-left">
                         <div class="staff-summary-label">Total Staff</div>
-                        <div class="staff-summary-value">${mobileDashboardFormatNumber(filteredEmployees.length)}</div>
+                        <div class="staff-summary-value">${mobileDashboardFormatNumber(kpiEmployees.length)}</div>
                     </div>
-                </div>`;
+                </button>`;
 
-            const companyDesktop = companiesSorted.map(company => `
-                <div class="staff-summary-company-card">
+            const companyDesktop = companiesSorted.map(company => {
+                const safeCompany = warningEscapeHtml(company);
+                const jsCompany = String(company).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+                const active = selectedCompanies.length === 1 && selectedCompanies[0] === company;
+                return `
+                <button type="button" class="staff-summary-company-card ${active ? 'is-active' : ''}" onclick="filterDashboardByCompanyCard('${jsCompany}')" aria-label="Filter dashboard to ${safeCompany}" aria-pressed="${active}">
                     <div class="staff-summary-icon"><i class="fa-solid fa-building"></i></div>
-                    <div class="min-w-0">
-                        <div class="staff-summary-label truncate" title="${warningEscapeHtml(company)}">${warningEscapeHtml(company)}</div>
-                        <div class="staff-summary-value">${mobileDashboardFormatNumber(companyCounts[company])}</div>
+                    <div class="min-w-0 text-left">
+                        <div class="staff-summary-label truncate" title="${safeCompany}">${safeCompany}</div>
+                        <div class="staff-summary-value">${mobileDashboardFormatNumber(companyCounts[company] || 0)}</div>
                     </div>
-                </div>`).join('');
+                </button>`;
+            }).join('');
 
             if (desktop) desktop.innerHTML = totalDesktop + companyDesktop;
 
             const totalMobile = `
-                <div class="mobile-dashboard-kpi">
+                <button type="button" class="mobile-dashboard-kpi ${allSelected ? 'is-active' : ''}" onclick="filterDashboardByCompanyCard(null)" aria-label="Show all companies" aria-pressed="${allSelected}">
                     <div class="mobile-dashboard-kpi-icon bg-blue-50 text-blue-600"><i class="fa-solid fa-users"></i></div>
-                    <div class="min-w-0">
+                    <div class="min-w-0 text-left">
                         <div class="mobile-dashboard-kpi-label">Total Staff</div>
-                        <div class="mobile-dashboard-kpi-value">${mobileDashboardFormatNumber(filteredEmployees.length)}</div>
+                        <div class="mobile-dashboard-kpi-value">${mobileDashboardFormatNumber(kpiEmployees.length)}</div>
                     </div>
-                </div>`;
+                </button>`;
 
-            const companyMobile = companiesSorted.map(company => `
-                <div class="mobile-dashboard-kpi">
+            const companyMobile = companiesSorted.map(company => {
+                const safeCompany = warningEscapeHtml(company);
+                const jsCompany = String(company).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+                const active = selectedCompanies.length === 1 && selectedCompanies[0] === company;
+                return `
+                <button type="button" class="mobile-dashboard-kpi ${active ? 'is-active' : ''}" onclick="filterDashboardByCompanyCard('${jsCompany}')" aria-label="Filter dashboard to ${safeCompany}" aria-pressed="${active}">
                     <div class="mobile-dashboard-kpi-icon bg-slate-50 text-slate-600"><i class="fa-solid fa-building"></i></div>
-                    <div class="min-w-0">
-                        <div class="mobile-dashboard-kpi-label truncate" title="${warningEscapeHtml(company)}">${warningEscapeHtml(company)}</div>
-                        <div class="mobile-dashboard-kpi-value">${mobileDashboardFormatNumber(companyCounts[company])}</div>
+                    <div class="min-w-0 text-left">
+                        <div class="mobile-dashboard-kpi-label truncate" title="${safeCompany}">${safeCompany}</div>
+                        <div class="mobile-dashboard-kpi-value">${mobileDashboardFormatNumber(companyCounts[company] || 0)}</div>
                     </div>
-                </div>`).join('');
+                </button>`;
+            }).join('');
 
             if (mobile) mobile.innerHTML = totalMobile + companyMobile;
         }
@@ -4008,6 +4381,7 @@
                 if (selectedDashboardWarning === 'HasVerbal' && !warningHistory.some(h => h.level === 'verbal')) return false;
                 if (selectedDashboardWarning === 'HasWritten' && !warningHistory.some(h => h.level === 'written')) return false;
                 if (selectedDashboardWarning === 'HasFinal' && !warningHistory.some(h => h.level === 'final')) return false;
+                if (selectedDashboardWarning === 'HasFIC' && !warningHistory.some(h => h.level === 'fic')) return false;
 
                 const ps=getDashboardPeriodStats(e);
                 const activityTotal=ps.AL+ps.SL+ps.SP+ps.UP+ps.A+ps.D+ps.OT+ps.Late5m+ps.Late3m;
@@ -4072,6 +4446,16 @@
             const n = Number(v || 0);
             if (Math.abs(n - Math.round(n)) < 0.001) return String(Math.round(n));
             return n.toFixed(1).replace(/\.0$/, '');
+        }
+
+        function isBeforeEmployeeJoinDate(emp, dateValue) {
+            if (!emp || !dateValue) return false;
+            const join = Number(emp.sortableJoinDate || 0) ? new Date(Number(emp.sortableJoinDate)) : new Date(emp.joinDate || '');
+            const d = dateValue instanceof Date ? new Date(dateValue) : new Date(dateValue);
+            if (isNaN(join.getTime()) || isNaN(d.getTime())) return false;
+            join.setHours(0,0,0,0);
+            d.setHours(0,0,0,0);
+            return d < join;
         }
 
         function getDashboardPeriodStats(emp) {
@@ -4237,12 +4621,12 @@
             const raw = staffWarnings[key];
             if (!raw) return { level:'normal', history:[] };
             if (typeof raw === 'string') {
-                const level = ['normal','verbal','written','final'].includes(raw.toLowerCase()) ? raw.toLowerCase() : 'normal';
+                const level = ['normal','verbal','written','final','fic'].includes(raw.toLowerCase()) ? raw.toLowerCase() : 'normal';
                 return { level, history: level === 'normal' ? [] : [{ level, year:WARNING_LEGACY_BASE_YEAR, startAt:null, endAt:null, note:'Imported from previous saved warning status.', issuer:'', attachments:[] }] };
             }
-            const level = ['normal','verbal','written','final'].includes(String(raw.level || '').toLowerCase()) ? String(raw.level).toLowerCase() : 'normal';
+            const level = ['normal','verbal','written','final','fic'].includes(String(raw.level || '').toLowerCase()) ? String(raw.level).toLowerCase() : 'normal';
             const history = Array.isArray(raw.history) ? raw.history.map(h => ({
-                level: ['normal','verbal','written','final'].includes(String(h.level || '').toLowerCase()) ? String(h.level).toLowerCase() : 'verbal',
+                level: ['normal','verbal','written','final','fic'].includes(String(h.level || '').toLowerCase()) ? String(h.level).toLowerCase() : 'verbal',
                 year: warningEntryYear(h),
                 startAt: h.startAt || null,
                 endAt: h.endAt || null,
@@ -4289,7 +4673,8 @@
                 normal:  { label:'Normal', icon:'fa-circle-check', cls:'warning-normal', score:0 },
                 verbal:  { label:'Verbal Warning', icon:'fa-comment-dots', cls:'warning-verbal', score:18 },
                 written: { label:'Written Warning', icon:'fa-file-circle-exclamation', cls:'warning-written', score:35 },
-                final:   { label:'Final Warning', icon:'fa-triangle-exclamation', cls:'warning-final', score:60 }
+                final:   { label:'Final Warning', icon:'fa-triangle-exclamation', cls:'warning-final', score:60 },
+                fic:     { label:'FIC', icon:'fa-file-signature', cls:'warning-fic', score:45 }
             };
             return { level, year:Number(year)||new Date().getFullYear(), count:getStaffWarningCount(staffId, year), ...map[level] };
         }
@@ -4297,7 +4682,7 @@
         // Severity: Final > Written > Verbal > Normal. This intentionally does not depend
         // on which warning was added last, so Verbal + Written + Verbal still displays Written.
         function getStaffWarningHighestLevel(staffId, year = new Date().getFullYear()) {
-            const severity = { normal:0, verbal:1, written:2, final:3 };
+            const severity = { normal:0, verbal:1, written:2, final:3, fic:0 };
             let highest = 'normal';
             getStaffWarningHistory(staffId, year).forEach(h => {
                 const level = String(h?.level || 'normal').toLowerCase();
@@ -4311,17 +4696,19 @@
                 normal:  { label:'Normal', icon:'fa-circle-check', cls:'warning-normal', score:0 },
                 verbal:  { label:'Verbal Warning', icon:'fa-comment-dots', cls:'warning-verbal', score:18 },
                 written: { label:'Written Warning', icon:'fa-file-circle-exclamation', cls:'warning-written', score:35 },
-                final:   { label:'Final Warning', icon:'fa-triangle-exclamation', cls:'warning-final', score:60 }
+                final:   { label:'Final Warning', icon:'fa-triangle-exclamation', cls:'warning-final', score:60 },
+                fic:     { label:'FIC', icon:'fa-file-signature', cls:'warning-fic', score:45 }
             };
             return { level, year:Number(year)||new Date().getFullYear(), count:getStaffWarningCount(staffId, year), ...map[level] };
         }
         function getStaffWarningBreakdown(staffId, year = new Date().getFullYear()) {
-            const counts = { verbal:0, written:0, final:0 };
+            const counts = { verbal:0, written:0, final:0, fic:0 };
             getStaffWarningHistory(staffId, year).forEach(h => {
                 const level = String(h?.level || '').toLowerCase();
                 if (Object.prototype.hasOwnProperty.call(counts, level)) counts[level]++;
             });
-            counts.total = counts.verbal + counts.written + counts.final;
+            counts.warningTotal = counts.verbal + counts.written + counts.final;
+            counts.total = counts.warningTotal + counts.fic;
             return counts;
         }
         function warningCountBreakdownHtml(staffId, year = new Date().getFullYear(), options = {}) {
@@ -4331,16 +4718,17 @@
             const items = [
                 ['verbal','V','Verbal Warning', counts.verbal],
                 ['written','W','Written Warning', counts.written],
-                ['final','F','Final Warning', counts.final]
+                ['final','F','Final Warning', counts.final],
+                ['fic','FIC','Final Improvement Commitment', counts.fic]
             ].filter(item => showZero || item[3] > 0);
-            return `<span class="warning-count-breakdown" title="${counts.verbal} verbal • ${counts.written} written • ${counts.final} final">${items.map(([cls,short,label,count]) => `<span class="warning-count-pill ${cls}" title="${count} ${label}${count===1?'':'s'}"><span>${short}</span><span class="count">${count}</span></span>`).join('')}</span>`;
+            return `<span class="warning-count-breakdown" title="${counts.verbal} verbal • ${counts.written} written • ${counts.final} final • ${counts.fic} FIC">${items.map(([cls,short,label,count]) => `<span class="warning-count-pill ${cls}" title="${count} ${label}${count===1?'':'s'}"><span>${short}</span><span class="count">${count}</span></span>`).join('')}</span>`;
         }
         function warningInlineIndicatorHtml(staffId, options = {}) {
             const year = Number(options.year) || new Date().getFullYear();
             const meta = getStaffWarningMeta(staffId, year);
             if (!meta || meta.level === 'normal') return '';
             const compact = options.compact !== false;
-            const label = compact ? ({verbal:'V', written:'W', final:'F'}[meta.level] || '!') : meta.label;
+            const label = compact ? ({verbal:'V', written:'W', final:'F', fic:'FIC'}[meta.level] || '!') : meta.label;
             const safeId = String(staffId || '').replace(/'/g, "\\'");
             return `<span class="warning-inline-indicator ${meta.cls}" title="${meta.label} • ${meta.count} warning${meta.count===1?'':'s'}" onclick="event.stopPropagation(); openWarningEditor(event, '${safeId}', ${year})"><i class="fa-solid ${meta.icon}"></i>${label}</span>`;
         }
@@ -4406,13 +4794,14 @@
                     return bt - at;
                 });
             const warningCount = history.filter(h => ['verbal','written','final'].includes(h.level)).length;
+            const ficCount = history.filter(h => h.level === 'fic').length;
             const meta = getStaffWarningMeta(staffId, selectedWarningHistoryYear);
-            if (summary) summary.textContent = `${selectedWarningHistoryYear} • ${warningCount} warning${warningCount===1?'':'s'} • Current: ${meta.label}`;
+            if (summary) summary.textContent = `${selectedWarningHistoryYear} • ${warningCount} warning${warningCount===1?'':'s'}${ficCount ? ` • ${ficCount} FIC` : ''} • Current: ${meta.label}`;
             if (!history.length) {
-                list.innerHTML = `<div class="text-center py-7 text-xs text-slate-400 bg-slate-50 border border-dashed rounded-xl"><i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i>No warning history in ${selectedWarningHistoryYear}. Employee starts this year in normal standing.</div>`;
+                list.innerHTML = `<div class="text-center py-7 text-xs text-slate-400 bg-slate-50 border border-dashed rounded-xl"><i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i>No performance or disciplinary history in ${selectedWarningHistoryYear}.</div>`;
                 return;
             }
-            const labels = { normal:'Normal', verbal:'Verbal Warning', written:'Written Warning', final:'Final Warning' };
+            const labels = { normal:'Normal', verbal:'Verbal Warning', written:'Written Warning', final:'Final Warning', fic:'FIC — Final Improvement Commitment' };
             list.innerHTML = history.map(h => {
                 const end = h.endAt ? warningFormatDateTime(h.endAt) : 'Year end / Current';
                 const isCurrent = meta.level === h.level && !h.endAt && history[0] === h;
@@ -4425,6 +4814,60 @@
                 </div>`;
             }).join('');
         }
+        window.updateNewWarningAttachmentCount = function() {
+            const input = document.getElementById('newWarningAttachmentInput');
+            const count = Array.from(input?.files || []).length;
+            const el = document.getElementById('newWarningAttachmentCount');
+            if (el) el.textContent = `${count} file${count===1?'':'s'}`;
+        };
+        window.updateNewWarningAttachmentVisibility = function() {
+            const level = document.getElementById('warningEditLevel')?.value || 'normal';
+            const section = document.getElementById('newWarningAttachmentSection');
+            const eligible = ['written','final','fic'].includes(level);
+            if (section) section.classList.toggle('hidden', !eligible);
+            if (!eligible) {
+                const input = document.getElementById('newWarningAttachmentInput');
+                if (input) input.value = '';
+                updateNewWarningAttachmentCount();
+            }
+        };
+        function validateNewWarningAttachmentFiles() {
+            const input = document.getElementById('newWarningAttachmentInput');
+            const files = Array.from(input?.files || []);
+            const allowed = new Set(['application/pdf','image/jpeg','image/png']);
+            for (const f of files) {
+                if (!allowed.has(f.type)) throw new Error(`${f.name}: only PDF, JPG and PNG are allowed.`);
+                if (f.size > 10*1024*1024) throw new Error(`${f.name}: maximum file size is 10 MB.`);
+            }
+            return files;
+        }
+        async function uploadNewWarningAttachmentFiles(staffId, level, startAt, issuer, files) {
+            if (!files.length) return [];
+            if (!['written','final','fic'].includes(level)) return [];
+            if (!window.fbStorage || !window.fbStorageRef || !window.fbUploadBytes || !window.fbGetDownloadURL) {
+                throw new Error('Firebase Storage is not ready. Enable Storage for this Firebase project first.');
+            }
+            await window.authReady;
+            const safeStaff = warningNormalizeKey(staffId).replace(/[^A-Z0-9_-]/gi,'_');
+            const entryKey = String(startAt || Date.now()).replace(/[^0-9A-Za-z_-]/g,'_');
+            const attachments = [];
+            for (const f of files) {
+                const safeName = f.name.replace(/[^0-9A-Za-z._-]+/g,'_').slice(-120);
+                const path = `warning-attachments/${safeStaff}/${entryKey}/${Date.now()}_${Math.random().toString(36).slice(2,8)}_${safeName}`;
+                const ref = window.fbStorageRef(window.fbStorage, path);
+                const snap = await window.fbUploadBytes(ref, f, {
+                    contentType:f.type,
+                    customMetadata:{ staffId:staffId, warningLevel:level }
+                });
+                const url = await window.fbGetDownloadURL(snap.ref);
+                attachments.push({
+                    name:f.name, url, path, contentType:f.type, size:f.size,
+                    uploadedAt:new Date().toISOString(), uploadedBy:issuer || 'HR'
+                });
+            }
+            return attachments;
+        }
+
         function setWarningEditorMode(mode) {
             const form = document.getElementById('warningStageForm');
             const addBtn = document.getElementById('warningAddChangeBtn');
@@ -4453,6 +4896,10 @@
             let defaultDate = new Date();
             if (selectedWarningHistoryYear !== defaultDate.getFullYear()) defaultDate = new Date(selectedWarningHistoryYear, 0, 1, 9, 0, 0);
             document.getElementById('warningEditStartAt').value = warningToLocalInput(defaultDate);
+            const newAttach = document.getElementById('newWarningAttachmentInput');
+            if (newAttach) newAttach.value = '';
+            updateNewWarningAttachmentCount();
+            updateNewWarningAttachmentVisibility();
             setWarningEditorMode('edit');
         };
         window.hideWarningStageForm = function() { setWarningEditorMode('timeline'); };
@@ -4489,7 +4936,7 @@
             if (!id || !chosenStart) { showAppToast('Please choose a valid warning start date/time.', 'error'); return; }
             const startDate = new Date(chosenStart);
             if (startDate.getFullYear() !== selectedWarningHistoryYear) { showAppToast(`Warning date must be within ${selectedWarningHistoryYear}.`, 'error'); return; }
-            if (!['normal','verbal','written','final'].includes(level)) { showAppToast('Please choose a valid warning stage.', 'error'); return; }
+            if (!['normal','verbal','written','final','fic'].includes(level)) { showAppToast('Please choose a valid performance / warning stage.', 'error'); return; }
 
             const record = warningNormalizeRecord(id);
             let history = record.history.map(h => ({...h, year:warningEntryYear(h)}));
@@ -4517,16 +4964,53 @@
                 }
             }
 
-            if (activeIndex) history[activeIndex.i].endAt = chosenStart;
-            history.push({ level, year:selectedWarningHistoryYear, startAt:chosenStart, endAt:null, note, issuer, attachments:[] });
+            let newFiles = [];
+            try {
+                newFiles = validateNewWarningAttachmentFiles();
+            } catch(e) {
+                showAppToast(e?.message || 'Invalid attachment.', 'error');
+                return;
+            }
 
-            staffWarnings[id] = { level:getStaffWarningLevelFromHistory(history, new Date().getFullYear()), history };
-            await window.saveCustomNotes();
-            renderWarningHistory(id);
-            renderMobileDashboardUI();
-            setWarningEditorMode('timeline');
-            const meta = getStaffWarningMeta(id, selectedWarningHistoryYear);
-            showAppToast(`${selectedWarningHistoryYear} timeline entry added: ${meta.label}`, 'info');
+            const saveBtn = document.getElementById('warningSaveStageBtn');
+            const originalSaveHtml = saveBtn?.innerHTML || '';
+            if (saveBtn) {
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = newFiles.length
+                    ? '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Uploading & Saving...'
+                    : '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Saving...';
+            }
+
+            try {
+                const attachments = await uploadNewWarningAttachmentFiles(id, level, chosenStart, issuer, newFiles);
+
+                if (activeIndex) history[activeIndex.i].endAt = chosenStart;
+                history.push({ level, year:selectedWarningHistoryYear, startAt:chosenStart, endAt:null, note, issuer, attachments });
+
+                staffWarnings[id] = { level:getStaffWarningLevelFromHistory(history, new Date().getFullYear()), history };
+                await window.saveCustomNotes();
+
+                const newAttach = document.getElementById('newWarningAttachmentInput');
+                if (newAttach) newAttach.value = '';
+                updateNewWarningAttachmentCount();
+
+                renderWarningHistory(id);
+                renderMobileDashboardUI();
+                setWarningEditorMode('timeline');
+                const meta = getStaffWarningMeta(id, selectedWarningHistoryYear);
+                showAppToast(`${selectedWarningHistoryYear} timeline entry added: ${meta.label}${attachments.length ? ` • ${attachments.length} file${attachments.length===1?'':'s'} attached` : ''}`, 'info');
+            } catch(e) {
+                console.error('Save stage / attachment upload failed', e);
+                const msg = String(e?.message || e || 'Could not save the entry.');
+                showAppToast(msg.includes('Storage') || msg.includes('storage')
+                    ? 'Could not upload the signed form. Check Firebase Storage is enabled and its rules allow authenticated uploads.'
+                    : msg, 'error');
+            } finally {
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = originalSaveHtml || '<i class="fa-solid fa-floppy-disk mr-1.5"></i> Save Stage';
+                }
+            }
         };
 
         function getStaffWarningLevelFromHistory(history, year) {
@@ -4578,7 +5062,7 @@
             const err = document.getElementById('warningHistoryEditError');
             const fail = msg => { if (err) { err.textContent=msg; err.classList.remove('hidden'); } };
             if (!id || !startAt) return fail('A valid start date/time is required.');
-            if (!['normal','verbal','written','final'].includes(level)) return fail('Please choose a valid stage.');
+            if (!['normal','verbal','written','final','fic'].includes(level)) return fail('Please choose a valid performance / warning stage.');
             if (new Date(startAt).getFullYear() !== selectedWarningHistoryYear) return fail(`Start date must be within ${selectedWarningHistoryYear}.`);
             if (endAt && new Date(endAt).getFullYear() !== selectedWarningHistoryYear) return fail(`End date must be within ${selectedWarningHistoryYear}.`);
             if (endAt && new Date(endAt) <= new Date(startAt)) return fail('End date/time must be after the start date/time.');
@@ -4695,12 +5179,12 @@
             const ctx = getCurrentWarningAttachmentContext();
             const level = document.getElementById('warningHistoryEditLevel')?.value || ctx?.entry?.level || 'normal';
             const count = Array.isArray(ctx?.entry?.attachments) ? ctx.entry.attachments.length : 0;
-            const eligible = level === 'written' || level === 'final';
+            const eligible = level === 'written' || level === 'final' || level === 'fic';
             section.classList.toggle('hidden', !eligible && count === 0);
             if (uploadBox) uploadBox.classList.toggle('hidden', !eligible);
             if (help) help.textContent = eligible
-                ? 'Upload the employee-signed warning form, scan/photo, or supporting PDF.'
-                : 'Archived attachments remain linked to this timeline entry. Upload is available for Written or Final Warning.';
+                ? 'Upload the employee-signed form, scan/photo, or supporting PDF.'
+                : 'Archived attachments remain linked to this timeline entry. Upload is available for Written Warning, Final Warning or FIC.';
         };
         window.renderWarningAttachments = function() {
             const list = document.getElementById('warningAttachmentList');
@@ -4710,7 +5194,7 @@
             const attachments = Array.isArray(ctx?.entry?.attachments) ? ctx.entry.attachments : [];
             if (countEl) countEl.textContent = `${attachments.length} file${attachments.length===1?'':'s'}`;
             if (!attachments.length) {
-                list.innerHTML = '<div class="text-[10px] text-slate-400 border border-dashed border-slate-200 rounded-lg p-3 text-center">No files attached to this warning.</div>';
+                list.innerHTML = '<div class="text-[10px] text-slate-400 border border-dashed border-slate-200 rounded-lg p-3 text-center">No files attached to this entry.</div>';
                 return;
             }
             list.innerHTML = attachments.map((a,i) => {
@@ -4731,7 +5215,7 @@
             const ctx = getCurrentWarningAttachmentContext();
             if (!ctx) { showAppToast('Save the warning entry first, then attach the signed form.', 'error'); return; }
             const level = document.getElementById('warningHistoryEditLevel')?.value || ctx.entry.level;
-            if (!['written','final'].includes(level)) { showAppToast('Attachments can be uploaded to Written or Final Warning entries.', 'error'); return; }
+            if (!['written','final','fic'].includes(level)) { showAppToast('Attachments can be uploaded to Written Warning, Final Warning or FIC entries.', 'error'); return; }
             if (!window.fbStorage || !window.fbStorageRef || !window.fbUploadBytes || !window.fbGetDownloadURL) { showAppToast('Firebase Storage is not ready. Enable Storage for this Firebase project first.', 'error'); return; }
             const input = document.getElementById('warningAttachmentInput');
             const files = Array.from(input?.files || []);
@@ -5224,10 +5708,10 @@
             return true;
         }
         function pdfWarningLabel(level) {
-            return ({normal:'Normal', verbal:'Verbal Warning', written:'Written Warning', final:'Final Warning'})[level] || pdfFormatValue(level);
+            return ({normal:'Normal', verbal:'Verbal Warning', written:'Written Warning', final:'Final Warning', fic:'FIC — Final Improvement Commitment'})[level] || pdfFormatValue(level);
         }
         function pdfWarningRgb(level) {
-            return ({normal:[5,150,105], verbal:[161,98,7], written:[194,65,12], final:[185,28,28]})[level] || [71,85,105];
+            return ({normal:[5,150,105], verbal:[161,98,7], written:[194,65,12], final:[185,28,28], fic:[79,70,229]})[level] || [71,85,105];
         }
 
         window.exportEmployeeCard = async function(event, staffId, requestedYear = null) {
@@ -5442,6 +5926,8 @@
                     let score = 0;
                     const warningMeta = getStaffWarningHighestMeta(e.id, selectedDashboardYear);
                     if (warningMeta.level !== 'normal') { reasons.push(warningMeta.label); score += warningMeta.score; }
+                    const ficCount = getStaffWarningBreakdown(e.id, selectedDashboardYear).fic;
+                    if (ficCount > 0) { reasons.push(`FIC ${ficCount}`); score += 20 + ficCount; }
                     if (ps.A > 0) { reasons.push(`A ${mobileDashboardFormatNumber(ps.A)}`); score += 6 + ps.A; }
                     if (ps.Late3m > 0) { reasons.push(`L30+ ${mobileDashboardFormatNumber(ps.Late3m)}`); score += 5 + ps.Late3m; }
                     if (ps.UP > 0) { reasons.push(`UP ${mobileDashboardFormatNumber(ps.UP)}`); score += 4 + ps.UP; }
@@ -5466,7 +5952,7 @@
             const leaveType = document.getElementById('dashboardLeaveTypeFilter')?.value || 'All';
             if (leaveType !== 'All') chips.push(leaveType === 'Late' ? 'Late only' : `${leaveType} only`);
             if (selectedDashboardWarning !== 'All') {
-                const labels = { AnyWarning:'Any Warning — Selected Year', EverWarning:'Ever Had Warning — Any Year', NoWarning:'No Warning — Selected Year', HasVerbal:'Has Verbal Warning', HasWritten:'Has Written Warning', HasFinal:'Has Final Warning' };
+                const labels = { AnyWarning:'Any Warning — Selected Year', EverWarning:'Ever Had Warning — Any Year', NoWarning:'No Warning — Selected Year', HasVerbal:'Has Verbal Warning', HasWritten:'Has Written Warning', HasFinal:'Has Final Warning', HasFIC:'Has FIC' };
                 chips.push(labels[selectedDashboardWarning] || selectedDashboardWarning);
             }
             if (searchQuery) chips.push(`Search: ${searchQuery}`);
@@ -5509,7 +5995,12 @@
                 else if (!isEmploymentVisible(e)) flags.push(`<span class="mobile-staff-flag">${e.status}</span>`);
                 else if (e.isProbation) flags.push('<span class="mobile-staff-flag text-indigo-700 bg-indigo-50 border-indigo-100">Probation</span>');
                 const cardWarningMeta = getStaffWarningHighestMeta(e.id, selectedDashboardYear);
-                const cardWarningClass = cardWarningMeta.level === 'verbal' ? 'staff-warning-card-verbal' : cardWarningMeta.level === 'written' ? 'staff-warning-card-written' : cardWarningMeta.level === 'final' ? 'staff-warning-card-final' : '';
+                const cardActionBreakdown = getStaffWarningBreakdown(e.id, selectedDashboardYear);
+                const cardWarningClass =
+                    cardWarningMeta.level === 'verbal' ? 'staff-warning-card-verbal' :
+                    cardWarningMeta.level === 'written' ? 'staff-warning-card-written' :
+                    cardWarningMeta.level === 'final' ? 'staff-warning-card-final' :
+                    (cardActionBreakdown.fic > 0 ? 'staff-warning-card-fic' : '');
                 return `<article class="mobile-staff-card ${cardWarningClass}" onclick="openModalById('${String(e.id).replace(/'/g,"\\'")}')">
                     <div class="mobile-staff-card-top">
                         ${getMobileDashboardPhoto(e,'mobile-staff-avatar')}
@@ -6167,7 +6658,13 @@
             const profileWarningYear = new Date().getFullYear();
             const warningMeta = getStaffWarningHighestMeta(e.id, profileWarningYear);
             const warningHistory = getStaffWarningHistory(e.id, profileWarningYear);
-            if (warningSection && (warningMeta.level !== 'normal' || warningHistory.length > 0)) {
+            const wb = getStaffWarningBreakdown(e.id, profileWarningYear);
+            // FIC is a formal performance status. If there is no active/higher warning
+            // but the staff has FIC history, show FIC instead of incorrectly showing Normal.
+            const displayMeta = (warningMeta.level === 'normal' && wb.fic > 0)
+                ? { level:'fic', label:'FIC', icon:'fa-file-signature', cls:'warning-fic' }
+                : warningMeta;
+            if (warningSection && (displayMeta.level !== 'normal' || warningHistory.length > 0)) {
                 warningSection.classList.remove('hidden');
                 const badge = document.getElementById('modalWarningBadge');
                 const count = document.getElementById('modalWarningCount');
@@ -6175,12 +6672,11 @@
                 const accent = document.getElementById('modalWarningAccent');
                 const editBtn = document.getElementById('modalWarningEditBtn');
                 if (badge) {
-                    badge.className = `staff-warning-badge ${warningMeta.cls}`;
-                    badge.innerHTML = `<i class="fa-solid ${warningMeta.icon}"></i>${warningMeta.label}`;
+                    badge.className = `staff-warning-badge ${displayMeta.cls}`;
+                    badge.innerHTML = `<i class="fa-solid ${displayMeta.icon}"></i>${displayMeta.label}`;
                 }
                 if (count) {
-                    const wb = getStaffWarningBreakdown(e.id, profileWarningYear);
-                    count.textContent = `${profileWarningYear} • V ${wb.verbal} • W ${wb.written} • F ${wb.final} • Total ${wb.total}`;
+                    count.textContent = `${profileWarningYear} • V ${wb.verbal} • W ${wb.written} • F ${wb.final} • FIC ${wb.fic} • Total ${wb.total}`;
                 }
                 const activeEntry = warningHistory.slice().sort((a,b)=>(new Date(b.startAt||0))-(new Date(a.startAt||0)))[0];
                 if (latest) {
@@ -6189,7 +6685,7 @@
                     latest.textContent = `${period}${note}`.trim();
                 }
                 if (accent) {
-                    accent.className = 'h-1 ' + ({ verbal:'bg-yellow-400', written:'bg-orange-500', final:'bg-red-500', normal:'bg-emerald-500' }[warningMeta.level] || 'bg-slate-300');
+                    accent.className = 'h-1 ' + ({ verbal:'bg-yellow-400', written:'bg-orange-500', final:'bg-red-500', fic:'bg-indigo-500', normal:'bg-emerald-500' }[displayMeta.level] || 'bg-slate-300');
                 }
                 if (editBtn) editBtn.onclick = (ev) => openWarningEditor(ev, e.id, profileWarningYear);
             } else if (warningSection) {
@@ -6574,7 +7070,7 @@
             rS.forEach(e=>{
                 let rO={no:cnt++,id:e.displayId,name:e.name,dys:[],t:{D:0,UP:0,A:0,L5:0,L3:0,SL:0,AL:0,SP:0}};
                 dA.forEach(dt=>{
-                    let ms=monthNames[dt.getMonth()].substring(0,3).toLowerCase(), dN=dt.getDate(), rec=dailyLeaveRecords.find(r=>r.staffId===e.id&&r.month.toLowerCase().startsWith(ms)&&r.day===dN), cV='P';
+                    let ms=monthNames[dt.getMonth()].substring(0,3).toLowerCase(), dN=dt.getDate(), rec=dailyLeaveRecords.find(r=>r.staffId===e.id&&r.month.toLowerCase().startsWith(ms)&&r.day===dN), cV=isBeforeEmployeeJoinDate(e,dt)?'':'P';
                     if(rec){
                         let l=rec.leaves, t=[], iM=(l.AL>0?1:0)+(l.SL>0?1:0)+(l.SP>0?1:0)+(l.UP>0?1:0)+(l.A>0?1:0)>1;
                         if(l.AL===0.5)t.push(iM?'AL':'H-AL');else if(l.AL>0)t.push('AL'); if(l.SL===0.5)t.push(iM?'SL':'H-SL');else if(l.SL>0)t.push('SL'); if(l.SP===0.5)t.push(iM?'SP':'H-SP');else if(l.SP>0)t.push('SP'); if(l.UP===0.5)t.push(iM?'UP':'H-UP');else if(l.UP>0)t.push('UP'); if(l.A===0.5)t.push(iM?'A':'H-A');else if(l.A>0)t.push('A'); if(l.Late5m>0)t.push('L'); if(l.Late3m>0)t.push("L'"); if(l.D===0.5)t.push(iM?'D':'H-D');else if(l.H===0.5)t.push(iM?'H':'H-H');else if(l.H>0)t.push('H');
@@ -6607,7 +7103,9 @@
                 let r = dailyLeaveRecords.find(rec => rec.staffId === e.id && rec.month.toLowerCase().startsWith(mName.substring(0,3).toLowerCase()) && rec.day === selectedCalendarDate);
                 if (!r) return; // Completely present / no record
                 
-                let h = r.leaves;
+                let h = {...r.leaves};
+                const exportDate = new Date(yr, currentCalendarDate.getMonth(), selectedCalendarDate);
+                if (isBeforeEmployeeJoinDate(e, exportDate)) h.A = 0;
                 // Calendar export intentionally excludes Late and OT statuses.
                 // Export the employee only when they have an exportable leave/attendance status.
                 // If a record is Late-only, OT-only, or Late+OT only, it is not included.
