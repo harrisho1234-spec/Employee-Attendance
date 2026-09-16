@@ -3349,7 +3349,7 @@
                     <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2">Stage</label><select id="warningHistoryEditLevel" onchange="updateWarningAttachmentVisibility()" class="w-full border border-slate-300 rounded-xl p-3 text-sm font-bold bg-white"><option value="normal">🟢 Normal</option><option value="verbal">🟡 Verbal Warning</option><option value="written">🟠 Written Warning</option><option value="final">🔴 Final Warning</option><option value="fic">🟣 FIC — Final Improvement Commitment</option></select></div>
                     <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2">Issued / Updated By</label><input id="warningHistoryEditIssuer" type="text" class="w-full border border-slate-300 rounded-xl p-3 text-sm font-semibold bg-white"></div>
                     <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2">Start Date / Time</label><input id="warningHistoryEditStartAt" type="datetime-local" class="w-full border border-slate-300 rounded-xl p-3 text-sm font-semibold bg-white"></div>
-                    <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2">End Date / Time</label><input id="warningHistoryEditEndAt" type="datetime-local" class="w-full border border-slate-300 rounded-xl p-3 text-sm font-semibold bg-white"><p class="text-[10px] text-slate-400 mt-1">Leave blank if this is the current active stage.</p></div>
+                    <div><label class="block text-xs font-bold text-slate-500 uppercase mb-2">End Date / Time</label><input id="warningHistoryEditEndAt" type="datetime-local" class="w-full border border-slate-300 rounded-xl p-3 text-sm font-semibold bg-white"><p class="text-[10px] text-slate-400 mt-1">Optional. Entries may overlap and more than one entry may remain open.</p></div>
                 </div>
                 <div class="mt-4"><label class="block text-xs font-bold text-slate-500 uppercase mb-2">Note / Reason</label><textarea id="warningHistoryEditNote" rows="4" class="w-full border border-slate-300 rounded-xl p-3 text-sm bg-white resize-y"></textarea></div>
 
@@ -3689,6 +3689,7 @@
 
         let globalRefreshInProgress = false;
         let globalAutoRefreshTimer = null;
+        let hasCompletedInitialDataLoad = false;
         const GLOBAL_AUTO_REFRESH_MS = 5 * 60 * 1000;
 
         function updateGlobalRefreshTimestamp() {
@@ -3699,9 +3700,39 @@
             });
         }
 
+        function isUserInteractionOpen() {
+            // Any active editing/viewing overlay should pause background refreshes.
+            if (document.body.classList.contains('modal-open')) return true;
+
+            const overlayIds = [
+                'employeeModal',
+                'warningEditModal',
+                'warningHistoryEditModal',
+                'noteEditModal',
+                'orgNodeEditModal',
+                'dailyCompanyModal',
+                'deptModal',
+                'imagePreviewModal',
+                'scanStatusPanel'
+            ];
+
+            for (const id of overlayIds) {
+                const el = document.getElementById(id);
+                if (el && !el.classList.contains('hidden')) return true;
+            }
+
+            const filterBackdrop = document.getElementById('mobileDashboardFilterBackdrop');
+            if (filterBackdrop && filterBackdrop.classList.contains('open')) return true;
+
+            if (document.querySelector('dialog[open]')) return true;
+
+            return false;
+        }
+
         function captureAllTabRefreshState() {
             return {
                 activeTab: document.body.dataset.activeTab || 'daily',
+                mainScrollTop: document.getElementById('mainContainer')?.scrollTop || 0,
 
                 dashCompanies: [...selectedCompanies],
                 dashDepartments: Array.isArray(selectedDepartments) ? [...selectedDepartments] : null,
@@ -3846,6 +3877,14 @@
             if (keep.orgCompany && availableCompanies.includes(keep.orgCompany) && typeof window.renderOrgChart === 'function') {
                 window.renderOrgChart(keep.orgCompany, true);
             }
+
+            // Keep the user's current working position instead of jumping to the top.
+            const mainScroll = document.getElementById('mainContainer');
+            if (mainScroll) {
+                requestAnimationFrame(() => {
+                    mainScroll.scrollTop = Number(keep.mainScrollTop) || 0;
+                });
+            }
         }
 
         function setGlobalRefreshButtonsLoading(isLoading) {
@@ -3872,6 +3911,13 @@
 
         window.refreshAllTabs = async function(btn = null, silent = false) {
             if (globalRefreshInProgress) return;
+
+            // Never interrupt a popup, editor, image preview, or open detail panel.
+            if (isUserInteractionOpen()) {
+                if (!silent) showAppToast('Close the open popup before refreshing.', 'info');
+                return;
+            }
+
             globalRefreshInProgress = true;
 
             const keep = captureAllTabRefreshState();
@@ -3879,17 +3925,24 @@
 
             try {
                 // Shared employee + attendance sources feed Dashboard, Calendar, Daily and Org.
+                // fetchData now refreshes data in the background without forcing Daily Attendance.
                 await fetchData();
                 restoreAllTabRefreshState(keep);
 
-                // Scan Activity has a separate live source, refresh it too.
-                if (typeof window.fetchLiveData === 'function') {
+                // Scan Activity has a separate live source, refresh it too,
+                // but only if the user has not opened an overlay while refresh was running.
+                if (!isUserInteractionOpen() && typeof window.fetchLiveData === 'function') {
                     try { await window.fetchLiveData(); }
                     catch (scanErr) { console.warn('Scan Activity refresh failed', scanErr); }
                 }
 
-                // Stay on the tab the user was using.
-                switchTab(keep.activeTab);
+                // Normally the active tab never changes now. Only restore it if something external
+                // changed it, and never do so while the user is inside a popup/editor.
+                if (!isUserInteractionOpen() &&
+                    (document.body.dataset.activeTab || 'daily') !== keep.activeTab) {
+                    switchTab(keep.activeTab);
+                }
+
                 updateGlobalRefreshTimestamp();
 
                 if (!silent) showAppToast('All tabs refreshed with the latest data.', 'info');
@@ -3910,9 +3963,9 @@
         function startGlobalAutoRefresh() {
             if (globalAutoRefreshTimer) clearInterval(globalAutoRefreshTimer);
             globalAutoRefreshTimer = setInterval(() => {
-                // Refresh every five minutes regardless of which tab is open.
-                // Do not interrupt the user while an edit/modal flow is open.
-                if (document.body.classList.contains('modal-open')) return;
+                // Refresh every five minutes, but never interrupt active work.
+                // If a popup/editor is open, this cycle is skipped and the next cycle will try again.
+                if (isUserInteractionOpen()) return;
                 refreshAllTabs(null, true);
             }, GLOBAL_AUTO_REFRESH_MS);
         }
@@ -4251,7 +4304,15 @@
             if(calLabel) calLabel.innerText=selectedCalendarCompanies.length===cArr.length?'All Companies':(selectedCalendarCompanies.length===1?selectedCalendarCompanies[0]:`${selectedCalendarCompanies.length} Companies`);
             const dF=document.getElementById('departmentFilter'); if(dF){dF.innerHTML='<option value="All">All Departments</option>'; Array.from(departments).sort().forEach(d=>{let o=document.createElement('option'); o.value=d; o.textContent=d; dF.appendChild(o);});}
 
-            switchTab('daily'); applyFilters(); renderCalendarSummary(monthNames[currentCalendarDate.getMonth()]); renderDailyAttendance();
+            // Render refreshed data in the background. Only choose the default Daily tab
+            // on the very first data load; subsequent refreshes must not flash Daily Attendance.
+            if (!hasCompletedInitialDataLoad) {
+                switchTab(document.body.dataset.activeTab || 'daily');
+                hasCompletedInitialDataLoad = true;
+            }
+            applyFilters();
+            renderCalendarSummary(monthNames[currentCalendarDate.getMonth()]);
+            renderDailyAttendance();
             if(oC.size>0) window.renderOrgChart(Array.from(oC).sort()[0]);
         }
 
@@ -5512,22 +5573,9 @@
                     const bt = b.h.startAt ? new Date(b.h.startAt).getTime() : 0;
                     return at - bt;
                 });
-            const latest = yearIndexes.length ? yearIndexes[yearIndexes.length - 1] : null;
-            const activeIndex = [...yearIndexes].reverse().find(x => !x.h.endAt);
-
-            if (latest) {
-                const latestStart = latest.h.startAt ? new Date(latest.h.startAt) : null;
-                const latestEnd = latest.h.endAt ? new Date(latest.h.endAt) : null;
-                if (latestStart && startDate <= latestStart) {
-                    showAppToast('New warning entries must start after the latest timeline entry. Adjust the start time or edit the existing entry instead.', 'error');
-                    return;
-                }
-                if (latestEnd && startDate < latestEnd) {
-                    showAppToast('Start date overlaps the latest timeline entry.', 'error');
-                    return;
-                }
-            }
-
+            // Freeform warning/performance history:
+            // entries may overlap, share the same start time, and be backdated.
+            // Saving a new entry never changes or closes any existing entry.
             let newFiles = [];
             try {
                 newFiles = validateNewWarningAttachmentFiles();
@@ -5548,8 +5596,26 @@
             try {
                 const attachments = await uploadNewWarningAttachmentFiles(id, level, chosenStart, issuer, newFiles);
 
-                if (activeIndex) history[activeIndex.i].endAt = chosenStart;
-                history.push({ level, year:selectedWarningHistoryYear, startAt:chosenStart, endAt:null, note, issuer, attachments });
+                // Add this entry exactly as entered. Do not alter any other timeline entry.
+                history.push({
+                    level,
+                    year:selectedWarningHistoryYear,
+                    startAt:chosenStart,
+                    endAt:null,
+                    note,
+                    issuer,
+                    attachments
+                });
+
+                // Chronological display only; overlapping/open entries are intentionally allowed.
+                history.sort((a,b) => {
+                    const ay = warningEntryYear(a);
+                    const by = warningEntryYear(b);
+                    if (ay !== by) return ay - by;
+                    const at = a.startAt ? new Date(a.startAt).getTime() : 0;
+                    const bt = b.startAt ? new Date(b.startAt).getTime() : 0;
+                    return at - bt;
+                });
 
                 staffWarnings[id] = { level:getStaffWarningLevelFromHistory(history, new Date().getFullYear()), history };
                 await window.saveCustomNotes();
@@ -5633,19 +5699,28 @@
             const record = warningNormalizeRecord(id);
             let history = record.history.map(h=>({...h}));
             if (!history[index]) return fail('This warning entry could not be found.');
-            const candidateStart = new Date(startAt).getTime();
-            const candidateEnd = endAt ? new Date(endAt).getTime() : Infinity;
-            for (let i=0;i<history.length;i++) {
-                if (i===index) continue;
-                const h=history[i];
-                if (warningEntryYear(h) !== selectedWarningHistoryYear) continue;
-                const hs = h.startAt ? new Date(h.startAt).getTime() : -Infinity;
-                const he = h.endAt ? new Date(h.endAt).getTime() : Infinity;
-                if (candidateStart < he && candidateEnd > hs) return fail('These dates overlap another warning stage. Adjust the start/end dates first.');
-            }
-            history[index] = { level, year:selectedWarningHistoryYear, startAt, endAt:endAt||null, note, issuer, attachments:Array.isArray(history[index].attachments)?history[index].attachments:[] };
-            const active = history.filter(h => warningEntryYear(h) === selectedWarningHistoryYear && !h.endAt);
-            if (active.length > 1) return fail('Only one timeline stage can be active at a time in this year. Add an end date to the other active stage.');
+            // Freeform timeline editing:
+            // overlap and multiple open/active entries are allowed by design.
+            history[index] = {
+                level,
+                year:selectedWarningHistoryYear,
+                startAt,
+                endAt:endAt||null,
+                note,
+                issuer,
+                attachments:Array.isArray(history[index].attachments)?history[index].attachments:[]
+            };
+
+            // Keep display order chronological without modifying any other entries.
+            history.sort((a,b) => {
+                const ay = warningEntryYear(a);
+                const by = warningEntryYear(b);
+                if (ay !== by) return ay - by;
+                const at = a.startAt ? new Date(a.startAt).getTime() : 0;
+                const bt = b.startAt ? new Date(b.startAt).getTime() : 0;
+                return at - bt;
+            });
+
             const currentLevel = getStaffWarningLevelFromHistory(history, new Date().getFullYear());
             staffWarnings[id] = { level:currentLevel, history };
             await window.saveCustomNotes();
@@ -9211,7 +9286,11 @@
   }
 
   fetchLiveData();
-  setInterval(fetchLiveData, 30000);
+  setInterval(() => {
+    // Do not rebuild Scan Activity while the user is inside any popup/editor.
+    if (typeof isUserInteractionOpen === 'function' && isUserInteractionOpen()) return;
+    fetchLiveData();
+  }, 30000);
 </script>
    <script>
 /* ==========================================================
@@ -9246,30 +9325,16 @@ if ('serviceWorker' in navigator) {
 
 
                 /*
-                 * Automatically reload once when a newly
-                 * installed service worker takes control.
+                 * Do NOT force-reload the dashboard when a new service worker takes control.
+                 * A forced reload can close an employee popup or discard work in progress.
+                 * The new app version will be used naturally on the user's next reload/open.
                  */
-                let refreshing = false;
-
-                navigator
-                    .serviceWorker
-                    .addEventListener(
-                        'controllerchange',
-                        () => {
-
-                            if (
-                                refreshing
-                            ) {
-                                return;
-                            }
-
-                            refreshing =
-                                true;
-
-                            window.location.reload();
-
-                        }
-                    );
+                navigator.serviceWorker.addEventListener(
+                    'controllerchange',
+                    () => {
+                        console.log('New Attendance app version is ready. It will be used on the next reload.');
+                    }
+                );
 
 
             } catch (error) {
