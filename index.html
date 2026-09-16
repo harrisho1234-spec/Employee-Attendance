@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Attendance Dashboard</title>
+    <meta name="app-build" content="2026-09-16-pending-scan-v2">
     <!-- Photo mapping: Staff ID primary, Name/File Name fallback -->
         <!-- PWA -->
     <meta name="theme-color" content="#2563eb">
@@ -8847,20 +8848,24 @@
       String(scanNow.getDate()).padStart(2, '0');
     const scanCurrentMins = scanNow.getHours() * 60 + scanNow.getMinutes();
 
-    const missingScanStatusForTarget = (targetMins) => {
+    const missingScanStatusForTarget = (targetMins, graceMins = 0) => {
       const selected = new Date(scanSelectedDate + 'T00:00:00');
       const today = new Date(scanToday + 'T00:00:00');
 
       // Future dates are always pending.
       if (!isNaN(selected.getTime()) && selected > today) return 'Pending Scan';
 
-      // On today, it remains pending until the scheduled scan time arrives.
-      if (scanSelectedDate === scanToday && Number.isFinite(Number(targetMins)) &&
-          scanCurrentMins < Number(targetMins)) {
+      const target = Number(targetMins);
+      const grace = Number(graceMins) || 0;
+
+      // Today: keep the status Pending until the employee's allowed scan window ends.
+      // Example: an 8:00 AM start is still Pending through 8:06 AM because 8:06 is ON TIME.
+      if (scanSelectedDate === scanToday && Number.isFinite(target) &&
+          scanCurrentMins <= (target + grace)) {
         return 'Pending Scan';
       }
 
-      // Historical dates, or today's scan after its scheduled time, are missed.
+      // Historical dates, or today's scan after its allowed window, are missed.
       return 'NOT SCANNED';
     };
 
@@ -8912,7 +8917,7 @@
       // after the scheduled scan time => NOT SCANNED
       let mStatus = (hasLeaveCode || lateStartStaff || forceAfternoonFirstScan)
         ? ''
-        : missingScanStatusForTarget(startMins);
+        : missingScanStatusForTarget(startMins, 6);
 
       // Normal 4X lunch-out is expected around 11:30 AM.
       let lOutStatus = (staff.shiftType === '2X' || lateStartStaff || forceAfternoonFirstScan)
@@ -8922,10 +8927,10 @@
       // Late-start / part-time staff use Lunch In as their first applicable scan.
       // Normal 4X lunch return is expected around 1:00 PM.
       let lInStatus = lateStartStaff
-        ? (hasLeaveCode ? '' : missingScanStatusForTarget(startMins))
+        ? (hasLeaveCode ? '' : missingScanStatusForTarget(startMins, 6))
         : ((staff.shiftType === '2X' || forceAfternoonFirstScan || forceMorningHalfDay)
             ? ''
-            : (hasLeaveCode ? '' : missingScanStatusForTarget(780)));
+            : (hasLeaveCode ? '' : missingScanStatusForTarget(780, 6)));
 
       let eStatus = (hasLeaveCode || forceMorningHalfDay)
         ? ''
@@ -9091,10 +9096,10 @@
       tr.dataset.morningScan = morningIn || '';
       const useAfternoonPrimary = !forceMorningHalfDay && (lateStartStaff || forceAfternoonFirstScan);
       tr.dataset.primaryStatus = forceMorningHalfDay
-        ? (mStatus || missingScanStatusForTarget(startMins))
+        ? (mStatus || missingScanStatusForTarget(startMins, 6))
         : (useAfternoonPrimary
-            ? (lInStatus || missingScanStatusForTarget(startMins))
-            : (mStatus || missingScanStatusForTarget(startMins)));
+            ? (lInStatus || missingScanStatusForTarget(startMins, 6))
+            : (mStatus || missingScanStatusForTarget(startMins, 6)));
       tr.dataset.primaryScan = forceMorningHalfDay
         ? (morningIn || '')
         : (useAfternoonPrimary ? (lunchIn || '') : (morningIn || ''));
@@ -9338,6 +9343,8 @@
 /* ==========================================================
    PWA SERVICE WORKER
    ========================================================== */
+
+console.log('Attendance build: 2026-09-16-pending-scan-v2');
 
 if ('serviceWorker' in navigator) {
 
