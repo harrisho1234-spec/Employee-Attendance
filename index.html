@@ -5,6 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Attendance Dashboard</title>
     <!-- Photo mapping: Staff ID primary, Name/File Name fallback -->
+        <!-- PWA -->
+    <meta name="theme-color" content="#2563eb">
+
+    <meta
+        name="mobile-web-app-capable"
+        content="yes"
+    >
+
+    <meta
+        name="apple-mobile-web-app-capable"
+        content="yes"
+    >
+
+    <meta
+        name="apple-mobile-web-app-status-bar-style"
+        content="default"
+    >
+
+    <meta
+        name="apple-mobile-web-app-title"
+        content="Attendance"
+    >
+
+    <link
+        rel="manifest"
+        href="./manifest.json"
+    >
+
+    <link
+        rel="icon"
+        type="image/png"
+        sizes="192x192"
+        href="./icons/icon-192.png"
+    >
+
+    <link
+        rel="icon"
+        type="image/png"
+        sizes="512x512"
+        href="./icons/icon-512.png"
+    >
+
+    <link
+        rel="apple-touch-icon"
+        href="./icons/icon-192.png"
+    >
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome -->
@@ -9167,5 +9213,78 @@
   fetchLiveData();
   setInterval(fetchLiveData, 30000);
 </script>
+   <script>
+/* ==========================================================
+   PWA SERVICE WORKER
+   ========================================================== */
+
+if ('serviceWorker' in navigator) {
+
+    window.addEventListener(
+        'load',
+        async () => {
+
+            try {
+
+                const registration =
+                    await navigator
+                        .serviceWorker
+                        .register(
+                            './sw.js'
+                        );
+
+                console.log(
+                    'Attendance service worker registered:',
+                    registration.scope
+                );
+
+
+                /*
+                 * Ask browser to check for a new version.
+                 */
+                registration.update();
+
+
+                /*
+                 * Automatically reload once when a newly
+                 * installed service worker takes control.
+                 */
+                let refreshing = false;
+
+                navigator
+                    .serviceWorker
+                    .addEventListener(
+                        'controllerchange',
+                        () => {
+
+                            if (
+                                refreshing
+                            ) {
+                                return;
+                            }
+
+                            refreshing =
+                                true;
+
+                            window.location.reload();
+
+                        }
+                    );
+
+
+            } catch (error) {
+
+                console.error(
+                    'Service worker registration failed:',
+                    error
+                );
+
+            }
+
+        }
+    );
+
+}
+</script> 
 </body>
 </html>
