@@ -45,10 +45,17 @@
             window.fbStorage = getStorage(app); window.fbStorageRef = storageRef; window.fbUploadBytes = uploadBytes; window.fbGetDownloadURL = getDownloadURL; window.fbDeleteObject = deleteObject;
 
             const auth = getAuth(app);
-            window.authReady = new Promise((resolve) => {
-                onAuthStateChanged(auth, (user) => { if (user) resolve(user); });
+            window.fbAuth = auth;
+            window.authReady = new Promise((resolve, reject) => {
+                let settled = false;
+                const ok = (user) => { if (!settled) { settled = true; resolve(user); } };
+                const fail = (err) => { if (!settled) { settled = true; reject(err); } };
+                onAuthStateChanged(auth, (user) => { if (user) ok(user); }, fail);
+                signInAnonymously(auth).then((cred) => ok(cred.user)).catch((e) => {
+                    console.error("Auth Error:", e);
+                    fail(e);
+                });
             });
-            signInAnonymously(auth).catch(e => console.error("Auth Error:", e));
         } catch(e) { console.error("Firebase Init Error:", e); }
     </script>
 
@@ -2422,37 +2429,6 @@
     </div>
 
     <!-- Image Preview Modal -->
-    
-    <div id="photoMigrationModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-[9998] items-center justify-center p-4" onclick="if(event.target===this)closePhotoMigrationPanel()">
-        <div class="bg-white w-full max-w-xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
-            <div class="px-5 py-4 border-b flex items-center justify-between">
-                <div>
-                    <h3 class="font-extrabold text-slate-900 text-lg">Staff Photo Sync</h3>
-                    <p class="text-xs text-slate-500 mt-1">Copies existing staff photos into Firebase Storage for reliable display on every device.</p>
-                </div>
-                <button onclick="closePhotoMigrationPanel()" class="w-9 h-9 rounded-lg hover:bg-slate-100 text-slate-400"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="p-5 space-y-4">
-                <div class="rounded-xl border border-blue-200 bg-blue-50 p-3 text-xs text-slate-600">
-                    Photos are resized to about <strong>400×400</strong> and saved as compressed JPEGs under <code>staff-photos/&lt;staff-id&gt;.jpg</code>.<br><span class="text-blue-700 font-semibold">For guaranteed results, use “Upload Photos” or “Upload / Replace Photo”. Direct upload does not depend on Google Drive permissions.</span>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="rounded-xl border p-3"><div class="text-[10px] uppercase font-bold text-slate-400">Ready</div><div id="photoSyncReady" class="text-xl font-extrabold text-slate-900">0</div></div>
-                    <div class="rounded-xl border p-3"><div class="text-[10px] uppercase font-bold text-slate-400">Completed</div><div id="photoSyncDone" class="text-xl font-extrabold text-emerald-600">0</div></div>
-                </div>
-                <div>
-                    <div class="flex items-center justify-between text-xs mb-1.5"><span class="font-semibold text-slate-600">Progress</span><span id="photoSyncPct" class="font-bold text-slate-500">0%</span></div>
-                    <div class="h-2 rounded-full bg-slate-100 overflow-hidden"><div id="photoSyncBar" class="h-full bg-blue-600" style="width:0%"></div></div>
-                </div>
-                <div id="photoSyncLog" class="h-40 overflow-auto rounded-xl bg-slate-50 border p-3 text-[11px] font-mono text-slate-600 whitespace-pre-wrap">Ready.</div>
-                <div class="flex flex-wrap justify-end gap-2">
-                    <button onclick="closePhotoMigrationPanel()" class="px-4 py-2 rounded-lg border border-slate-300 font-bold text-sm text-slate-600">Close</button>
-                    <button id="photoSyncStartBtn" onclick="syncAllStaffPhotosToFirebase()" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm"><i class="fa-solid fa-cloud-arrow-up mr-1.5"></i>Sync All Photos</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
 <div id="imagePreviewModal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md hidden z-[9999] flex items-center justify-center p-4 opacity-0 transition-opacity duration-300" onclick="closeImagePreview()">
         <img id="previewImg" src="" class="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl transform scale-95 transition-transform duration-300">
         <button class="absolute top-4 right-4 text-white hover:text-gray-300 text-4xl w-12 h-12 flex items-center justify-center" onclick="closeImagePreview()"><i class="fa-solid fa-xmark"></i></button>
@@ -2539,14 +2515,11 @@
                 </div>
                 
                 <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 w-full xl:w-auto">
-                    <button id="photoBulkUploadBtn" type="button" onclick="document.getElementById('photoBulkUploadInput').click()" class="w-full sm:w-auto bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-sm font-bold rounded-lg px-3.5 py-2.5 flex items-center justify-center gap-2 shadow-sm transition-colors" title="Upload staff photos directly to Firebase">
-                        <i class="fa-solid fa-folder-open"></i><span>Upload Photos</span>
+                    <button id="photoBulkUploadBtn" type="button" onclick="document.getElementById('photoBulkUploadInput').click()" class="w-full sm:w-auto bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-sm font-bold rounded-lg px-3.5 py-2.5 flex items-center justify-center gap-2 shadow-sm transition-colors" title="Upload staff photos to Google Drive">
+                        <i class="fa-brands fa-google-drive"></i><span>Upload Photos</span>
                     </button>
                     <input id="photoBulkUploadInput" type="file" multiple accept="image/jpeg,image/png,image/webp" class="hidden" onchange="handleBulkStaffPhotoUpload(this)">
-                    <button id="photoMigrationBtn" type="button" onclick="openPhotoMigrationPanel()" class="w-full sm:w-auto bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-sm font-bold rounded-lg px-3.5 py-2.5 flex items-center justify-center gap-2 shadow-sm transition-colors" title="Sync staff photos to Firebase">
-                        <i class="fa-solid fa-images"></i><span>Sync Photos</span>
-                    </button>
-                    <button id="dashboardRefreshBtn" type="button" onclick="refreshAllTabs(this)" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 border border-blue-600 text-white text-sm font-bold rounded-lg px-3.5 py-2.5 flex items-center justify-center gap-2 shadow-sm transition-colors" title="Refresh Dashboard">
+<button id="dashboardRefreshBtn" type="button" onclick="refreshAllTabs(this)" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 border border-blue-600 text-white text-sm font-bold rounded-lg px-3.5 py-2.5 flex items-center justify-center gap-2 shadow-sm transition-colors" title="Refresh Dashboard">
                         <i class="fa-solid fa-rotate"></i><span>Refresh</span>
                     </button>
                     <div class="relative filter-dropdown w-full sm:w-auto">
@@ -4597,7 +4570,7 @@
                 snap.forEach(d => { map[d.id] = d.data(); });
                 return map;
             } catch(e) {
-                console.warn('Could not load Firebase staff photo map', e);
+                console.warn('Could not load Google Drive staff photo map', e);
                 return {};
             }
         }
@@ -4698,7 +4671,45 @@
             }
         }
 
-        async function uploadStaffPhotoFileToFirebase(emp, file) {
+        function withTimeout(promise, ms, label) {
+            return Promise.race([
+                Promise.resolve(promise),
+                new Promise((_, reject) => setTimeout(() => reject(new Error(`${label} timed out after ${Math.round(ms/1000)} seconds.`)), ms))
+            ]);
+        }
+
+        function firebaseUploadErrorMessage(err) {
+            const code = String(err?.code || '');
+            const msg = String(err?.message || err || '');
+            const lower = msg.toLowerCase();
+            if (code.includes('auth') || lower.includes('auth')) return 'Firebase sign-in failed. Enable Anonymous Authentication in Firebase Authentication, then try again.';
+            if (code.includes('storage/unauthorized') || lower.includes('permission')) return 'Google Drive denied the upload. Check Storage rules for authenticated users.';
+            if (code.includes('storage/bucket-not-found')) return 'Google Drive bucket was not found. Check the Google Drive setup.';
+            if (lower.includes('timed out')) return msg + ' Check internet connection and Firebase settings.';
+            return msg || 'Could not upload the staff photo.';
+        }
+
+        const STAFF_PHOTO_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwoIQLIY1az5u9qL4TEKGkAq_lDBmfRRYffJN6TpkzSYVgJLCBQDBdZTuHvl4KnXpbrbQ/exec';
+
+        async function blobToDataUrl(blob) {
+            return await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(String(reader.result || ''));
+                reader.onerror = () => reject(new Error('Could not read the processed photo.'));
+                reader.readAsDataURL(blob);
+            });
+        }
+
+        function appsScriptPhotoErrorMessage(err) {
+            const msg = String(err?.message || err || '');
+            if (/timed out/i.test(msg)) return msg + ' Check your internet connection and the Apps Script deployment.';
+            if (/failed to fetch|networkerror|load failed/i.test(msg)) {
+                return 'Could not contact the Google Apps Script photo service. Make sure the Web App is deployed as “Execute as me” and access is set to “Anyone”.';
+            }
+            return msg || 'Could not upload the staff photo to Google Drive.';
+        }
+
+        async function uploadStaffPhotoFileToDrive(emp, file) {
             if (!emp) throw new Error('Employee not found.');
             if (!file) throw new Error('No photo selected.');
 
@@ -4706,41 +4717,58 @@
             if (!allowed.has(file.type)) throw new Error('Only JPG, PNG or WebP photos are supported.');
             if (file.size > 15 * 1024 * 1024) throw new Error('Photo is too large. Maximum 15 MB.');
 
-            if (!window.fbStorage || !window.fbStorageRef || !window.fbUploadBytes || !window.fbGetDownloadURL) {
-                throw new Error('Firebase Storage is not ready.');
+            const blob = await withTimeout(fileToCompressedStaffPhotoBlob(file, 400, 0.82), 15000, 'Photo processing');
+            const base64 = await withTimeout(blobToDataUrl(blob), 10000, 'Photo encoding');
+
+            const payload = {
+                action: 'uploadPhoto',
+                staffId: String(emp.displayId || emp.id || '').trim(),
+                staffName: String(emp.name || '').trim(),
+                company: String(emp.company || '').trim(),
+                mimeType: 'image/jpeg',
+                base64
+            };
+
+            const response = await withTimeout(fetch(STAFF_PHOTO_WEB_APP_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload),
+                redirect: 'follow',
+                cache: 'no-store'
+            }), 45000, 'Google Drive photo upload');
+
+            if (!response.ok) throw new Error(`Photo service returned HTTP ${response.status}.`);
+
+            let result;
+            try {
+                result = await withTimeout(response.json(), 10000, 'Photo service response');
+            } catch (e) {
+                throw new Error('The photo service returned an unreadable response. Check the Apps Script Web App deployment.');
             }
-            if (!window.db || !window.fbDoc || !window.fbSetDoc) {
-                throw new Error('Firebase Firestore is not ready.');
+
+            if (!result || result.ok !== true) {
+                throw new Error(result?.error || result?.message || 'Google Drive upload failed.');
             }
 
-            await window.authReady;
+            // Update this employee immediately; the published CSV will become the long-term source on refresh.
+            const returnedUrl = result.thumbnailUrl || result.url || '';
+            const returnedDriveUrl = result.url || '';
+            const returnedId = result.fileId || (typeof pdfExtractDriveFileId === 'function' ? pdfExtractDriveFileId(returnedDriveUrl) : '');
 
-            const blob = await fileToCompressedStaffPhotoBlob(file, 400, 0.82);
-            const safeId = String(emp.displayId || emp.id || emp.name || 'staff').replace(/[^0-9A-Za-z_-]+/g,'_');
-            const path = `staff-photos/${safeId}.jpg`;
+            emp.firebasePhotoUrl = '';
+            emp.photoSourceUrl = returnedDriveUrl || emp.photoSourceUrl || '';
+            emp.photoFileId = returnedId || emp.photoFileId || '';
+            emp.photoUrls = buildStaffPhotoUrls(emp.photoFileId || emp.photoSourceUrl);
+            if (returnedUrl && !emp.photoUrls.includes(returnedUrl)) emp.photoUrls.unshift(returnedUrl);
+            emp.photoUrl = emp.photoUrls[0] || returnedUrl || returnedDriveUrl;
+            emp.photoFallbackUrl = emp.photoUrls[1] || '';
 
-            const ref = window.fbStorageRef(window.fbStorage, path);
-            const snap = await window.fbUploadBytes(ref, blob, {
-                contentType:'image/jpeg',
-                cacheControl:'public,max-age=31536000',
-                customMetadata:{
-                    staffId:String(emp.displayId || emp.id || ''),
-                    name:String(emp.name || '')
-                }
-            });
-
-            const url = await window.fbGetDownloadURL(snap.ref);
-            await saveFirebasePhotoRecord(emp, url, path, blob.size);
-
-            emp.firebasePhotoUrl = url;
-
-            // Clear a device's remembered Drive endpoint so Firebase is preferred immediately.
             try {
                 const cacheKey = String(emp.photoFileId || emp.id || emp.displayId || emp.name || '').trim();
                 if (cacheKey) localStorage.removeItem('staffPhotoWorking:' + cacheKey);
             } catch(e) {}
 
-            return { url, path, size:blob.size };
+            return result;
         }
 
         function refreshPhotoDrivenViews() {
@@ -4776,13 +4804,21 @@
 
             const btn = document.getElementById('modalPhotoUploadBtn');
             const oldHtml = btn?.innerHTML || '';
+            let uploadWatchdog = null;
             try {
                 if (btn) {
                     btn.disabled = true;
                     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Uploading...';
                 }
+                uploadWatchdog = setTimeout(() => {
+                    if (btn && btn.disabled) {
+                        btn.disabled = false;
+                        btn.innerHTML = oldHtml || '<i class="fa-solid fa-camera mr-1"></i>Upload / Replace Photo';
+                        showAppToast('Upload took too long. Check Firebase Authentication / Storage settings.', 'error');
+                    }
+                }, 75000);
 
-                const result = await uploadStaffPhotoFileToFirebase(emp, file);
+                const result = await uploadStaffPhotoFileToDrive(emp, file);
                 refreshPhotoDrivenViews();
 
                 // Refresh the profile avatar immediately.
@@ -4791,14 +4827,12 @@
                     avatar.innerHTML = staffPhotoImgHtml(emp, 'w-full h-full object-cover', emp.name || 'Avatar') || emp.name[0];
                 }
 
-                showAppToast(`Photo updated for ${emp.name}.`, 'info');
+                showAppToast(`Photo uploaded to Google Drive for ${emp.name}.`, 'info');
             } catch(e) {
                 console.error('Direct staff photo upload failed', e);
-                const msg = String(e?.message || e || 'Could not upload staff photo.');
-                showAppToast(msg.includes('permission') || msg.includes('Permission')
-                    ? 'Firebase denied the upload. Check Firebase Storage / Firestore rules.'
-                    : msg, 'error');
+                showAppToast(appsScriptPhotoErrorMessage(e), 'error');
             } finally {
+                if (uploadWatchdog) clearTimeout(uploadWatchdog);
                 if (btn) {
                     btn.disabled = false;
                     btn.innerHTML = oldHtml || '<i class="fa-solid fa-camera mr-1"></i>Upload / Replace Photo';
@@ -4824,7 +4858,7 @@
                 }
 
                 try {
-                    await uploadStaffPhotoFileToFirebase(emp, file);
+                    await uploadStaffPhotoFileToDrive(emp, file);
                     uploaded++;
                 } catch(e) {
                     failed++;
@@ -4835,148 +4869,12 @@
             refreshPhotoDrivenViews();
             input.value = '';
 
-            let msg = `${uploaded} photo${uploaded===1?'':'s'} uploaded to Firebase.`;
+            let msg = `${uploaded} photo${uploaded===1?'':'s'} uploaded to Google Drive.`;
             if (unmatched.length) msg += ` ${unmatched.length} filename${unmatched.length===1?'':'s'} could not be matched.`;
             if (failed) msg += ` ${failed} upload${failed===1?'':'s'} failed.`;
             showAppToast(msg, failed ? 'error' : 'info');
 
             if (unmatched.length) console.warn('Unmatched staff photo filenames:', unmatched);
-        };
-
-        window.openPhotoMigrationPanel = function() {
-            const m = document.getElementById('photoMigrationModal');
-            if (!m) return;
-            const candidates = allEmployees.filter(e => getStaffPhotoUrls(e).length > 0);
-            document.getElementById('photoSyncReady').textContent = String(candidates.length);
-            document.getElementById('photoSyncDone').textContent = '0';
-            document.getElementById('photoSyncPct').textContent = '0%';
-            document.getElementById('photoSyncBar').style.width = '0%';
-            document.getElementById('photoSyncLog').textContent = 'Ready.';
-            m.classList.remove('hidden');
-            m.classList.add('flex');
-        };
-
-        window.closePhotoMigrationPanel = function() {
-            const m = document.getElementById('photoMigrationModal');
-            if (!m) return;
-            m.classList.add('hidden');
-            m.classList.remove('flex');
-        };
-
-        async function loadImageForFirebase(emp) {
-            const urls = getStaffPhotoUrls(emp).filter(u => u && u !== emp.firebasePhotoUrl);
-            let lastErr = null;
-            for (const url of urls) {
-                try {
-                    const img = new Image();
-                    img.crossOrigin = 'anonymous';
-                    img.referrerPolicy = 'no-referrer';
-                    const loaded = await new Promise((resolve, reject) => {
-                        const t = setTimeout(() => reject(new Error('timeout')), 10000);
-                        img.onload = () => { clearTimeout(t); resolve(img); };
-                        img.onerror = () => { clearTimeout(t); reject(new Error('load failed')); };
-                        img.src = url;
-                    });
-                    return loaded;
-                } catch(e) { lastErr = e; }
-            }
-            throw lastErr || new Error('No working source photo URL');
-        }
-
-        async function imageToCompressedJpegBlob(img, maxSize = 400, quality = 0.82) {
-            const ratio = Math.min(1, maxSize / Math.max(img.naturalWidth || img.width, img.naturalHeight || img.height));
-            const w = Math.max(1, Math.round((img.naturalWidth || img.width) * ratio));
-            const h = Math.max(1, Math.round((img.naturalHeight || img.height) * ratio));
-            const canvas = document.createElement('canvas');
-            canvas.width = w; canvas.height = h;
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0,0,w,h);
-            ctx.drawImage(img,0,0,w,h);
-            return await new Promise((resolve, reject) => {
-                canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('JPEG conversion failed')), 'image/jpeg', quality);
-            });
-        }
-
-        async function saveFirebasePhotoRecord(emp, url, path, size) {
-            if (!window.db || !window.fbDoc || !window.fbSetDoc) return;
-            const key = firebasePhotoDocKey(emp);
-            if (!key) return;
-            await window.fbSetDoc(window.fbDoc(window.db, 'staff_photos', key), {
-                staffId: emp.displayId || emp.id || '',
-                name: emp.name || '',
-                url, path, size: size || 0,
-                updatedAt: new Date().toISOString()
-            }, { merge:true });
-        }
-
-        window.syncAllStaffPhotosToFirebase = async function() {
-            const btn = document.getElementById('photoSyncStartBtn');
-            if (!window.fbStorage || !window.fbStorageRef || !window.fbUploadBytes || !window.fbGetDownloadURL) {
-                showAppToast('Firebase Storage is not ready. Enable Firebase Storage first.', 'error');
-                return;
-            }
-            await window.authReady;
-
-            const candidates = allEmployees.filter(e => getStaffPhotoUrls(e).length > 0);
-            if (!candidates.length) {
-                showAppToast('No staff photos found to sync.', 'info');
-                return;
-            }
-
-            if (btn) {
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i>Syncing...';
-            }
-            document.getElementById('photoSyncLog').textContent = 'Starting photo sync...';
-            let done = 0;
-            updatePhotoSyncProgress(done, candidates.length);
-
-            for (const emp of candidates) {
-                try {
-                    if (emp.firebasePhotoUrl) {
-                        photoLog(`${emp.name}: already in Firebase, skipped.`);
-                        done++; updatePhotoSyncProgress(done, candidates.length);
-                        continue;
-                    }
-
-                    const img = await loadImageForFirebase(emp);
-                    const blob = await imageToCompressedJpegBlob(img, 400, 0.82);
-                    const safeId = String(emp.displayId || emp.id || emp.name || 'staff').replace(/[^0-9A-Za-z_-]+/g,'_');
-                    const path = `staff-photos/${safeId}.jpg`;
-                    const ref = window.fbStorageRef(window.fbStorage, path);
-                    const snap = await window.fbUploadBytes(ref, blob, {
-                        contentType:'image/jpeg',
-                        cacheControl:'public,max-age=31536000,immutable',
-                        customMetadata:{ staffId:String(emp.displayId || emp.id || ''), name:String(emp.name || '') }
-                    });
-                    const url = await window.fbGetDownloadURL(snap.ref);
-                    await saveFirebasePhotoRecord(emp, url, path, blob.size);
-                    emp.firebasePhotoUrl = url;
-                    photoLog(`${emp.name}: uploaded (${Math.round(blob.size/1024)} KB).`);
-                } catch(e) {
-                    console.warn('Photo sync failed', emp.name, e);
-                    photoLog(`${emp.name}: FAILED - ${e?.message || e}`);
-                }
-                done++;
-                updatePhotoSyncProgress(done, candidates.length);
-            }
-
-            renderMobileDashboardUI();
-            renderDailyAttendance();
-            if (typeof window.renderOrgChart === 'function' && typeof currentOrgCompany !== 'undefined' && currentOrgCompany) {
-                try { window.renderOrgChart(currentOrgCompany, true); } catch(e) {}
-            }
-            if (typeof window.fetchLiveData === 'function') {
-                try { await window.fetchLiveData(); } catch(e) {}
-            }
-
-            photoLog('Photo sync finished.');
-            if (btn) {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up mr-1.5"></i>Sync All Photos';
-            }
-            showAppToast('Firebase staff photo sync finished.', 'info');
         };
 
         function getStaffPhotoUrls(emp) {
@@ -4987,7 +4885,6 @@
                 if (u && !urls.includes(u)) urls.push(u);
             };
 
-            add(emp.firebasePhotoUrl);
             if (Array.isArray(emp.photoUrls)) emp.photoUrls.forEach(add);
             if (emp.photoFileId) buildStaffPhotoUrls(emp.photoFileId).forEach(add);
             if (emp.photoSourceUrl) buildStaffPhotoUrls(emp.photoSourceUrl).forEach(add);
@@ -5398,7 +5295,7 @@
             if (!files.length) return [];
             if (!['written','final','fic'].includes(level)) return [];
             if (!window.fbStorage || !window.fbStorageRef || !window.fbUploadBytes || !window.fbGetDownloadURL) {
-                throw new Error('Firebase Storage is not ready. Enable Storage for this Firebase project first.');
+                throw new Error('Google Drive is not ready. Enable Storage for this Firebase project first.');
             }
             await window.authReady;
             const safeStaff = warningNormalizeKey(staffId).replace(/[^A-Z0-9_-]/gi,'_');
@@ -5556,7 +5453,7 @@
                 console.error('Save stage / attachment upload failed', e);
                 const msg = String(e?.message || e || 'Could not save the entry.');
                 showAppToast(msg.includes('Storage') || msg.includes('storage')
-                    ? 'Could not upload the signed form. Check Firebase Storage is enabled and its rules allow authenticated uploads.'
+                    ? 'Could not upload the signed form. Check Google Drive is enabled and its rules allow authenticated uploads.'
                     : msg, 'error');
             } finally {
                 if (saveBtn) {
@@ -5769,7 +5666,7 @@
             if (!ctx) { showAppToast('Save the warning entry first, then attach the signed form.', 'error'); return; }
             const level = document.getElementById('warningHistoryEditLevel')?.value || ctx.entry.level;
             if (!['written','final','fic'].includes(level)) { showAppToast('Attachments can be uploaded to Written Warning, Final Warning or FIC entries.', 'error'); return; }
-            if (!window.fbStorage || !window.fbStorageRef || !window.fbUploadBytes || !window.fbGetDownloadURL) { showAppToast('Firebase Storage is not ready. Enable Storage for this Firebase project first.', 'error'); return; }
+            if (!window.fbStorage || !window.fbStorageRef || !window.fbUploadBytes || !window.fbGetDownloadURL) { showAppToast('Google Drive is not ready. Enable Storage for this Firebase project first.', 'error'); return; }
             const input = document.getElementById('warningAttachmentInput');
             const files = Array.from(input?.files || []);
             if (!files.length) { showAppToast('Choose a PDF, JPG or PNG file first.', 'error'); return; }
@@ -5805,7 +5702,7 @@
             } catch(e) {
                 console.error('Warning attachment upload failed', e);
                 const msg = String(e?.message || e || 'Upload failed');
-                showAppToast(msg.includes('storage') ? 'Upload failed. Check Firebase Storage is enabled and its rules allow authenticated uploads.' : msg, 'error');
+                showAppToast(msg.includes('storage') ? 'Upload failed. Check Google Drive is enabled and its rules allow authenticated uploads.' : msg, 'error');
             } finally {
                 if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up mr-1.5"></i>Upload'; }
             }
