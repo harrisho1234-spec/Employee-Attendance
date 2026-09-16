@@ -4452,15 +4452,25 @@
                 if (Array.isArray(selectedDepartments) && selectedDepartments.length === 0) return false;
                 if (selectedStatuses.length > 0 && !selectedStatuses.includes(getEffectiveStaffStatus(e, refDate))) return false;
 
-                const warningHistory = getStaffWarningHistory(e.id, selectedDashboardYear).filter(h => ['verbal','written','final'].includes(String(h?.level || '').toLowerCase()));
-                const allWarningHistory = warningNormalizeRecord(e.id).history.filter(h => ['verbal','written','final'].includes(String(h?.level || '').toLowerCase()));
+                // Keep warning-only history separate from FIC history.
+                const selectedYearPerformanceHistory = getStaffWarningHistory(e.id, selectedDashboardYear);
+                const warningHistory = selectedYearPerformanceHistory.filter(h =>
+                    ['verbal','written','final'].includes(String(h?.level || '').toLowerCase())
+                );
+                const ficHistory = selectedYearPerformanceHistory.filter(h =>
+                    String(h?.level || '').toLowerCase() === 'fic'
+                );
+                const allWarningHistory = warningNormalizeRecord(e.id).history.filter(h =>
+                    ['verbal','written','final'].includes(String(h?.level || '').toLowerCase())
+                );
+
                 if (selectedDashboardWarning === 'AnyWarning' && warningHistory.length === 0) return false;
                 if (selectedDashboardWarning === 'EverWarning' && allWarningHistory.length === 0) return false;
                 if (selectedDashboardWarning === 'NoWarning' && warningHistory.length > 0) return false;
                 if (selectedDashboardWarning === 'HasVerbal' && !warningHistory.some(h => h.level === 'verbal')) return false;
                 if (selectedDashboardWarning === 'HasWritten' && !warningHistory.some(h => h.level === 'written')) return false;
                 if (selectedDashboardWarning === 'HasFinal' && !warningHistory.some(h => h.level === 'final')) return false;
-                if (selectedDashboardWarning === 'HasFIC' && !warningHistory.some(h => h.level === 'fic')) return false;
+                if (selectedDashboardWarning === 'HasFIC' && ficHistory.length === 0) return false;
 
                 const ps = getDashboardPeriodStats(e);
                 const activityTotal = ps.AL + ps.SL + ps.SP + ps.UP + ps.A + ps.D + ps.OT + ps.Late5m + ps.Late3m;
@@ -4574,7 +4584,7 @@
                 if (selectedDashboardWarning === 'HasVerbal' && !warningHistory.some(h => h.level === 'verbal')) return false;
                 if (selectedDashboardWarning === 'HasWritten' && !warningHistory.some(h => h.level === 'written')) return false;
                 if (selectedDashboardWarning === 'HasFinal' && !warningHistory.some(h => h.level === 'final')) return false;
-                if (selectedDashboardWarning === 'HasFIC' && !warningHistory.some(h => h.level === 'fic')) return false;
+                if (selectedDashboardWarning === 'HasFIC' && !getStaffWarningHistory(e.id, selectedDashboardYear).some(h => h.level === 'fic')) return false;
 
                 const ps=getDashboardPeriodStats(e);
                 const activityTotal=ps.AL+ps.SL+ps.SP+ps.UP+ps.A+ps.D+ps.OT+ps.Late5m+ps.Late3m;
@@ -5285,11 +5295,9 @@
             });
             if (!history.length) return 'normal';
             const latest = history[history.length - 1];
-            // A closed final stage means the employee returned to Normal for the remainder of that year.
-            if (latest.endAt) {
-                const end = new Date(latest.endAt);
-                if (!isNaN(end.getTime()) && end.getFullYear() === y) return 'normal';
-            }
+            // Current-year status follows the latest recorded stage.
+            // Older years remain history, but a current-year entry is not turned
+            // back to Normal simply because another record was added later.
             return latest.level || 'normal';
         }
         function getStaffWarningCount(staffId, year = new Date().getFullYear()) {
@@ -5431,10 +5439,11 @@
             }
             const labels = { normal:'Normal', verbal:'Verbal Warning', written:'Written Warning', final:'Final Warning', fic:'FIC — Final Improvement Commitment' };
             list.innerHTML = history.map(h => {
-                const end = h.endAt ? warningFormatDateTime(h.endAt) : 'Year end / Current';
-                const isCurrent = meta.level === h.level && !h.endAt && history[0] === h;
+                const isCurrentYearRecord = Number(selectedWarningHistoryYear) === new Date().getFullYear();
+                const end = h.endAt ? warningFormatDateTime(h.endAt) : (isCurrentYearRecord ? 'Current Year' : 'Year end');
+                const statusLabel = isCurrentYearRecord ? 'Current Year' : 'History';
                 return `<div class="warning-history-item ${h.level}">
-                    <div class="warning-history-stage"><span>${labels[h.level] || h.level}</span><span class="flex items-center gap-2"><span class="text-[9px] text-slate-400">${isCurrent ? 'Active' : (h.endAt ? 'Closed' : 'Year record')}</span><button type="button" onclick="openWarningHistoryEntryEditor(event,'${warningEscapeHtml(warningNormalizeKey(staffId))}',${h._index})" class="text-[9px] font-bold text-blue-600 bg-blue-50 border border-blue-100 px-2 py-1 rounded-md hover:bg-blue-100"><i class="fa-solid fa-pen mr-1"></i>Edit</button></span></div>
+                    <div class="warning-history-stage"><span>${labels[h.level] || h.level}</span><span class="flex items-center gap-2"><span class="text-[9px] text-slate-400">${statusLabel}</span><button type="button" onclick="openWarningHistoryEntryEditor(event,'${warningEscapeHtml(warningNormalizeKey(staffId))}',${h._index})" class="text-[9px] font-bold text-blue-600 bg-blue-50 border border-blue-100 px-2 py-1 rounded-md hover:bg-blue-100"><i class="fa-solid fa-pen mr-1"></i>Edit</button></span></div>
                     <div class="warning-history-period">${warningFormatDateTime(h.startAt)} → ${end}</div>
                     ${h.issuer ? `<div class="warning-history-period"><i class="fa-solid fa-user-pen mr-1"></i>${warningEscapeHtml(h.issuer)}</div>` : ''}
                     ${h.note ? `<div class="warning-history-note">${warningEscapeHtml(h.note)}</div>` : '<div class="warning-history-note text-slate-400 italic">No note recorded.</div>'}
@@ -5653,7 +5662,6 @@
             });
             if (!list.length) return 'normal';
             const latest=list[list.length-1];
-            if (latest.endAt) { const d=new Date(latest.endAt); if (!isNaN(d.getTime()) && d.getFullYear()===y) return 'normal'; }
             return latest.level || 'normal';
         }
 
@@ -7340,7 +7348,8 @@
                             const s = rowStyle[h.level] || rowStyle.verbal;
                             const date = h.startAt ? warningFormatDateTime(h.startAt) : '-';
                             const note = h.note ? warningEscapeHtml(h.note) : '';
-                            const status = h.endAt ? 'Closed' : 'Open';
+                            const isCurrentYearRecord = Number(profileWarningYear) === new Date().getFullYear();
+                            const status = isCurrentYearRecord ? 'Current Year' : 'History';
                             return `<div class="flex items-center gap-2 px-2 py-1.5 rounded-lg border ${s.bg} ${s.border}">
                                 <span class="w-2 h-2 rounded-full ${s.dot} shrink-0"></span>
                                 <div class="min-w-0 flex-1">
@@ -7350,7 +7359,7 @@
                                     </div>
                                     ${note ? `<div class="text-[9px] text-slate-500 truncate mt-0.5">${note}</div>` : ''}
                                 </div>
-                                <span class="text-[8px] font-bold ${h.endAt ? 'text-slate-400' : 'text-emerald-600'} shrink-0">${status}</span>
+                                <span class="text-[8px] font-bold ${isCurrentYearRecord ? 'text-blue-600' : 'text-slate-400'} shrink-0">${status}</span>
                             </div>`;
                         }).join('')
                         : `<div class="text-[9px] text-slate-400 py-1">No warning or FIC records for ${profileWarningYear}.</div>`;
