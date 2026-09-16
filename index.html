@@ -24,7 +24,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, getDocs, collection, setDoc, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
         const firebaseConfig = {
@@ -40,7 +40,7 @@
             const app = initializeApp(firebaseConfig);
             window.db = getFirestore(app);
             window.appId = firebaseConfig.appId;
-            window.fbDoc = doc; window.fbGetDoc = getDoc; window.fbSetDoc = setDoc; 
+            window.fbDoc = doc; window.fbGetDoc = getDoc; window.fbGetDocs = getDocs; window.fbCollection = collection; window.fbSetDoc = setDoc; 
             window.fbOnSnapshot = onSnapshot; window.fbDeleteDoc = deleteDoc;
             window.fbStorage = getStorage(app); window.fbStorageRef = storageRef; window.fbUploadBytes = uploadBytes; window.fbGetDownloadURL = getDownloadURL; window.fbDeleteObject = deleteObject;
 
@@ -2413,8 +2413,7 @@
 </style>
 </head>
 <body class="text-slate-800 h-screen flex flex-col" data-active-tab="daily">
-
-    <!-- Global Loading Screen -->
+<!-- Global Loading Screen -->
     <div id="globalLoader">
         <div class="loader-spinner"></div>
         <h2 class="text-xl font-bold text-slate-800 mb-2">Loading Dashboard...</h2>
@@ -2423,7 +2422,38 @@
     </div>
 
     <!-- Image Preview Modal -->
-    <div id="imagePreviewModal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md hidden z-[9999] flex items-center justify-center p-4 opacity-0 transition-opacity duration-300" onclick="closeImagePreview()">
+    
+    <div id="photoMigrationModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-[9998] items-center justify-center p-4" onclick="if(event.target===this)closePhotoMigrationPanel()">
+        <div class="bg-white w-full max-w-xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+            <div class="px-5 py-4 border-b flex items-center justify-between">
+                <div>
+                    <h3 class="font-extrabold text-slate-900 text-lg">Staff Photo Sync</h3>
+                    <p class="text-xs text-slate-500 mt-1">Copies existing staff photos into Firebase Storage for reliable display on every device.</p>
+                </div>
+                <button onclick="closePhotoMigrationPanel()" class="w-9 h-9 rounded-lg hover:bg-slate-100 text-slate-400"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-5 space-y-4">
+                <div class="rounded-xl border border-blue-200 bg-blue-50 p-3 text-xs text-slate-600">
+                    Photos are resized to about <strong>400×400</strong> and saved as compressed JPEGs under <code>staff-photos/&lt;staff-id&gt;.jpg</code>.<br><span class="text-blue-700 font-semibold">For guaranteed results, use “Upload Photos” or “Upload / Replace Photo”. Direct upload does not depend on Google Drive permissions.</span>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="rounded-xl border p-3"><div class="text-[10px] uppercase font-bold text-slate-400">Ready</div><div id="photoSyncReady" class="text-xl font-extrabold text-slate-900">0</div></div>
+                    <div class="rounded-xl border p-3"><div class="text-[10px] uppercase font-bold text-slate-400">Completed</div><div id="photoSyncDone" class="text-xl font-extrabold text-emerald-600">0</div></div>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between text-xs mb-1.5"><span class="font-semibold text-slate-600">Progress</span><span id="photoSyncPct" class="font-bold text-slate-500">0%</span></div>
+                    <div class="h-2 rounded-full bg-slate-100 overflow-hidden"><div id="photoSyncBar" class="h-full bg-blue-600" style="width:0%"></div></div>
+                </div>
+                <div id="photoSyncLog" class="h-40 overflow-auto rounded-xl bg-slate-50 border p-3 text-[11px] font-mono text-slate-600 whitespace-pre-wrap">Ready.</div>
+                <div class="flex flex-wrap justify-end gap-2">
+                    <button onclick="closePhotoMigrationPanel()" class="px-4 py-2 rounded-lg border border-slate-300 font-bold text-sm text-slate-600">Close</button>
+                    <button id="photoSyncStartBtn" onclick="syncAllStaffPhotosToFirebase()" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm"><i class="fa-solid fa-cloud-arrow-up mr-1.5"></i>Sync All Photos</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<div id="imagePreviewModal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md hidden z-[9999] flex items-center justify-center p-4 opacity-0 transition-opacity duration-300" onclick="closeImagePreview()">
         <img id="previewImg" src="" class="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl transform scale-95 transition-transform duration-300">
         <button class="absolute top-4 right-4 text-white hover:text-gray-300 text-4xl w-12 h-12 flex items-center justify-center" onclick="closeImagePreview()"><i class="fa-solid fa-xmark"></i></button>
     </div>
@@ -2509,6 +2539,13 @@
                 </div>
                 
                 <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 w-full xl:w-auto">
+                    <button id="photoBulkUploadBtn" type="button" onclick="document.getElementById('photoBulkUploadInput').click()" class="w-full sm:w-auto bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-sm font-bold rounded-lg px-3.5 py-2.5 flex items-center justify-center gap-2 shadow-sm transition-colors" title="Upload staff photos directly to Firebase">
+                        <i class="fa-solid fa-folder-open"></i><span>Upload Photos</span>
+                    </button>
+                    <input id="photoBulkUploadInput" type="file" multiple accept="image/jpeg,image/png,image/webp" class="hidden" onchange="handleBulkStaffPhotoUpload(this)">
+                    <button id="photoMigrationBtn" type="button" onclick="openPhotoMigrationPanel()" class="w-full sm:w-auto bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-sm font-bold rounded-lg px-3.5 py-2.5 flex items-center justify-center gap-2 shadow-sm transition-colors" title="Sync staff photos to Firebase">
+                        <i class="fa-solid fa-images"></i><span>Sync Photos</span>
+                    </button>
                     <button id="dashboardRefreshBtn" type="button" onclick="refreshAllTabs(this)" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 border border-blue-600 text-white text-sm font-bold rounded-lg px-3.5 py-2.5 flex items-center justify-center gap-2 shadow-sm transition-colors" title="Refresh Dashboard">
                         <i class="fa-solid fa-rotate"></i><span>Refresh</span>
                     </button>
@@ -3094,6 +3131,10 @@
                         <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-1">
                             <span id="modalId" class="bg-slate-100 px-2 py-0.5 rounded text-slate-600 text-xs font-bold border border-slate-200">ID</span>
                             <span id="modalCompany" class="text-xs sm:text-sm font-medium text-slate-500 flex items-center gap-1">Company</span>
+                            <button id="modalPhotoUploadBtn" type="button" onclick="triggerStaffPhotoUploadFromModal()" class="text-[10px] sm:text-xs font-bold text-blue-600 bg-blue-50 border border-blue-200 rounded-lg px-2.5 py-1.5 hover:bg-blue-100">
+                                <i class="fa-solid fa-camera mr-1"></i>Upload / Replace Photo
+                            </button>
+                            <input id="modalPhotoUploadInput" type="file" accept="image/jpeg,image/png,image/webp" class="hidden" onchange="handleStaffPhotoUploadFromModal(this)">
                         </div>
                     </div>
                 </div>
@@ -4010,10 +4051,11 @@
                                     let m = finalUrl.match(/[?&]id=([^&]+)/);
                                     if (m) photoFallbackUrl = `https://lh3.googleusercontent.com/d/${m[1]}=w800`;
                                 }
-                                emp.photoUrl = finalUrl;
-                                emp.photoFallbackUrl = photoFallbackUrl;
                                 emp.photoSourceUrl = urlMatch.trim();
                                 emp.photoFileId = pdfExtractDriveFileId(urlMatch.trim()) || pdfExtractDriveFileId(finalUrl) || '';
+                                emp.photoUrls = buildStaffPhotoUrls(emp.photoFileId || emp.photoSourceUrl);
+                                emp.photoUrl = emp.photoUrls[0] || finalUrl;
+                                emp.photoFallbackUrl = emp.photoUrls[1] || photoFallbackUrl || '';
                                 // Keep the visible dashboard photo exactly as before, but pre-build
                                 // CORS-safe variants specifically for jsPDF export.
                                 if (emp.photoFileId) {
@@ -4513,9 +4555,520 @@
             if(period) period.textContent = `${selectedDashboardMonth==='All'?'Full Year':selectedDashboardMonth} ${selectedDashboardYear}`;
         }
 
+        function photoEscapeAttr(value) {
+            return String(value ?? '')
+                .replace(/&/g,'&amp;').replace(/"/g,'&quot;')
+                .replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        }
+
+        function buildStaffPhotoUrls(sourceUrlOrId) {
+            const raw = String(sourceUrlOrId || '').trim();
+            let id = '';
+            if (raw && !/^https?:\/\//i.test(raw) && /^[A-Za-z0-9_-]{20,}$/.test(raw)) id = raw;
+            if (!id && typeof pdfExtractDriveFileId === 'function') id = pdfExtractDriveFileId(raw) || '';
+
+            const urls = [];
+            const push = (u) => {
+                u = String(u || '').trim();
+                if (u && !urls.includes(u)) urls.push(u);
+            };
+
+            if (id) {
+                // Different Google endpoints work differently across Safari, PWA/WebView,
+                // Chrome and signed-in / signed-out devices. Try several automatically.
+                push(`https://lh3.googleusercontent.com/d/${id}=w800`);
+                push(`https://drive.google.com/thumbnail?id=${id}&sz=w800`);
+                push(`https://drive.google.com/uc?export=view&id=${id}`);
+                push(`https://drive.usercontent.google.com/download?id=${id}&export=view&authuser=0`);
+            }
+            push(raw);
+            return urls;
+        }
+
+        function firebasePhotoDocKey(emp) {
+            return String(emp?.id || emp?.displayId || emp?.name || '').trim();
+        }
+
+        async function loadFirebasePhotoMap() {
+            if (!window.db || !window.fbCollection || !window.fbGetDocs) return {};
+            try {
+                const snap = await window.fbGetDocs(window.fbCollection(window.db, 'staff_photos'));
+                const map = {};
+                snap.forEach(d => { map[d.id] = d.data(); });
+                return map;
+            } catch(e) {
+                console.warn('Could not load Firebase staff photo map', e);
+                return {};
+            }
+        }
+
+        async function applyFirebasePhotosToEmployees() {
+            const map = await loadFirebasePhotoMap();
+            allEmployees.forEach(emp => {
+                const key = firebasePhotoDocKey(emp);
+                const rec = map[key];
+                if (rec?.url) emp.firebasePhotoUrl = rec.url;
+            });
+        }
+
+        function photoLog(msg) {
+            const el = document.getElementById('photoSyncLog');
+            if (!el) return;
+            const stamp = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+            el.textContent += `\n[${stamp}] ${msg}`;
+            el.scrollTop = el.scrollHeight;
+        }
+
+        function updatePhotoSyncProgress(done, total) {
+            const pct = total ? Math.round(done * 100 / total) : 0;
+            const doneEl = document.getElementById('photoSyncDone');
+            const pctEl = document.getElementById('photoSyncPct');
+            const bar = document.getElementById('photoSyncBar');
+            if (doneEl) doneEl.textContent = String(done);
+            if (pctEl) pctEl.textContent = `${pct}%`;
+            if (bar) bar.style.width = `${pct}%`;
+        }
+
+        function normalizePhotoMatchKey(value) {
+            return String(value || '')
+                .toLowerCase()
+                .replace(/\.[a-z0-9]+$/i,'')
+                .replace(/[^a-z0-9]+/g,'')
+                .trim();
+        }
+
+        function findEmployeeForPhotoFilename(filename) {
+            const base = String(filename || '').replace(/\.[^.]+$/,'').trim();
+            const key = normalizePhotoMatchKey(base);
+            if (!key) return null;
+
+            // 1) Exact staff ID/display ID.
+            let emp = allEmployees.find(e =>
+                normalizePhotoMatchKey(e.displayId) === key ||
+                normalizePhotoMatchKey(e.id) === key
+            );
+            if (emp) return emp;
+
+            // 2) Exact staff name.
+            emp = allEmployees.find(e => normalizePhotoMatchKey(e.name) === key);
+            if (emp) return emp;
+
+            // 3) Filename contains a full staff ID or name.
+            emp = allEmployees.find(e => {
+                const idKey = normalizePhotoMatchKey(e.displayId || e.id);
+                const nameKey = normalizePhotoMatchKey(e.name);
+                return (idKey && key.includes(idKey)) || (nameKey && key.includes(nameKey));
+            });
+            return emp || null;
+        }
+
+        async function fileToCompressedStaffPhotoBlob(file, maxSize = 400, quality = 0.82) {
+            const objectUrl = URL.createObjectURL(file);
+            try {
+                const img = new Image();
+                const loaded = await new Promise((resolve, reject) => {
+                    img.onload = () => resolve(img);
+                    img.onerror = () => reject(new Error('Could not read this image file.'));
+                    img.src = objectUrl;
+                });
+
+                const srcW = loaded.naturalWidth || loaded.width;
+                const srcH = loaded.naturalHeight || loaded.height;
+                const ratio = Math.min(1, maxSize / Math.max(srcW, srcH));
+                const w = Math.max(1, Math.round(srcW * ratio));
+                const h = Math.max(1, Math.round(srcH * ratio));
+
+                const canvas = document.createElement('canvas');
+                canvas.width = w;
+                canvas.height = h;
+                const ctx = canvas.getContext('2d', { alpha:false });
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0,0,w,h);
+                ctx.drawImage(loaded,0,0,w,h);
+
+                return await new Promise((resolve, reject) => {
+                    canvas.toBlob(
+                        blob => blob ? resolve(blob) : reject(new Error('Could not compress the photo.')),
+                        'image/jpeg',
+                        quality
+                    );
+                });
+            } finally {
+                URL.revokeObjectURL(objectUrl);
+            }
+        }
+
+        async function uploadStaffPhotoFileToFirebase(emp, file) {
+            if (!emp) throw new Error('Employee not found.');
+            if (!file) throw new Error('No photo selected.');
+
+            const allowed = new Set(['image/jpeg','image/png','image/webp']);
+            if (!allowed.has(file.type)) throw new Error('Only JPG, PNG or WebP photos are supported.');
+            if (file.size > 15 * 1024 * 1024) throw new Error('Photo is too large. Maximum 15 MB.');
+
+            if (!window.fbStorage || !window.fbStorageRef || !window.fbUploadBytes || !window.fbGetDownloadURL) {
+                throw new Error('Firebase Storage is not ready.');
+            }
+            if (!window.db || !window.fbDoc || !window.fbSetDoc) {
+                throw new Error('Firebase Firestore is not ready.');
+            }
+
+            await window.authReady;
+
+            const blob = await fileToCompressedStaffPhotoBlob(file, 400, 0.82);
+            const safeId = String(emp.displayId || emp.id || emp.name || 'staff').replace(/[^0-9A-Za-z_-]+/g,'_');
+            const path = `staff-photos/${safeId}.jpg`;
+
+            const ref = window.fbStorageRef(window.fbStorage, path);
+            const snap = await window.fbUploadBytes(ref, blob, {
+                contentType:'image/jpeg',
+                cacheControl:'public,max-age=31536000',
+                customMetadata:{
+                    staffId:String(emp.displayId || emp.id || ''),
+                    name:String(emp.name || '')
+                }
+            });
+
+            const url = await window.fbGetDownloadURL(snap.ref);
+            await saveFirebasePhotoRecord(emp, url, path, blob.size);
+
+            emp.firebasePhotoUrl = url;
+
+            // Clear a device's remembered Drive endpoint so Firebase is preferred immediately.
+            try {
+                const cacheKey = String(emp.photoFileId || emp.id || emp.displayId || emp.name || '').trim();
+                if (cacheKey) localStorage.removeItem('staffPhotoWorking:' + cacheKey);
+            } catch(e) {}
+
+            return { url, path, size:blob.size };
+        }
+
+        function refreshPhotoDrivenViews() {
+            try { renderMobileDashboardUI(); } catch(e) {}
+            try { applyFilters(); } catch(e) {}
+            try { renderDailyAttendance(); } catch(e) {}
+            try {
+                if (typeof currentOrgCompany !== 'undefined' && currentOrgCompany && typeof window.renderOrgChart === 'function') {
+                    window.renderOrgChart(currentOrgCompany, true);
+                }
+            } catch(e) {}
+            try {
+                if (typeof window.fetchLiveData === 'function') window.fetchLiveData();
+            } catch(e) {}
+        }
+
+        window.triggerStaffPhotoUploadFromModal = function() {
+            const input = document.getElementById('modalPhotoUploadInput');
+            if (input) input.click();
+        };
+
+        window.handleStaffPhotoUploadFromModal = async function(input) {
+            const file = input?.files?.[0];
+            if (!file) return;
+
+            const empId = String(window.currentModalEmployeeId || '');
+            const emp = allEmployees.find(e => normalizeId(e.id) === normalizeId(empId));
+            if (!emp) {
+                showAppToast('Could not identify this employee.', 'error');
+                input.value = '';
+                return;
+            }
+
+            const btn = document.getElementById('modalPhotoUploadBtn');
+            const oldHtml = btn?.innerHTML || '';
+            try {
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Uploading...';
+                }
+
+                const result = await uploadStaffPhotoFileToFirebase(emp, file);
+                refreshPhotoDrivenViews();
+
+                // Refresh the profile avatar immediately.
+                const avatar = document.getElementById('modalAvatar');
+                if (avatar) {
+                    avatar.innerHTML = staffPhotoImgHtml(emp, 'w-full h-full object-cover', emp.name || 'Avatar') || emp.name[0];
+                }
+
+                showAppToast(`Photo updated for ${emp.name}.`, 'info');
+            } catch(e) {
+                console.error('Direct staff photo upload failed', e);
+                const msg = String(e?.message || e || 'Could not upload staff photo.');
+                showAppToast(msg.includes('permission') || msg.includes('Permission')
+                    ? 'Firebase denied the upload. Check Firebase Storage / Firestore rules.'
+                    : msg, 'error');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = oldHtml || '<i class="fa-solid fa-camera mr-1"></i>Upload / Replace Photo';
+                }
+                input.value = '';
+            }
+        };
+
+        window.handleBulkStaffPhotoUpload = async function(input) {
+            const files = Array.from(input?.files || []);
+            if (!files.length) return;
+
+            let uploaded = 0, failed = 0;
+            const unmatched = [];
+
+            showAppToast(`Uploading ${files.length} staff photo${files.length===1?'':'s'}...`, 'info');
+
+            for (const file of files) {
+                const emp = findEmployeeForPhotoFilename(file.name);
+                if (!emp) {
+                    unmatched.push(file.name);
+                    continue;
+                }
+
+                try {
+                    await uploadStaffPhotoFileToFirebase(emp, file);
+                    uploaded++;
+                } catch(e) {
+                    failed++;
+                    console.warn('Bulk staff photo upload failed:', file.name, e);
+                }
+            }
+
+            refreshPhotoDrivenViews();
+            input.value = '';
+
+            let msg = `${uploaded} photo${uploaded===1?'':'s'} uploaded to Firebase.`;
+            if (unmatched.length) msg += ` ${unmatched.length} filename${unmatched.length===1?'':'s'} could not be matched.`;
+            if (failed) msg += ` ${failed} upload${failed===1?'':'s'} failed.`;
+            showAppToast(msg, failed ? 'error' : 'info');
+
+            if (unmatched.length) console.warn('Unmatched staff photo filenames:', unmatched);
+        };
+
+        window.openPhotoMigrationPanel = function() {
+            const m = document.getElementById('photoMigrationModal');
+            if (!m) return;
+            const candidates = allEmployees.filter(e => getStaffPhotoUrls(e).length > 0);
+            document.getElementById('photoSyncReady').textContent = String(candidates.length);
+            document.getElementById('photoSyncDone').textContent = '0';
+            document.getElementById('photoSyncPct').textContent = '0%';
+            document.getElementById('photoSyncBar').style.width = '0%';
+            document.getElementById('photoSyncLog').textContent = 'Ready.';
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+        };
+
+        window.closePhotoMigrationPanel = function() {
+            const m = document.getElementById('photoMigrationModal');
+            if (!m) return;
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+        };
+
+        async function loadImageForFirebase(emp) {
+            const urls = getStaffPhotoUrls(emp).filter(u => u && u !== emp.firebasePhotoUrl);
+            let lastErr = null;
+            for (const url of urls) {
+                try {
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    img.referrerPolicy = 'no-referrer';
+                    const loaded = await new Promise((resolve, reject) => {
+                        const t = setTimeout(() => reject(new Error('timeout')), 10000);
+                        img.onload = () => { clearTimeout(t); resolve(img); };
+                        img.onerror = () => { clearTimeout(t); reject(new Error('load failed')); };
+                        img.src = url;
+                    });
+                    return loaded;
+                } catch(e) { lastErr = e; }
+            }
+            throw lastErr || new Error('No working source photo URL');
+        }
+
+        async function imageToCompressedJpegBlob(img, maxSize = 400, quality = 0.82) {
+            const ratio = Math.min(1, maxSize / Math.max(img.naturalWidth || img.width, img.naturalHeight || img.height));
+            const w = Math.max(1, Math.round((img.naturalWidth || img.width) * ratio));
+            const h = Math.max(1, Math.round((img.naturalHeight || img.height) * ratio));
+            const canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0,0,w,h);
+            ctx.drawImage(img,0,0,w,h);
+            return await new Promise((resolve, reject) => {
+                canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('JPEG conversion failed')), 'image/jpeg', quality);
+            });
+        }
+
+        async function saveFirebasePhotoRecord(emp, url, path, size) {
+            if (!window.db || !window.fbDoc || !window.fbSetDoc) return;
+            const key = firebasePhotoDocKey(emp);
+            if (!key) return;
+            await window.fbSetDoc(window.fbDoc(window.db, 'staff_photos', key), {
+                staffId: emp.displayId || emp.id || '',
+                name: emp.name || '',
+                url, path, size: size || 0,
+                updatedAt: new Date().toISOString()
+            }, { merge:true });
+        }
+
+        window.syncAllStaffPhotosToFirebase = async function() {
+            const btn = document.getElementById('photoSyncStartBtn');
+            if (!window.fbStorage || !window.fbStorageRef || !window.fbUploadBytes || !window.fbGetDownloadURL) {
+                showAppToast('Firebase Storage is not ready. Enable Firebase Storage first.', 'error');
+                return;
+            }
+            await window.authReady;
+
+            const candidates = allEmployees.filter(e => getStaffPhotoUrls(e).length > 0);
+            if (!candidates.length) {
+                showAppToast('No staff photos found to sync.', 'info');
+                return;
+            }
+
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i>Syncing...';
+            }
+            document.getElementById('photoSyncLog').textContent = 'Starting photo sync...';
+            let done = 0;
+            updatePhotoSyncProgress(done, candidates.length);
+
+            for (const emp of candidates) {
+                try {
+                    if (emp.firebasePhotoUrl) {
+                        photoLog(`${emp.name}: already in Firebase, skipped.`);
+                        done++; updatePhotoSyncProgress(done, candidates.length);
+                        continue;
+                    }
+
+                    const img = await loadImageForFirebase(emp);
+                    const blob = await imageToCompressedJpegBlob(img, 400, 0.82);
+                    const safeId = String(emp.displayId || emp.id || emp.name || 'staff').replace(/[^0-9A-Za-z_-]+/g,'_');
+                    const path = `staff-photos/${safeId}.jpg`;
+                    const ref = window.fbStorageRef(window.fbStorage, path);
+                    const snap = await window.fbUploadBytes(ref, blob, {
+                        contentType:'image/jpeg',
+                        cacheControl:'public,max-age=31536000,immutable',
+                        customMetadata:{ staffId:String(emp.displayId || emp.id || ''), name:String(emp.name || '') }
+                    });
+                    const url = await window.fbGetDownloadURL(snap.ref);
+                    await saveFirebasePhotoRecord(emp, url, path, blob.size);
+                    emp.firebasePhotoUrl = url;
+                    photoLog(`${emp.name}: uploaded (${Math.round(blob.size/1024)} KB).`);
+                } catch(e) {
+                    console.warn('Photo sync failed', emp.name, e);
+                    photoLog(`${emp.name}: FAILED - ${e?.message || e}`);
+                }
+                done++;
+                updatePhotoSyncProgress(done, candidates.length);
+            }
+
+            renderMobileDashboardUI();
+            renderDailyAttendance();
+            if (typeof window.renderOrgChart === 'function' && typeof currentOrgCompany !== 'undefined' && currentOrgCompany) {
+                try { window.renderOrgChart(currentOrgCompany, true); } catch(e) {}
+            }
+            if (typeof window.fetchLiveData === 'function') {
+                try { await window.fetchLiveData(); } catch(e) {}
+            }
+
+            photoLog('Photo sync finished.');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up mr-1.5"></i>Sync All Photos';
+            }
+            showAppToast('Firebase staff photo sync finished.', 'info');
+        };
+
+        function getStaffPhotoUrls(emp) {
+            if (!emp) return [];
+            let urls = [];
+            const add = (u) => {
+                u = String(u || '').trim();
+                if (u && !urls.includes(u)) urls.push(u);
+            };
+
+            add(emp.firebasePhotoUrl);
+            if (Array.isArray(emp.photoUrls)) emp.photoUrls.forEach(add);
+            if (emp.photoFileId) buildStaffPhotoUrls(emp.photoFileId).forEach(add);
+            if (emp.photoSourceUrl) buildStaffPhotoUrls(emp.photoSourceUrl).forEach(add);
+            add(emp.photoUrl);
+            add(emp.photoFallbackUrl);
+
+            // If this device previously found an endpoint that works, try it first.
+            const cacheKey = String(emp.photoFileId || emp.id || emp.displayId || emp.name || '').trim();
+            if (cacheKey) {
+                try {
+                    const cached = localStorage.getItem('staffPhotoWorking:' + cacheKey);
+                    if (cached) {
+                        urls = [cached, ...urls.filter(u => u !== cached)];
+                    }
+                } catch(e) {}
+            }
+            return urls;
+        }
+
+        window.rememberStaffPhotoWorkingUrl = function(img) {
+            try {
+                const key = img?.dataset?.photoKey || '';
+                if (key && img.currentSrc) localStorage.setItem('staffPhotoWorking:' + key, img.currentSrc);
+                else if (key && img.src) localStorage.setItem('staffPhotoWorking:' + key, img.src);
+            } catch(e) {}
+        };
+
+        window.advanceStaffPhotoFallback = function(img) {
+            if (!img) return;
+            let urls = [];
+            try { urls = JSON.parse(decodeURIComponent(img.dataset.photoUrls || '[]')); } catch(e) {}
+            let idx = parseInt(img.dataset.photoIndex || '0', 10);
+            if (!Number.isFinite(idx)) idx = 0;
+
+            const current = img.getAttribute('src') || '';
+            while (++idx < urls.length) {
+                const next = urls[idx];
+                if (next && next !== current) {
+                    img.dataset.photoIndex = String(idx);
+                    img.src = next;
+                    return;
+                }
+            }
+
+            // Every remote endpoint failed on this device: show the staff initial instead of a broken image.
+            const initial = String(img.dataset.photoInitial || '?').trim().charAt(0).toUpperCase() || '?';
+            const replacement = document.createElement('div');
+            replacement.className = img.className || '';
+            replacement.classList.add('mobile-avatar-placeholder');
+            if (replacement.classList.contains('staff-photo')) {
+                replacement.classList.remove('staff-photo');
+                replacement.classList.add('staff-photo-placeholder');
+            } else {
+                replacement.style.display = 'flex';
+                replacement.style.alignItems = 'center';
+                replacement.style.justifyContent = 'center';
+                replacement.style.fontWeight = '800';
+                replacement.style.color = '#2563eb';
+                replacement.style.background = '#eff6ff';
+            }
+            replacement.textContent = initial;
+            replacement.title = 'Photo unavailable on this device';
+            img.replaceWith(replacement);
+        };
+
+        function staffPhotoImgHtml(emp, className, altText = '', preview = false) {
+            const urls = getStaffPhotoUrls(emp);
+            const initial = String(emp?.name || '?').trim().charAt(0).toUpperCase() || '?';
+            if (!urls.length) return '';
+            const key = String(emp?.photoFileId || emp?.id || emp?.displayId || emp?.name || '').trim();
+            const packed = encodeURIComponent(JSON.stringify(urls));
+            const click = preview
+                ? ` onclick="event.stopPropagation(); openImagePreview(event, this.src)"`
+                : '';
+            return `<img src="${photoEscapeAttr(urls[0])}" class="${photoEscapeAttr(className)}" alt="${photoEscapeAttr(altText || emp?.name || 'Staff photo')}" loading="eager" decoding="async" referrerpolicy="no-referrer" data-photo-urls="${photoEscapeAttr(packed)}" data-photo-index="0" data-photo-key="${photoEscapeAttr(key)}" data-photo-initial="${photoEscapeAttr(initial)}" onload="rememberStaffPhotoWorkingUrl(this)" onerror="advanceStaffPhotoFallback(this)"${click}>`;
+        }
+
         function getMobileDashboardPhoto(emp, sizeClass) {
             const initial = String(emp.name || '?').trim().charAt(0).toUpperCase();
-            if (emp.photoUrl) return `<img src="${emp.photoUrl}" alt="" class="${sizeClass}">`;
+            const photo = staffPhotoImgHtml(emp, sizeClass, emp.name || 'Staff photo');
+            if (photo) return photo;
             return `<div class="${sizeClass} mobile-avatar-placeholder">${initial}</div>`;
         }
 
@@ -6639,14 +7192,15 @@
 
                     let tr=document.createElement('tr'); tr.className="hover:bg-blue-50/50 border-b transition-colors";
                     tr.innerHTML=`<td class="px-5 py-3 cursor-pointer align-top" onclick="openModalById('${e.id}')">${e.displayId}</td><td class="px-5 py-3 font-bold cursor-pointer align-top" onclick="openModalById('${e.id}')"><div class="flex items-center gap-1.5"><span>${e.name}</span>${warningInlineIndicatorHtml(e.id,{year:yr})}</div></td><td class="px-5 py-3 text-xs cursor-pointer align-top" onclick="openModalById('${e.id}')">${e.position}</td><td class="px-5 py-3 cursor-pointer align-top" onclick="openModalById('${e.id}')"><div class="flex gap-1.5 flex-wrap">${t.join('')}</div></td><td class="px-5 py-3 text-xs align-top">${nStr}</td><td class="px-5 py-3 text-xs align-top" onclick="event.stopPropagation()">${reasonInputs}</td>`; tb.appendChild(tr);
-                    if(mc) { let crd=document.createElement('div'); crd.className="bg-white rounded-xl shadow-sm border p-4 cursor-pointer relative overflow-hidden"; crd.onclick=()=>openModal(e); crd.innerHTML=`<div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div><div class="flex gap-3 pl-1"><div class="w-10 h-10 rounded-full bg-slate-50 border flex items-center justify-center font-bold overflow-hidden">${e.photoUrl ? `<img src="${e.photoUrl}" class="w-full h-full object-cover">` : e.name[0]}</div><div class="flex-grow"><h4 class="font-bold text-sm flex items-center gap-1.5">${e.name}${warningInlineIndicatorHtml(e.id,{year:yr})}</h4><div class="text-[11px] text-slate-500">${e.displayId} &bull; ${e.position}</div><div class="mt-2 flex flex-wrap gap-1.5">${t.join('')}</div><div class="mt-2 flex flex-col gap-1">${nStr}</div><div class="mt-2 flex flex-col gap-1" onclick="event.stopPropagation()">${reasonInputs}</div></div></div>`; mc.appendChild(crd); }
+                    if(mc) { let crd=document.createElement('div'); crd.className="bg-white rounded-xl shadow-sm border p-4 cursor-pointer relative overflow-hidden"; crd.onclick=()=>openModal(e); crd.innerHTML=`<div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div><div class="flex gap-3 pl-1"><div class="w-10 h-10 rounded-full bg-slate-50 border flex items-center justify-center font-bold overflow-hidden">${staffPhotoImgHtml(e, 'w-full h-full object-cover', e.name || 'Staff photo') || e.name[0]}</div><div class="flex-grow"><h4 class="font-bold text-sm flex items-center gap-1.5">${e.name}${warningInlineIndicatorHtml(e.id,{year:yr})}</h4><div class="text-[11px] text-slate-500">${e.displayId} &bull; ${e.position}</div><div class="mt-2 flex flex-wrap gap-1.5">${t.join('')}</div><div class="mt-2 flex flex-col gap-1">${nStr}</div><div class="mt-2 flex flex-col gap-1" onclick="event.stopPropagation()">${reasonInputs}</div></div></div>`; mc.appendChild(crd); }
                 });
             });
         }
 
-        window.openModalById=id=>{let e=allEmployees.find(x=>x.id===id); if(e)openModal(e);};
+        window.openModalById=id=>{window.currentModalEmployeeId=id; let e=allEmployees.find(x=>x.id===id); if(e)openModal(e);};
         function openModal(e) {
-            let avatarContent = e.photoUrl ? `<img src="${e.photoUrl}" class="w-full h-full object-cover" alt="Avatar">` : e.name[0];
+            window.currentModalEmployeeId = e?.id || window.currentModalEmployeeId || '';
+            let avatarContent = staffPhotoImgHtml(e, 'w-full h-full object-cover', e.name || 'Avatar') || e.name[0];
             document.getElementById('modalAvatar').innerHTML = avatarContent;
             document.getElementById('modalName').innerHTML=`${e.name} ${isNoticePeriodStaff(e) ? noticePeriodBadgeHtml(e,true) : ((e.status==='Resigned'||e.status==='Terminated')?`<span class="text-[9px] bg-red-100 text-red-700 px-1.5 rounded border">${e.status}</span>`:'')}`;
             document.getElementById('modalId').innerText=e.displayId; document.getElementById('modalCompany').innerHTML=`${getCompanyLogo(e.company)} ${e.company}`;
@@ -6782,7 +7336,7 @@
                 cd.innerHTML=`
                     <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-blue-500 rounded-l-xl"></div>
                     <div class="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-full bg-slate-100 border-2 border-white shadow-sm flex justify-center items-center font-bold text-lg text-blue-600 overflow-hidden ml-1">
-                        ${e.photoUrl ? `<img src="${e.photoUrl}" class="w-full h-full object-cover">` : e.name[0]}
+                        ${staffPhotoImgHtml(e, 'w-full h-full object-cover', e.name || 'Staff photo') || e.name[0]}
                     </div>
                     <div class="flex-grow min-w-0">
                         <h4 class="font-bold text-base text-slate-900 truncate">${e.name}</h4>
@@ -6840,7 +7394,7 @@
                 if (node.level !== 'missing' && node.name !== 'N/A' && !empMatch) { rC = 'border-orange-400 border-dashed'; nC = 'text-orange-600'; }
 
                 let initials = empMatch ? empMatch.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase() : '?';
-                let avatarContent = (empMatch && empMatch.photoUrl) ? `<img src="${empMatch.photoUrl}" class="w-full h-full object-cover rounded-full" alt="Avatar">` : ((!empMatch && (node.level === 'missing' || node.name === 'N/A')) ? '<i class="fa-solid fa-question text-red-400"></i>' : initials);
+                let avatarContent = empMatch ? (staffPhotoImgHtml(empMatch, 'w-full h-full object-cover rounded-full', empMatch.name || 'Avatar') || initials) : ((node.level === 'missing' || node.name === 'N/A') ? '<i class="fa-solid fa-question text-red-400"></i>' : initials);
                 
                 let cClass = empMatch ? 'cursor-pointer hover:-translate-y-1 hover:shadow-lg' : 'cursor-help opacity-90';
                 let click = empMatch ? `onclick="openModalById('${empMatch.id}')"` : `onclick="showAppToast('Data Mismatch Error', 'error')"`;
@@ -7810,35 +8364,31 @@
         if (!row || !row.length) return;
         const urlCell = row.find(c => typeof c === 'string' && /^https?:\/\//i.test(c.trim()));
         if (!urlCell) return;
-        let finalUrl = urlCell.trim();
-        let photoFallbackUrl = '';
-        const driveFile = finalUrl.match(/drive\.google\.com\/file\/d\/([^\/]+)/i);
-        const driveOpen = finalUrl.match(/drive\.google\.com\/open\?id=([^&]+)/i);
-        const driveUc = finalUrl.match(/[?&]id=([^&]+)/i);
-        if (driveFile) {
-          const id = driveFile[1];
-          finalUrl = `https://drive.google.com/thumbnail?id=${id}&sz=w400`;
-          photoFallbackUrl = `https://drive.google.com/uc?export=view&id=${id}`;
-        } else if (driveOpen) {
-          const id = driveOpen[1];
-          finalUrl = `https://drive.google.com/thumbnail?id=${id}&sz=w400`;
-          photoFallbackUrl = `https://drive.google.com/uc?export=view&id=${id}`;
-        } else if (driveUc) {
-          const id = driveUc[1];
-          photoFallbackUrl = `https://drive.google.com/uc?export=view&id=${id}`;
-        }
+        const sourceUrl = urlCell.trim();
+        const fileId = (typeof pdfExtractDriveFileId === 'function' ? pdfExtractDriveFileId(sourceUrl) : '') || '';
+        const urls = buildStaffPhotoUrls(fileId || sourceUrl);
         const textCells = row.filter(c => typeof c === 'string' && c.trim() && c.trim() !== urlCell.trim());
-        textCells.forEach(txt => photoRecords.push({ name: normalizePhotoName(txt), url: finalUrl, fallbackUrl: photoFallbackUrl }));
+        textCells.forEach(txt => photoRecords.push({
+          name: normalizePhotoName(txt),
+          fileId,
+          sourceUrl,
+          urls,
+          url: urls[0] || sourceUrl,
+          fallbackUrl: urls[1] || ''
+        }));
       });
       activeStaff.forEach(emp => {
         const empName = normalizePhotoName(emp.name);
         const empId = normalizeScanPolicy(emp.id);
         const match = photoRecords.find(r => r.name === empName || (empName && (r.name.includes(empName) || empName.includes(r.name))));
-        emp.photoUrl = match ? match.url : '';
+        emp.photoFileId = match ? (match.fileId || '') : '';
+        emp.photoSourceUrl = match ? (match.sourceUrl || '') : '';
+        emp.photoUrls = match ? [...(match.urls || [])] : [];
+        emp.photoUrl = match ? (match.url || '') : '';
         emp.photoFallbackUrl = match ? (match.fallbackUrl || '') : '';
       });
     } else {
-      activeStaff.forEach(emp => { emp.photoUrl = ''; emp.photoFallbackUrl = ''; });
+      activeStaff.forEach(emp => { emp.photoUrl = ''; emp.photoFallbackUrl = ''; emp.photoUrls = []; emp.photoFileId = ''; emp.photoSourceUrl = ''; });
     }
 
     return { activeStaff };
@@ -8390,9 +8940,8 @@
       tr.innerHTML = `
         <td>
           <div class="staff-cell-wrap">
-            ${staff.photoUrl
-              ? `<img src="${staff.photoUrl}" class="staff-photo" alt="${staff.name || 'Staff'}" loading="eager" decoding="async" referrerpolicy="no-referrer" data-photo-fallback="${String(staff.photoFallbackUrl || '').replace(/"/g, '&quot;')}" onclick="event.stopPropagation(); openImagePreview('${String(staff.photoUrl).replace(/'/g, "\\'")}')" onerror="if(this.dataset.photoFallback && this.src !== this.dataset.photoFallback){this.src=this.dataset.photoFallback;}else{this.style.display='none';this.nextElementSibling?.classList.remove('hidden');}">`
-              : `<div class="staff-photo-placeholder">${String(staff.name || '?').trim().charAt(0).toUpperCase()}</div>`}
+            ${staffPhotoImgHtml(staff, 'staff-photo', staff.name || 'Staff', true)
+              || `<div class="staff-photo-placeholder">${String(staff.name || '?').trim().charAt(0).toUpperCase()}</div>`}
             <div class="min-w-0">
               <div class="staff-name-main flex items-center gap-1">${staff.name}${warningInlineIndicatorHtml(staff.id,{year:new Date(document.getElementById('dateSelect').value+'T00:00:00').getFullYear()})}</div>
               <div class="staff-meta-line">${staff.id || '-'} &nbsp;•&nbsp; ${staff.company || '-'}</div>
