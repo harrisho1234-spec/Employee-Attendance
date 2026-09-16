@@ -3171,19 +3171,22 @@
                 </div>
                 <div id="modalWarningSection" class="hidden bg-white rounded-xl border shadow-sm mb-5 overflow-hidden">
                     <div id="modalWarningAccent" class="h-1 bg-emerald-500"></div>
-                    <div class="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+
+                    <div class="px-3 sm:px-4 pt-3 pb-2 flex items-center justify-between gap-2">
                         <div class="min-w-0">
-                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Warning Status</p>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Warning / Performance</p>
                             <div class="flex flex-wrap items-center gap-2">
                                 <span id="modalWarningBadge" class="staff-warning-badge warning-normal"><i class="fa-solid fa-circle-check"></i>Normal</span>
-                                <span id="modalWarningCount" class="text-[10px] font-bold text-slate-500 bg-slate-50 border border-slate-200 rounded-full px-2 py-1">0 warnings</span>
+                                <span id="modalWarningCount" class="text-[9px] font-bold text-slate-500 bg-slate-50 border border-slate-200 rounded-full px-2 py-1">0 warnings</span>
                             </div>
-                            <p id="modalWarningLatest" class="text-[11px] text-slate-500 mt-2 leading-relaxed"></p>
                         </div>
-                        <button id="modalWarningEditBtn" type="button" class="shrink-0 px-3 py-2 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-bold text-slate-700 flex items-center justify-center gap-1.5">
-                            <i class="fa-solid fa-clock-rotate-left"></i> View / Edit Timeline
+                        <button id="modalWarningEditBtn" type="button" class="shrink-0 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-[10px] font-bold text-slate-700 flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-clock-rotate-left"></i> Timeline
                         </button>
                     </div>
+
+                    <div id="modalWarningRows" class="px-3 sm:px-4 pb-3 space-y-1 max-h-32 overflow-y-auto custom-scrollbar"></div>
+                    <p id="modalWarningLatest" class="hidden"></p>
                 </div>
                 <h3 class="text-sm font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-scale-balanced text-blue-500"></i> Leave Balances (YTD)</h3>
                 <div class="bg-white border rounded-xl overflow-x-auto mb-4 shadow-sm custom-scrollbar">
@@ -7318,12 +7321,42 @@
                 if (count) {
                     count.textContent = `${profileWarningYear} • V ${wb.verbal} • W ${wb.written} • F ${wb.final} • FIC ${wb.fic} • Total ${wb.total}`;
                 }
-                const activeEntry = warningHistory.slice().sort((a,b)=>(new Date(b.startAt||0))-(new Date(a.startAt||0)))[0];
-                if (latest) {
-                    const period = activeEntry ? `Latest record: ${warningFormatDateTime(activeEntry.startAt)}` : '';
-                    const note = activeEntry && activeEntry.note ? ` • ${activeEntry.note}` : '';
-                    latest.textContent = `${period}${note}`.trim();
+                const compactRows = document.getElementById('modalWarningRows');
+                const profileEntries = warningHistory
+                    .filter(h => ['verbal','written','final','fic'].includes(h.level))
+                    .slice()
+                    .sort((a,b)=>(new Date(b.startAt||0))-(new Date(a.startAt||0)));
+
+                if (compactRows) {
+                    const rowStyle = {
+                        verbal:  { label:'Verbal Warning', dot:'bg-yellow-400', text:'text-yellow-800', bg:'bg-yellow-50/60', border:'border-yellow-100' },
+                        written: { label:'Written Warning', dot:'bg-orange-500', text:'text-orange-700', bg:'bg-orange-50/60', border:'border-orange-100' },
+                        final:   { label:'Final Warning', dot:'bg-red-500', text:'text-red-700', bg:'bg-red-50/60', border:'border-red-100' },
+                        fic:     { label:'FIC', dot:'bg-indigo-500', text:'text-indigo-700', bg:'bg-indigo-50/60', border:'border-indigo-100' }
+                    };
+
+                    compactRows.innerHTML = profileEntries.length
+                        ? profileEntries.map(h => {
+                            const s = rowStyle[h.level] || rowStyle.verbal;
+                            const date = h.startAt ? warningFormatDateTime(h.startAt) : '-';
+                            const note = h.note ? warningEscapeHtml(h.note) : '';
+                            const status = h.endAt ? 'Closed' : 'Open';
+                            return `<div class="flex items-center gap-2 px-2 py-1.5 rounded-lg border ${s.bg} ${s.border}">
+                                <span class="w-2 h-2 rounded-full ${s.dot} shrink-0"></span>
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-center gap-2 min-w-0">
+                                        <span class="text-[10px] font-extrabold ${s.text} whitespace-nowrap">${s.label}</span>
+                                        <span class="text-[9px] text-slate-400 truncate">${date}</span>
+                                    </div>
+                                    ${note ? `<div class="text-[9px] text-slate-500 truncate mt-0.5">${note}</div>` : ''}
+                                </div>
+                                <span class="text-[8px] font-bold ${h.endAt ? 'text-slate-400' : 'text-emerald-600'} shrink-0">${status}</span>
+                            </div>`;
+                        }).join('')
+                        : `<div class="text-[9px] text-slate-400 py-1">No warning or FIC records for ${profileWarningYear}.</div>`;
                 }
+
+                if (latest) latest.textContent = '';
                 if (accent) {
                     accent.className = 'h-1 ' + ({ verbal:'bg-yellow-400', written:'bg-orange-500', final:'bg-red-500', fic:'bg-indigo-500', normal:'bg-emerald-500' }[displayMeta.level] || 'bg-slate-300');
                 }
