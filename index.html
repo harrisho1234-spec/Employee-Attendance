@@ -3030,6 +3030,7 @@
         <div class="card-icon icon-notscanned">👁️</div>
         <div class="card-content">
           <div class="title">Not Scanned</div>
+          <div class="text-[8px] text-slate-400 mt-0.5">Overdue only</div>
           <div class="val" id="cntNotScanned">0</div>
         </div>
       </div>
@@ -8673,6 +8674,33 @@
         return bm - am;
       });
 
+    // For the selected date, missing scans that are not due yet should be
+    // shown as "Pending Scan", not "NOT SCANNED".
+    const scanSelectedDate = document.getElementById('dateSelect').value;
+    const scanNow = new Date();
+    const scanToday =
+      scanNow.getFullYear() + '-' +
+      String(scanNow.getMonth() + 1).padStart(2, '0') + '-' +
+      String(scanNow.getDate()).padStart(2, '0');
+    const scanCurrentMins = scanNow.getHours() * 60 + scanNow.getMinutes();
+
+    const missingScanStatusForTarget = (targetMins) => {
+      const selected = new Date(scanSelectedDate + 'T00:00:00');
+      const today = new Date(scanToday + 'T00:00:00');
+
+      // Future dates are always pending.
+      if (!isNaN(selected.getTime()) && selected > today) return 'Pending Scan';
+
+      // On today, it remains pending until the scheduled scan time arrives.
+      if (scanSelectedDate === scanToday && Number.isFinite(Number(targetMins)) &&
+          scanCurrentMins < Number(targetMins)) {
+        return 'Pending Scan';
+      }
+
+      // Historical dates, or today's scan after its scheduled time, are missed.
+      return 'NOT SCANNED';
+    };
+
     displayStaffList.forEach(staff => {
       const positionText = String(staff.position || '').toLowerCase();
       const isPartTime = positionText.includes('part time') || positionText.includes('part-time');
@@ -8716,10 +8744,30 @@
       // Morning In requirement. Their first applicable scan belongs in Lunch In.
       const lateStartStaff = (staff.shiftType === '2X' && startMins >= 720) || isPartTime;
 
-      let mStatus = (hasLeaveCode || lateStartStaff || forceAfternoonFirstScan) ? '' : (forceMorningHalfDay ? 'NOT SCANNED' : 'NOT SCANNED');
-      let lOutStatus = (staff.shiftType === '2X' || lateStartStaff || forceAfternoonFirstScan) ? '' : (forceMorningHalfDay ? 'NOT SCANNED' : (hasLeaveCode ? '' : 'NOT SCANNED'));
-      let lInStatus = (staff.shiftType === '2X' || lateStartStaff || forceAfternoonFirstScan || forceMorningHalfDay) ? '' : (hasLeaveCode ? '' : 'NOT SCANNED');
-      let eStatus = (hasLeaveCode || forceMorningHalfDay) ? '' : 'NOT SCANNED';
+      // Missing-scan placeholders are time-aware:
+      // before the scheduled scan time => Pending Scan
+      // after the scheduled scan time => NOT SCANNED
+      let mStatus = (hasLeaveCode || lateStartStaff || forceAfternoonFirstScan)
+        ? ''
+        : missingScanStatusForTarget(startMins);
+
+      // Normal 4X lunch-out is expected around 11:30 AM.
+      let lOutStatus = (staff.shiftType === '2X' || lateStartStaff || forceAfternoonFirstScan)
+        ? ''
+        : (hasLeaveCode ? '' : missingScanStatusForTarget(690));
+
+      // Late-start / part-time staff use Lunch In as their first applicable scan.
+      // Normal 4X lunch return is expected around 1:00 PM.
+      let lInStatus = lateStartStaff
+        ? (hasLeaveCode ? '' : missingScanStatusForTarget(startMins))
+        : ((staff.shiftType === '2X' || forceAfternoonFirstScan || forceMorningHalfDay)
+            ? ''
+            : (hasLeaveCode ? '' : missingScanStatusForTarget(780)));
+
+      let eStatus = (hasLeaveCode || forceMorningHalfDay)
+        ? ''
+        : missingScanStatusForTarget(staff.targetEveningMins);
+
       let dailyCode = dailyAttendanceCode || '';
 
       // Morning In Status (Before or at 8:06 AM -> ON TIME)
@@ -8880,8 +8928,10 @@
       tr.dataset.morningScan = morningIn || '';
       const useAfternoonPrimary = !forceMorningHalfDay && (lateStartStaff || forceAfternoonFirstScan);
       tr.dataset.primaryStatus = forceMorningHalfDay
-        ? (mStatus || 'NOT SCANNED')
-        : (useAfternoonPrimary ? (lInStatus || 'NOT SCANNED') : (mStatus || 'NOT SCANNED'));
+        ? (mStatus || missingScanStatusForTarget(startMins))
+        : (useAfternoonPrimary
+            ? (lInStatus || missingScanStatusForTarget(startMins))
+            : (mStatus || missingScanStatusForTarget(startMins)));
       tr.dataset.primaryScan = forceMorningHalfDay
         ? (morningIn || '')
         : (useAfternoonPrimary ? (lunchIn || '') : (morningIn || ''));
@@ -9050,7 +9100,7 @@
 
 
   function openScanStatusPanel(status) {
-    const labels = { leave: 'On Leave', notScanned: 'Not Scanned', late: 'Late', late30: 'Late 30+' };
+    const labels = { leave: 'On Leave', pending: 'Pending Scan', notScanned: 'Not Scanned', late: 'Late', late30: 'Late 30+' };
     const panel = document.getElementById('scanStatusPanel');
     const list = document.getElementById('scanStatusPanelList');
     const rows = Array.from(document.querySelectorAll('#attendanceTable tr')).filter(r => r.style.display !== 'none' && r.querySelectorAll('td').length);
@@ -9062,6 +9112,7 @@
       if (status === 'leave') return codes.some(c => leaveCodes.has(c));
       const primaryStatus = row.dataset.primaryStatus || morning;
       const primaryCode = codes[0] || '';
+      if (status === 'pending') return primaryCode === 'P' && primaryStatus.includes('Pending Scan');
       if (status === 'notScanned') return primaryCode === 'P' && primaryStatus.includes('NOT SCANNED');
       if (status === 'late30') return primaryStatus.includes('Late (30+)');
       if (status === 'late') return primaryStatus.includes('Late') && !primaryStatus.includes('Late (30+)');
@@ -9099,6 +9150,7 @@
       const leaveTypeHtml = codes.length ? `<span class="leave-code-group">${codes.map(code => `<span class="code-badge ${leaveBadgeClass(code)}">${code}</span>`).join('')}</span>` : '-';
       let detail = '';
       if (status === 'leave') detail = `<div class="scan-status-detail"><i class="fa-solid fa-calendar-day"></i> Leave: <strong>${leaveTypeHtml}</strong></div>`;
+      if (status === 'pending') detail = `<div class="scan-status-detail"><i class="fa-solid fa-hourglass-half"></i> Due: <strong>${missedTime}</strong></div>`;
       if (status === 'notScanned') detail = `<div class="scan-status-detail"><i class="fa-solid fa-clock"></i> Missed: <strong>${missedTime}</strong></div>`;
       if (status === 'late' || status === 'late30') detail = `<div class="scan-status-detail"><i class="fa-solid fa-fingerprint"></i> Scan: <strong>${scanTime}</strong></div>`;
       return `<div class="scan-status-profile" onclick="openScanPanelStaff('${safeId}')">${photo ? `<img src="${photo.src}" class="w-12 h-12 rounded-full object-cover border">` : `<div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500">${initial}</div>`}<div class="min-w-0 flex-1"><div class="font-bold text-slate-800 truncate flex items-center gap-1">${name}${warningInlineIndicatorHtml(id,{year:new Date(document.getElementById('dateSelect').value+'T00:00:00').getFullYear()})}</div><div class="text-xs text-slate-500 mt-1 truncate">${meta}</div>${detail}</div></div>`;
