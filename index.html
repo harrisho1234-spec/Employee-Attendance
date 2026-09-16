@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Attendance Dashboard</title>
+    <!-- Photo mapping: Staff ID primary, Name/File Name fallback -->
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome -->
@@ -3992,59 +3993,125 @@
                 });
             }
 
-            if(photos) {
-                photos.forEach(row => {
-                    if(!row || row.length < 2) return;
-                    let urlMatch = row.find(c => typeof c === 'string' && c.trim().match(/^https?:\/\//));
-                    if(urlMatch) {
-                        let textCells = row.filter(c => typeof c === 'string' && c !== urlMatch && c.trim().length > 2);
-                        for(let txt of textCells) {
-                            let cleanName = txt.replace(/(Mr\.|Ms\.|Mrs\.)\s*/gi, '').replace(/\s+/g, '').toLowerCase();
-                            let emp = allEmployees.find(e => { let eName = e.name.replace(/(Mr\.|Ms\.|Mrs\.)\s*/gi, '').replace(/\s+/g, '').toLowerCase(); return eName === cleanName || eName.includes(cleanName) || cleanName.includes(eName); });
-                            if(emp) {
-                                let finalUrl = urlMatch.trim();
-                                let photoFallbackUrl = '';
-                                if(finalUrl.includes('drive.google.com/file/d/')) {
-                                    let m = finalUrl.match(/\/d\/([^\/]+)/);
-                                    if(m) {
-                                        const driveId = m[1];
-                                        finalUrl = `https://drive.google.com/thumbnail?id=${driveId}&sz=w400`;
-                                        photoFallbackUrl = `https://lh3.googleusercontent.com/d/${driveId}=w800`;
-                                    }
-                                }
-                                else if (finalUrl.includes('drive.google.com/open?id=')) {
-                                    let m = finalUrl.match(/id=([^&]+)/);
-                                    if(m) {
-                                        const driveId = m[1];
-                                        finalUrl = `https://drive.google.com/thumbnail?id=${driveId}&sz=w400`;
-                                        photoFallbackUrl = `https://lh3.googleusercontent.com/d/${driveId}=w800`;
-                                    }
-                                }
-                                else {
-                                    let m = finalUrl.match(/[?&]id=([^&]+)/);
-                                    if (m) photoFallbackUrl = `https://lh3.googleusercontent.com/d/${m[1]}=w800`;
-                                }
-                                emp.photoSourceUrl = urlMatch.trim();
-                                emp.photoFileId = pdfExtractDriveFileId(urlMatch.trim()) || pdfExtractDriveFileId(finalUrl) || '';
-                                emp.photoUrls = buildStaffPhotoUrls(emp.photoFileId || emp.photoSourceUrl);
-                                emp.photoUrl = emp.photoUrls[0] || finalUrl;
-                                emp.photoFallbackUrl = emp.photoUrls[1] || photoFallbackUrl || '';
-                                // Keep the visible dashboard photo exactly as before, but pre-build
-                                // CORS-safe variants specifically for jsPDF export.
-                                if (emp.photoFileId) {
-                                    const pdfSafe = pdfPhotoProxyUrls(`https://lh3.googleusercontent.com/d/${emp.photoFileId}=w1200`);
-                                    emp.photoPdfUrl = pdfSafe[0] || '';
-                                    emp.photoPdfFallbackUrl = pdfSafe[1] || '';
-                                } else {
-                                    const pdfSafe = pdfPhotoProxyUrls(finalUrl);
-                                    emp.photoPdfUrl = pdfSafe[0] || '';
-                                    emp.photoPdfFallbackUrl = pdfSafe[1] || '';
-                                }
-                                break;
-                            }
-                        }
-                    }
+            if (photos && Array.isArray(photos) && photos.length) {
+                // Photo sheet format:
+                // A File name | B Link | C Staff ID | D Staff Name | E Company | F File ID | G Updated At
+                //
+                // Matching priority:
+                // 1) Staff ID (primary, reliable)
+                // 2) Staff Name
+                // 3) Old filename without extension (legacy fallback)
+
+                const photoHeaderRowIndex = photos.findIndex(row => {
+                    if (!Array.isArray(row)) return false;
+                    const normalized = row.map(normalizeHeaderName);
+                    return normalized.includes('file name') &&
+                           normalized.includes('link') &&
+                           normalized.includes('staff id');
                 });
+
+                const headerRow = photoHeaderRowIndex >= 0 ? photos[photoHeaderRowIndex] : [];
+                const photoHeaderMap = {};
+                headerRow.forEach((value, index) => {
+                    photoHeaderMap[normalizeHeaderName(value)] = index;
+                });
+
+                const photoCol = {
+                    fileName: photoHeaderMap['file name'] ?? 0,
+                    link: photoHeaderMap['link'] ?? 1,
+                    staffId: photoHeaderMap['staff id'] ?? 2,
+                    staffName: photoHeaderMap['staff name'] ?? 3,
+                    company: photoHeaderMap['company'] ?? 4,
+                    fileId: photoHeaderMap['file id'] ?? 5
+                };
+
+                const normalizePhotoName = value => String(value || '')
+                    .replace(/(Mr\.|Ms\.|Mrs\.)\s*/gi, '')
+                    .replace(/\.[^.]+$/i, '')
+                    .replace(/^\s*[A-Za-z]{2,5}-\d+\s*-\s*/i, '')
+                    .replace(/\s+/g, '')
+                    .toLowerCase();
+
+                const applyPhotoToEmployee = (emp, driveLink, explicitFileId) => {
+                    if (!emp) return;
+
+                    const rawLink = String(driveLink || '').trim();
+                    const driveId = String(explicitFileId || '').trim() ||
+                        pdfExtractDriveFileId(rawLink);
+
+                    if (!rawLink && !driveId) return;
+
+                    let sourceUrl = rawLink;
+                    if (!sourceUrl && driveId) {
+                        sourceUrl = `https://drive.google.com/file/d/${driveId}/view?usp=drivesdk`;
+                    }
+
+                    emp.photoSourceUrl = sourceUrl;
+                    emp.photoFileId = driveId || pdfExtractDriveFileId(sourceUrl) || '';
+                    emp.photoUrls = buildStaffPhotoUrls(emp.photoFileId || emp.photoSourceUrl);
+
+                    // Put the returned/known Drive thumbnail first when possible.
+                    if (emp.photoFileId) {
+                        const thumbnail = `https://drive.google.com/thumbnail?id=${emp.photoFileId}&sz=w800`;
+                        if (!emp.photoUrls.includes(thumbnail)) emp.photoUrls.unshift(thumbnail);
+                    }
+
+                    emp.photoUrl = emp.photoUrls[0] || sourceUrl || null;
+                    emp.photoFallbackUrl = emp.photoUrls[1] || '';
+
+                    if (emp.photoFileId) {
+                        const pdfSafe = pdfPhotoProxyUrls(`https://lh3.googleusercontent.com/d/${emp.photoFileId}=w1200`);
+                        emp.photoPdfUrl = pdfSafe[0] || '';
+                        emp.photoPdfFallbackUrl = pdfSafe[1] || '';
+                    } else {
+                        const pdfSafe = pdfPhotoProxyUrls(sourceUrl);
+                        emp.photoPdfUrl = pdfSafe[0] || '';
+                        emp.photoPdfFallbackUrl = pdfSafe[1] || '';
+                    }
+                };
+
+                const firstDataRow = photoHeaderRowIndex >= 0 ? photoHeaderRowIndex + 1 : 0;
+
+                for (let r = firstDataRow; r < photos.length; r++) {
+                    const row = photos[r];
+                    if (!Array.isArray(row)) continue;
+
+                    const fileName = String(row[photoCol.fileName] || '').trim();
+                    const driveLink = String(row[photoCol.link] || '').trim();
+                    const staffId = String(row[photoCol.staffId] || '').trim();
+                    const staffName = String(row[photoCol.staffName] || '').trim();
+                    const explicitFileId = String(row[photoCol.fileId] || '').trim();
+
+                    // Staff may exist in the photo sheet before a photo has been uploaded.
+                    if (!driveLink && !explicitFileId) continue;
+
+                    let emp = null;
+
+                    // 1) Staff ID is the permanent primary key.
+                    if (staffId) {
+                        const wantedId = normalizeId(staffId);
+                        emp = allEmployees.find(e =>
+                            normalizeId(e.id) === wantedId ||
+                            normalizeId(e.displayId) === wantedId
+                        );
+                    }
+
+                    // 2) Staff Name fallback.
+                    if (!emp && staffName) {
+                        const wantedName = normalizePhotoName(staffName);
+                        emp = allEmployees.find(e => normalizePhotoName(e.name) === wantedName);
+                    }
+
+                    // 3) Legacy filename fallback for existing old rows.
+                    if (!emp && fileName) {
+                        const wantedName = normalizePhotoName(fileName);
+                        emp = allEmployees.find(e => normalizePhotoName(e.name) === wantedName);
+                    }
+
+                    if (emp) {
+                        applyPhotoToEmployee(emp, driveLink, explicitFileId);
+                    }
+                }
             }
 
             grids.forEach(mg => {
