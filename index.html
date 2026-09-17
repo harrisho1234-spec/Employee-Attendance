@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Attendance Dashboard</title>
-    <meta name="app-build" content="2026-09-17-scan-dedupe-v1">
+    <meta name="app-build" content="2026-09-17-hq-dashboard-order-v2">
     <!-- Photo mapping: Staff ID primary, Name/File Name fallback -->
         <!-- PWA -->
     <meta name="theme-color" content="#2563eb">
@@ -5640,17 +5640,25 @@
                 });
             });
 
-            const cArr=Array.from(companies).sort(); let mList=document.getElementById('companyCheckboxList'), cList=document.getElementById('calCompanyCheckboxList'), dList=document.getElementById('dailyCompanyCheckboxList'), rowList=document.getElementById('calRowCompanyDropdownMenu');
+            const cArr=companyDisplayOrder(companies); let mList=document.getElementById('companyCheckboxList'), cList=document.getElementById('calCompanyCheckboxList'), dList=document.getElementById('dailyCompanyCheckboxList'), rowList=document.getElementById('calRowCompanyDropdownMenu');
             if(mList)mList.innerHTML=''; if(cList)cList.innerHTML=''; if(dList)dList.innerHTML=''; if(rowList)rowList.innerHTML=''; if(orgList)orgList.innerHTML='';
             let oC=new Set();
             cArr.forEach(c => {
                 let sc=c.replace(/'/g,"\\'"), lb=`<span class="text-sm flex items-center">${getCompanyLogo(c)} ${c}</span>`;
                 if(mList)mList.innerHTML+=`<label class="flex items-center space-x-2 p-1.5 hover:bg-slate-50"><input type="checkbox" value="${c.replace(/"/g,'&quot;')}" class="rounded" checked onchange="handleCompanyCheck('${sc}',this.checked,'main')">${lb}</label>`;
-                if(cList)cList.innerHTML+=`<label class="flex items-center space-x-2 p-1 hover:bg-slate-50"><input type="checkbox" value="${c.replace(/"/g,'&quot;')}" class="rounded" ${c==='ITC'?'checked':''} onchange="handleCompanyCheck('${sc}',this.checked,'cal')">${lb}</label>`;
+                if(cList)cList.innerHTML+=`<label class="flex items-center space-x-2 p-1 hover:bg-slate-50"><input type="checkbox" value="${c.replace(/"/g,'&quot;')}" class="rounded" ${c==='HQ'?'checked':''} onchange="handleCompanyCheck('${sc}',this.checked,'cal')">${lb}</label>`;
                 if(dList)dList.innerHTML+=`<label class="flex items-center space-x-2 p-1.5 hover:bg-slate-50"><input type="checkbox" value="${c.replace(/"/g,'&quot;')}" class="rounded" checked onchange="handleCompanyCheck('${sc}',this.checked,'daily')">${lb}</label>`;
-                if(c==='LPH'||c==='LPL') oC.add('LPH & LPL'); else oC.add(c);
+
+                // Org Chart rules:
+                // - HQ replaces the old ITC menu/structure.
+                // - DHS intentionally has no separate Org Chart.
+                // - LPH + LPL remain combined as before.
+                if(c==='DHS') return;
+                if(c==='LPH'||c==='LPL') oC.add('LPH & LPL');
+                else oC.add(c);
             });
-            if(orgList) Array.from(oC).sort().forEach(c => {
+            const orgCompanies = companyDisplayOrder(oC);
+            if(orgList) orgCompanies.forEach(c => {
                 let sc=c.replace(/'/g,"\\'"), logo=(c==='LPH & LPL')?getCompanyLogo('LPH')+getCompanyLogo('LPL'):getCompanyLogo(c);
                 orgList.innerHTML+=`<button onclick="window.renderOrgChart('${sc}')" class="w-full text-left px-3 py-2 text-sm hover:bg-blue-50 rounded flex items-center gap-2">${logo} ${c}</button>`;
             });
@@ -5662,9 +5670,9 @@
                 });
             }
             selectedCompanies=[...cArr];
-            selectedCalendarCompanies=cArr.includes('ITC')?['ITC']:[...cArr];
+            selectedCalendarCompanies=cArr.includes('HQ')?['HQ']:[...cArr];
             selectedDailyCompanies=[...cArr];
-            selectedCalendarRowCompany = cArr.includes('ITC') ? 'ITC' : (cArr[0] || '__ALL__');
+            selectedCalendarRowCompany = cArr.includes('HQ') ? 'HQ' : (cArr[0] || '__ALL__');
             selectedCalendarRowMonth = new Date().getMonth();
             selectedCalendarRowYear = attendanceDataYear;
             initializeCalendarRowPeriodFilters();
@@ -5688,7 +5696,7 @@
             applyFilters();
             renderCalendarSummary(monthNames[currentCalendarDate.getMonth()]);
             renderDailyAttendance();
-            if(oC.size>0) window.renderOrgChart(Array.from(oC).sort()[0]);
+            if(oC.size>0) window.renderOrgChart(companyDisplayOrder(oC)[0]);
             if ((document.body.dataset.activeTab || '') === 'report' && typeof renderReport === 'function') renderReport();
         }
 
@@ -6029,7 +6037,7 @@
         }
 
         window.filterDashboardByCompanyCard = function(company = null) {
-            const allCompanyNames = Array.from(companies).filter(Boolean).sort((a,b)=>a.localeCompare(b));
+            const allCompanyNames = companyDisplayOrder(companies);
             if (!company) {
                 selectedCompanies = [...allCompanyNames];
             } else {
@@ -6051,7 +6059,32 @@
 
             const knownCompanies = Array.from(companies).filter(Boolean);
             Object.keys(companyCounts).forEach(c => { if (!knownCompanies.includes(c)) knownCompanies.push(c); });
-            const companiesSorted = knownCompanies.sort((a, b) => a.localeCompare(b));
+
+            // Dashboard View uses its own explicit order so it cannot be overridden
+            // by any alphabetical sort elsewhere in the app.
+            // Required order: HQ first, DHS last.
+            const companiesSorted = knownCompanies.slice().sort((a,b) => {
+                const A = String(a || '').trim().toUpperCase();
+                const B = String(b || '').trim().toUpperCase();
+
+                if (A === B) return 0;
+                if (A === 'HQ') return -1;
+                if (B === 'HQ') return 1;
+                if (A === 'DHS') return 1;
+                if (B === 'DHS') return -1;
+
+                const preferred = ['LPH','LPL','LPT','TTC'];
+                const ai = preferred.indexOf(A);
+                const bi = preferred.indexOf(B);
+
+                if (ai !== -1 || bi !== -1) {
+                    if (ai === -1) return 1;
+                    if (bi === -1) return -1;
+                    return ai - bi;
+                }
+
+                return String(a).localeCompare(String(b));
+            });
             const desktop = document.getElementById('kpiContainer');
             const mobile = document.getElementById('mobileStaffKpiContainer');
             const allSelected = selectedCompanies.length === companies.size || selectedCompanies.length === 0;
@@ -6707,6 +6740,22 @@
             return `<div class="${sizeClass} mobile-avatar-placeholder">${initial}</div>`;
         }
 
+
+        function companyDisplayOrder(list) {
+            return Array.from(list || [])
+                .filter(Boolean)
+                .sort((a,b) => {
+                    const A = String(a || '').trim().toUpperCase();
+                    const B = String(b || '').trim().toUpperCase();
+                    if (A === B) return 0;
+                    if (A === 'HQ') return -1;
+                    if (B === 'HQ') return 1;
+                    if (A === 'DHS') return 1;
+                    if (B === 'DHS') return -1;
+                    return String(a).localeCompare(String(b));
+                });
+        }
+
         function syncDesktopDashboardControlsFromState() {
             const mainChecks = document.querySelectorAll('#companyCheckboxList input[type="checkbox"]');
             mainChecks.forEach(cb => cb.checked = selectedCompanies.includes(cb.value.replace(/&quot;/g, '"')));
@@ -6730,7 +6779,7 @@
         function syncMobileDashboardFilterUI() {
             const companyWrap = document.getElementById('mobileDashboardCompanyChecks');
             if (companyWrap) {
-                const arr = Array.from(companies).sort();
+                const arr = companyDisplayOrder(companies);
                 companyWrap.innerHTML = arr.map(c => {
                     const safe = c.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
                     const checked = selectedCompanies.includes(c) ? 'checked' : '';
@@ -8261,7 +8310,7 @@
             syncDesktopDashboardControlsFromState(); applyFilters();
         };
         window.mobileDashboardSelectAllCompanies = function(checked) {
-            selectedCompanies = checked ? Array.from(companies).sort() : [];
+            selectedCompanies = checked ? companyDisplayOrder(companies) : [];
             syncDesktopDashboardControlsFromState(); applyFilters();
         };
         window.toggleMobileDashboardDepartmentMenu = function() {
@@ -8299,7 +8348,7 @@
             applyFilters();
         };
         window.resetMobileDashboardFilters = function() {
-            selectedCompanies = Array.from(companies).sort();
+            selectedCompanies = companyDisplayOrder(companies);
             selectedDepartments = null;
             selectedStatuses = ['Active'];
             selectedDashboardYear = attendanceDataYear;
@@ -8334,7 +8383,7 @@
         }
 
         function updateReportCompanyDropdownUI(){
-            const list=Array.from(companies).filter(Boolean).sort();
+            const list=companyDisplayOrder(companies);
             const label=document.getElementById('reportCompanyDropdownLabel');
             const all=document.getElementById('reportSelectAllCompanies');
             const box=document.getElementById('reportCompanyCheckboxList');
@@ -8386,7 +8435,7 @@
         };
 
         window.handleReportSelectAllCompanies=function(checked){
-            selectedReportCompanies=checked?Array.from(companies).filter(Boolean).sort():[];
+            selectedReportCompanies=checked?companyDisplayOrder(companies):[];
             updateReportCompanyDropdownUI();
             syncReportDepartments();
             renderReport();
@@ -8398,7 +8447,7 @@
             if(yearB){const def=new Date().getFullYear()-1,keep=Number(yearB.value)||def;yearB.innerHTML=years.map(y=>`<option value="${y}">${y}</option>`).join('');yearB.value=years.includes(keep)?String(keep):String(years[Math.min(1,years.length-1)]);}
             if(month&&!month.options.length){month.innerHTML='<option value="All">Whole Year</option>'+monthNames.map((m,i)=>`<option value="${i}">${m}</option>`).join('');month.value='All';}
 
-            const list=Array.from(companies).filter(Boolean).sort();
+            const list=companyDisplayOrder(companies);
             if(!selectedReportCompanies.length&&list.length) selectedReportCompanies=[...list];
             updateReportCompanyDropdownUI();
             syncReportDepartments();
@@ -8409,7 +8458,7 @@
 
         window.syncReportDepartments=function(){
             const sel=document.getElementById('reportDepartmentSelect');if(!sel)return;const keep=sel.value||'All';
-            const list=Array.from(companies).filter(Boolean).sort();
+            const list=companyDisplayOrder(companies);
             const selectedSet=new Set(selectedReportCompanies.length?selectedReportCompanies:list);
             const depts=Array.from(new Set(allEmployees
                 .filter(e=>isEmploymentVisible(e,new Date()))
@@ -8541,7 +8590,7 @@
 
 
         window.filterReportByCompanyCard=function(company){
-            const list=Array.from(companies).filter(Boolean).sort();
+            const list=companyDisplayOrder(companies);
             if(company==='All'){
                 selectedReportCompanies=[...list];
             }else{
@@ -8558,7 +8607,7 @@
 
         function renderReportCompanyKpis(data){
             const box=document.getElementById('reportCompanyKpis');if(!box)return;
-            const list=Array.from(companies).filter(Boolean).sort();
+            const list=companyDisplayOrder(companies);
             const allSelected=list.length>0&&selectedReportCompanies.length===list.length;
             const dept=document.getElementById('reportDepartmentSelect')?.value||'All';
             const allCount=data.scopeEmployees.length;
@@ -9157,7 +9206,7 @@
         window.renderReport=function(){
             initializeReportControls();
             const data=getReportData(),lab=document.getElementById('reportPeriodLabel'),d=document.getElementById('reportDepartmentSelect')?.value||'All';
-            const list=Array.from(companies).filter(Boolean).sort();
+            const list=companyDisplayOrder(companies);
             const companyLabel=selectedReportCompanies.length===list.length?'All Companies':selectedReportCompanies.length===1?selectedReportCompanies[0]:selectedReportCompanies.length?`${selectedReportCompanies.length} Companies`:'No Companies';
             if(lab)lab.textContent=`${data.period.label} • ${companyLabel} • ${d==='All'?'All Departments':d} • ${data.scopeEmployees.length} current staff${reportSearchQuery?` • Search result for "${reportSearchQuery}"`:''}`;
             const leaveTitle=document.getElementById('reportLeaveWatchTitle'),lateTitle=document.getElementById('reportLateWatchTitle');
@@ -9171,7 +9220,7 @@
             if(a)a.value=String(now.getFullYear());
             if(b)b.value=String(now.getFullYear()-1);
             if(m)m.value='All';
-            selectedReportCompanies=Array.from(companies).filter(Boolean).sort();
+            selectedReportCompanies=companyDisplayOrder(companies);
             reportSearchQuery='';
             const searchInput=document.getElementById('reportSearchInput'); if(searchInput) searchInput.value='';
             document.getElementById('reportSearchClear')?.classList.add('hidden');
@@ -9186,7 +9235,7 @@
 
         function buildFullReportExportData(){
             const data=getReportData();
-            const companyList=Array.from(companies).filter(Boolean).sort();
+            const companyList=companyDisplayOrder(companies);
             const company=selectedReportCompanies.length===companyList.length?'All Companies':selectedReportCompanies.length===1?selectedReportCompanies[0]:selectedReportCompanies.join(', ');
             const department=document.getElementById('reportDepartmentSelect')?.value||'All';
 
@@ -9418,7 +9467,7 @@
                 const full=buildFullReportExportData();
                 const doc=new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
 
-                const companyList=Array.from(companies).filter(Boolean).sort();
+                const companyList=companyDisplayOrder(companies);
                 const company=selectedReportCompanies.length===companyList.length?'All Companies':selectedReportCompanies.length===1?selectedReportCompanies[0]:selectedReportCompanies.join(', ');
                 const department=document.getElementById('reportDepartmentSelect')?.value||'All';
 
@@ -10025,7 +10074,7 @@
                 let aSp=[]; if(allL>0)aSp.push(`<span class="bg-red-50 text-red-700 px-2 py-1 rounded border border-red-100">${allL} Leave</span>`); if(allO>0)aSp.push(`<span class="bg-slate-700 text-white px-2 py-1 rounded border border-slate-800">${allO} Off</span>`); if(allLa>0)aSp.push(`<span class="bg-orange-50 text-orange-700 px-2 py-1 rounded border">${allLa} Late</span>`); if(allH>0)aSp.push(`<span class="bg-rose-50 text-rose-700 px-2 py-1 rounded border">${allH} Hol</span>`);
                 sH+=`<div class="flex items-center text-xs border border-blue-200 bg-blue-50/50 shadow-sm rounded-lg p-3 pr-4 mr-2"><div class="flex items-center gap-2 border-r border-blue-200 pr-4"><span class="font-bold text-blue-800">All Selected</span><span class="text-blue-500 text-[10px]">${allG}/${allTot} Staff</span></div><div class="pl-4 flex gap-1.5">${aSp.length>0?aSp.join(''):'<span class="bg-emerald-50 text-emerald-700 px-2 py-1 rounded border border-emerald-200 shadow-sm">All Present</span>'}</div></div>`;
 
-                dC.sort().forEach(c=>{
+                companyDisplayOrder(dC).forEach(c=>{
                     let tot=allEmployees.filter(e=>e.company===c&&isEmploymentVisible(e)).length, g=grp[c]||[], oL=0,oD=0,oLa=0, oH=0;
                     g.forEach(i=>{oL+=(i.leaves.AL+i.leaves.SL+i.leaves.SP+i.leaves.UP+i.leaves.A); oD+=i.leaves.D; oLa+=(i.leaves.Late5m+i.leaves.Late3m); oH+=i.leaves.H;});
                     let sp=[]; if(oL>0)sp.push(`<span class="bg-red-50 text-red-700 px-2 py-1 rounded border border-red-100">${oL} Leave</span>`); if(oD>0)sp.push(`<span class="bg-slate-700 text-white px-2 py-1 rounded border border-slate-800">${oD} Off</span>`); if(oLa>0)sp.push(`<span class="bg-orange-50 text-orange-700 px-2 py-1 rounded border">${oLa} Late</span>`); if(oH>0)sp.push(`<span class="bg-rose-50 text-rose-700 px-2 py-1 rounded border">${oH} Hol</span>`);
@@ -10349,7 +10398,44 @@
             setTimeout(()=>md.classList.add('hidden'),300);
         };
 
+
+        function orgStructureStorageCompany(companyName) {
+            const c = String(companyName || '').trim().toUpperCase();
+            return c === 'HQ' ? 'ITC' : String(companyName || '').trim();
+        }
+
+        function orgChartLiveStaff(companyName) {
+            if (companyName === 'LPH & LPL') {
+                return allEmployees.filter(e =>
+                    (e.company === 'LPH' || e.company === 'LPL') &&
+                    getEffectiveStaffStatus(e) === 'Active'
+                );
+            }
+
+            if (String(companyName || '').trim().toUpperCase() === 'HQ') {
+                // Preserve the former ITC organization exactly:
+                // staff now assigned to HQ or DHS can still match their old ITC tree nodes.
+                return allEmployees.filter(e =>
+                    (String(e.company || '').trim().toUpperCase() === 'HQ' ||
+                     String(e.company || '').trim().toUpperCase() === 'DHS') &&
+                    getEffectiveStaffStatus(e) === 'Active'
+                );
+            }
+
+            if (String(companyName || '').trim().toUpperCase() === 'DHS') {
+                return [];
+            }
+
+            return allEmployees.filter(e =>
+                e.company === companyName &&
+                getEffectiveStaffStatus(e) === 'Active'
+            );
+        }
+
         window.renderOrgChart = async function(companyName, bypassCache = false) {
+            if (String(companyName || '').trim().toUpperCase() === 'DHS') {
+                companyName = 'HQ';
+            }
             currentOrgCompany = companyName; if(!bypassCache) currentOrgTree = null;
             if(orgMenu) orgMenu.classList.add('hidden');
             let logoHtml = companyName === 'LPH & LPL' ? getCompanyLogo('LPH') + getCompanyLogo('LPL') : getCompanyLogo(companyName);
@@ -10362,7 +10448,8 @@
         const drawAndPanzoom = async () => {
             const canvas = document.getElementById('orgChartCanvas'); if (!canvas || !currentOrgCompany) return;
             const companyName = currentOrgCompany;
-            let staff = companyName === 'LPH & LPL' ? allEmployees.filter(e => (e.company === 'LPH' || e.company === 'LPL') && getEffectiveStaffStatus(e) === 'Active') : allEmployees.filter(e => e.company === companyName && getEffectiveStaffStatus(e) === 'Active');
+            const storageCompanyName = orgStructureStorageCompany(companyName);
+            let staff = orgChartLiveStaff(companyName);
             if (staff.length === 0) { canvas.innerHTML = `<div class="text-slate-400 py-10">No active staff found.</div>`; return; }
 
             let assignedIds = new Set();
@@ -10414,17 +10501,17 @@
                 if (window.db && window.appId && window.authReady) {
                     try {
                         await window.authReady;
-                        const snap = await window.fbGetDoc(window.fbDoc(window.db, 'artifacts', window.appId, 'public', 'data', 'orgCharts', companyName.replace(/[^a-zA-Z0-9-]/g, '_')));
+                        const snap = await window.fbGetDoc(window.fbDoc(window.db, 'artifacts', window.appId, 'public', 'data', 'orgCharts', storageCompanyName.replace(/[^a-zA-Z0-9-]/g, '_')));
                         if (snap.exists() && snap.data().tree) { currentOrgTree = JSON.parse(snap.data().tree); loaded = true; }
                     } catch(e) {}
                 }
-                if (!loaded) { let saved = localStorage.getItem('orgTree_' + companyName); if (saved) try { currentOrgTree = JSON.parse(saved); } catch(e) { currentOrgTree = null; } else currentOrgTree = null; }
+                if (!loaded) { let saved = localStorage.getItem('orgTree_' + storageCompanyName); if (saved) try { currentOrgTree = JSON.parse(saved); } catch(e) { currentOrgTree = null; } else currentOrgTree = null; }
             }
 
             if (!currentOrgTree) {
                 let rootNode = null;
                 // Default Org Chart Templates
-                if (companyName.includes('ITC')) {
+                if (companyName === 'HQ' || companyName.includes('ITC')) {
                     rootNode = { name: "Mol Pisal", role: "General Manager", level: "management", children: [ { name: "Long Chansovanney", role: "Accounting Manager", level: "management", children: [ { name: "Heng Chandara", role: "Sr. Accounting Officer", level: "middle", children: [{ name: "Chhom Sovannut", role: "Accounting Assistant", level: "staff" }] }, { name: "Tha Vuthea", role: "Senior Accountant", level: "middle", children: [ { name: "Som Chhunkunthida", role: "Accountant (A/P)", level: "staff" }, { name: "Mey Sotyna", role: "Accountant (A/R)", level: "staff", children: [ { name: "Hong Thanak", role: "Payment Collector", level: "staff" }, { name: "Seng Ahnisa", role: "Tax Accountant", level: "staff" } ] } ] } ] }, { name: "Plong Sovanny", role: "Finance and Tax Manager", level: "management" }, { name: "Srun povpisal", role: "Head Dept. of Product", level: "management", children: [ { name: "Porm Raksmey", role: "Senior Product Officer", level: "staff", children: [{ name: "Ra Lina", role: "Product Admin", level: "staff" }] }, { name: "Keo Sovannaroth", role: "Product Manager", level: "middle", children: [{ name: "Tang Eang", role: "Senior Product Officer", level: "staff" }] } ] }, { name: "Dyna Yaneth", role: "Assistant CEO", level: "management", children: [ { name: "Pum Savra", role: "Sup. HR & Admin", level: "middle", children: [{ name: "Mom Viwath", role: "HR & Admin", level: "staff" }] } ] }, { name: "N/A", role: "MKT Manager", level: "missing", children: [ { name: "N/A", role: "Sr. Marketing Communication", level: "missing", children: [ { name: "N/A", role: "Designer", level: "missing" }, { name: "N/A", role: "Designer", level: "missing" } ] } ] }, { name: "N/A", role: "Sales Manager", level: "missing", children: [ { name: "Din Sokheoun", role: "Senior Sales Executive", level: "middle", children: [ { name: "Oy Sovannel", role: "Sales Executive", level: "staff" }, { name: "Mey Sideth", role: "Sales Executive", level: "staff" }, { name: "Choun Chhenguon", role: "Sales Executive", level: "staff" }, { name: "Sot Radong", role: "Sales Executive", level: "staff" } ] } ] }, { name: "Han Sonyta", role: "Stock Manager", level: "management", children: [ { name: "Pen Sokha", role: "Sr. Stock Officer", level: "staff" }, { name: "Nheb Chanthoeun", role: "Stock & Delivery", level: "staff" }, { name: "Phal Phidet", role: "Stock Assistant", level: "staff" }, { name: "Tem Vanthen", role: "Delivery", level: "staff" }, { name: "Tour Monghout", role: "Delivery", level: "staff" }, { name: "Chheng Sokry", role: "Delivery", level: "staff" }, { name: "Ret Darin", role: "Delivery", level: "staff" }, { name: "N/A", role: "Delivery", level: "missing" }, { name: "N/A", role: "Delivery", level: "missing" }, { name: "N/A", role: "Delivery", level: "missing" }, { name: "N/A", role: "Delivery", level: "missing" } ] } ] };
                 } else if (companyName === 'LPT') {
                     rootNode = { name: "Tann Lyhour", role: "Managing Director", level: "management", children: [{ name: "Thonn Sambath Vichea", role: "Operation Lead", level: "middle", children: [ { name: "Mon Sreyneang", role: "Senior Corporate Sales", level: "staff" }, { name: "Eng Kakada", role: "Procurement & Admin", level: "staff" }, { name: "N/A", role: "Marketing & Content Executive", level: "missing" }, { name: "Lot Long", role: "Designer", level: "staff" } ] }] };
@@ -10491,7 +10578,7 @@
 
             if (window.db && window.appId && window.fbOnSnapshot && window.authReady) {
                 if (window.orgUnsubscribe) window.orgUnsubscribe();
-                window.orgUnsubscribe = window.fbOnSnapshot(window.fbDoc(window.db, 'artifacts', window.appId, 'public', 'data', 'orgCharts', companyName.replace(/[^a-zA-Z0-9-]/g, '_')), (s) => {
+                window.orgUnsubscribe = window.fbOnSnapshot(window.fbDoc(window.db, 'artifacts', window.appId, 'public', 'data', 'orgCharts', storageCompanyName.replace(/[^a-zA-Z0-9-]/g, '_')), (s) => {
                     if (s.exists() && !isOrgEditMode && s.data().tree && s.data().tree !== JSON.stringify(currentOrgTree)) { showAppToast("Cloud update detected. Syncing layout...", "info"); currentOrgTree = JSON.parse(s.data().tree); renderOrgChart(companyName, true); }
                 }, (e) => {});
             }
@@ -10509,9 +10596,10 @@
 
         window.saveOrgTreeData = async function() {
             if(currentOrgCompany && currentOrgTree) {
-                try { localStorage.setItem('orgTree_' + currentOrgCompany, JSON.stringify(currentOrgTree)); } catch(e) {}
+                const storageCompanyName = orgStructureStorageCompany(currentOrgCompany);
+                try { localStorage.setItem('orgTree_' + storageCompanyName, JSON.stringify(currentOrgTree)); } catch(e) {}
                 if (window.db && window.appId && window.fbDoc && window.fbSetDoc && window.authReady) {
-                    try { await window.authReady; await window.fbSetDoc(window.fbDoc(window.db, 'artifacts', window.appId, 'public', 'data', 'orgCharts', currentOrgCompany.replace(/[^a-zA-Z0-9-]/g, '_')), { tree: JSON.stringify(currentOrgTree), updatedAt: Date.now() }); } catch(e) { showAppToast("Failed to sync to Cloud. Saved locally.", "error"); }
+                    try { await window.authReady; await window.fbSetDoc(window.fbDoc(window.db, 'artifacts', window.appId, 'public', 'data', 'orgCharts', storageCompanyName.replace(/[^a-zA-Z0-9-]/g, '_')), { tree: JSON.stringify(currentOrgTree), updatedAt: Date.now() }); } catch(e) { showAppToast("Failed to sync to Cloud. Saved locally.", "error"); }
                 }
             }
         };
@@ -10668,7 +10756,7 @@
             });
 
             // Ensure all selected companies are processed, even if they have 0 leaves (like LPT)
-            cN = selectedCalendarCompanies.length > 0 ? [...selectedCalendarCompanies].sort() : Array.from(companies).sort();
+            cN = selectedCalendarCompanies.length > 0 ? [...selectedCalendarCompanies].sort() : companyDisplayOrder(companies);
             if(cN.length === 0){showAppToast("No companies to export.");return;}
             
             // Group LPH and LPL together
@@ -12300,7 +12388,7 @@
    PWA SERVICE WORKER
    ========================================================== */
 
-console.log('Attendance build: 2026-09-17-scan-dedupe-v1');
+console.log('Attendance build: 2026-09-17-hq-dashboard-order-v2');
 
 if ('serviceWorker' in navigator) {
 
