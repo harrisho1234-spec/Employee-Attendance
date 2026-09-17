@@ -1,4 +1,4 @@
-const CACHE_NAME = 'attendance-app-v6';
+const CACHE_NAME = 'attendance-app-v7';
 
 const APP_FILES = [
   './',
