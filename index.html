@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Attendance Dashboard</title>
-    <meta name="app-build" content="2026-09-16-pending-scan-v2">
+    <meta name="app-build" content="2026-09-17-notice-filter-v1">
     <!-- Photo mapping: Staff ID primary, Name/File Name fallback -->
         <!-- PWA -->
     <meta name="theme-color" content="#2563eb">
@@ -2586,9 +2586,10 @@
                         <button id="statusDropdownBtn" class="w-full sm:w-auto bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg p-2.5 min-w-[140px] flex justify-between items-center cursor-pointer hover:bg-slate-100 transition-colors">
                             <span id="statusDropdownLabel">Active</span><i class="fa-solid fa-chevron-down text-xs ml-2 text-slate-400"></i>
                         </button>
-                        <div id="statusDropdownMenu" class="hidden absolute left-0 sm:left-auto sm:right-0 z-30 w-full sm:w-48 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg flex flex-col overflow-hidden">
+                        <div id="statusDropdownMenu" class="hidden absolute left-0 sm:left-auto sm:right-0 z-30 w-full sm:w-52 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg flex flex-col overflow-hidden">
                             <div class="p-2 flex flex-col space-y-1">
                                 <label class="flex items-center space-x-2 p-1.5 hover:bg-slate-50 rounded cursor-pointer"><input type="checkbox" value="Active" class="status-checkbox rounded text-blue-600" checked onchange="handleStatusCheck()"><span class="text-sm">Active</span></label>
+                                <label class="flex items-center space-x-2 p-1.5 hover:bg-slate-50 rounded cursor-pointer"><input type="checkbox" value="Notice Period" class="status-checkbox rounded text-amber-500" onchange="handleStatusCheck()"><span class="text-sm">Notice Period</span></label>
                                 <label class="flex items-center space-x-2 p-1.5 hover:bg-slate-50 rounded cursor-pointer"><input type="checkbox" value="Resigned" class="status-checkbox rounded text-orange-500" onchange="handleStatusCheck()"><span class="text-sm">Resigned</span></label>
                                 <label class="flex items-center space-x-2 p-1.5 hover:bg-slate-50 rounded cursor-pointer"><input type="checkbox" value="Terminated" class="status-checkbox rounded text-red-500" onchange="handleStatusCheck()"><span class="text-sm">Terminated</span></label>
                             </div>
@@ -2724,6 +2725,7 @@
                             <span class="mobile-filter-label">Status</span>
                             <div class="mobile-filter-check-grid">
                                 <label class="mobile-filter-check"><input type="checkbox" value="Active" class="mobile-dashboard-status rounded" onchange="mobileDashboardSetStatuses()"><span>Active</span></label>
+                                <label class="mobile-filter-check"><input type="checkbox" value="Notice Period" class="mobile-dashboard-status rounded" onchange="mobileDashboardSetStatuses()"><span>Notice Period</span></label>
                                 <label class="mobile-filter-check"><input type="checkbox" value="Resigned" class="mobile-dashboard-status rounded" onchange="mobileDashboardSetStatuses()"><span>Resigned</span></label>
                                 <label class="mobile-filter-check"><input type="checkbox" value="Terminated" class="mobile-dashboard-status rounded" onchange="mobileDashboardSetStatuses()"><span>Terminated</span></label>
                             </div>
@@ -3674,7 +3676,7 @@
             let arr = []; document.querySelectorAll('.status-checkbox').forEach(cb => { if(cb.checked) arr.push(cb.value); });
             selectedStatuses = arr;
             let lb = document.getElementById('statusDropdownLabel');
-            if (arr.length === 3) lb.innerText = 'All Statuses'; else if (arr.length === 0) lb.innerText = 'None'; else lb.innerText = arr.join(', ');
+            if (arr.length === 4) lb.innerText = 'All Statuses'; else if (arr.length === 0) lb.innerText = 'None'; else lb.innerText = arr.join(', ');
             applyFilters();
         };
 
@@ -4411,6 +4413,28 @@
             return lastDay >= ref;
         }
 
+        // Dashboard filter: resigned staff whose Last Working Day has not passed.
+        function isResignedNoticePeriodStaff(emp, referenceDate = new Date()) {
+            if (!emp || emp.status !== 'Resigned') return false;
+            const lastDay = parseStaffDateValue(emp.resignedDate);
+            if (!lastDay) return false;
+            const ref = new Date(referenceDate); ref.setHours(0,0,0,0);
+            lastDay.setHours(23,59,59,999);
+            return lastDay >= ref;
+        }
+
+        function matchesDashboardStatusFilter(emp, referenceDate = new Date()) {
+            if (!selectedStatuses.length) return true;
+
+            if (selectedStatuses.includes('Notice Period') &&
+                isResignedNoticePeriodStaff(emp, referenceDate)) {
+                return true;
+            }
+
+            const effective = getEffectiveStaffStatus(emp, referenceDate);
+            return selectedStatuses.includes(effective);
+        }
+
         // One shared employment-visibility rule used by every tab.
         // Active staff are always visible. Resigned/Terminated staff remain visible
         // through their Last Working Day, then disappear from current staff views.
@@ -4451,7 +4475,7 @@
             return allEmployees.filter(e => {
                 if (Array.isArray(selectedDepartments) && selectedDepartments.length > 0 && !selectedDepartments.includes(e.department)) return false;
                 if (Array.isArray(selectedDepartments) && selectedDepartments.length === 0) return false;
-                if (selectedStatuses.length > 0 && !selectedStatuses.includes(getEffectiveStaffStatus(e, refDate))) return false;
+                if (!matchesDashboardStatusFilter(e, refDate)) return false;
 
                 // Keep warning-only history separate from FIC history.
                 const selectedYearPerformanceHistory = getStaffWarningHistory(e.id, selectedDashboardYear);
@@ -4576,7 +4600,7 @@
                 if(selectedCompanies.length>0 && !selectedCompanies.includes(e.company)) return false;
                 if(Array.isArray(selectedDepartments) && selectedDepartments.length > 0 && !selectedDepartments.includes(e.department)) return false;
                 if(Array.isArray(selectedDepartments) && selectedDepartments.length === 0) return false;
-                if(selectedStatuses.length > 0 && !selectedStatuses.includes(getEffectiveStaffStatus(e, refDate))) return false;
+                if (!matchesDashboardStatusFilter(e, refDate)) return false;
                 const warningHistory = getStaffWarningHistory(e.id, selectedDashboardYear).filter(h => ['verbal','written','final'].includes(String(h?.level || '').toLowerCase()));
                 const allWarningHistory = warningNormalizeRecord(e.id).history.filter(h => ['verbal','written','final'].includes(String(h?.level || '').toLowerCase()));
                 if (selectedDashboardWarning === 'AnyWarning' && warningHistory.length === 0) return false;
@@ -5175,7 +5199,7 @@
             const sf = document.getElementById('searchInput'); if (sf) sf.value = searchQuery;
             document.querySelectorAll('.status-checkbox').forEach(cb => cb.checked = selectedStatuses.includes(cb.value));
             const sl = document.getElementById('statusDropdownLabel');
-            if (sl) sl.innerText = selectedStatuses.length === 3 ? 'All Statuses' : (selectedStatuses.length === 0 ? 'None' : selectedStatuses.join(', '));
+            if (sl) sl.innerText = selectedStatuses.length === 4 ? 'All Statuses' : (selectedStatuses.length === 0 ? 'None' : selectedStatuses.join(', '));
         }
 
         function syncMobileDashboardFilterUI() {
@@ -9344,7 +9368,7 @@
    PWA SERVICE WORKER
    ========================================================== */
 
-console.log('Attendance build: 2026-09-16-pending-scan-v2');
+console.log('Attendance build: 2026-09-17-notice-filter-v1');
 
 if ('serviceWorker' in navigator) {
 
