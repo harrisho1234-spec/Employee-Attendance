@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Attendance Dashboard</title>
-    <meta name="app-build" content="2026-09-17-hq-dashboard-order-v2">
+    <meta name="app-build" content="2026-09-17-hq-first-dhs-last-report-v1">
     <!-- Photo mapping: Staff ID primary, Name/File Name fallback -->
         <!-- PWA -->
     <meta name="theme-color" content="#2563eb">
@@ -8628,7 +8628,7 @@
         }
 
         function renderReportSummary(data){
-            const cs=Array.from(new Set(data.scopeEmployees.map(e=>e.company).filter(Boolean))).sort(),head=document.getElementById('reportSummaryHead'),body=document.getElementById('reportSummaryBody');if(!head||!body)return;const disp=cs.length?cs:['—'];
+            const cs=companyDisplayOrder(new Set(data.scopeEmployees.map(e=>e.company).filter(Boolean))),head=document.getElementById('reportSummaryHead'),body=document.getElementById('reportSummaryBody');if(!head||!body)return;const disp=cs.length?cs:['—'];
             head.innerHTML=`<tr><th class="text-left px-3 py-3 border-b">Metric</th>${disp.map(c=>{const js=String(c).replace(/\\/g,'\\\\').replace(/'/g,"\\'");return`<th onclick="${c==='—'?'':'filterReportByCompanyCard(\''+js+'\')'}" class="report-summary-company text-center px-3 py-3 border-b min-w-[110px]">${reportEscapeHtml(c)}</th>`;}).join('')}<th onclick="filterReportByCompanyCard('All')" class="report-summary-company text-center px-3 py-3 border-b min-w-[110px] bg-blue-50/50">Total</th></tr>`;
             const metrics=[['AL','Annual Leave (AL)'],['SL','Sick Leave (SL)'],['SP','Special Leave (SP)'],['UP','Unpaid Leave (UP)'],['late','Total Lateness'],['utilization','Paid Leave Utilization %']];
             const stats=(c,recs)=>{const es=data.scopeEmployees.filter(e=>e.company===c),ids=new Set(es.map(e=>e.id));return calculateReportStats(recs.filter(r=>ids.has(r.staffId)),es);};const ta=calculateReportStats(data.aRecords,data.scopeEmployees),tb=data.period.mode==='year'?calculateReportStats(data.bRecords,data.scopeEmployees):null;
@@ -9117,7 +9117,7 @@
 
             const companyBox=document.getElementById('reportMetricCompanyBreakdown');
             if(companyBox){
-                const selectedCompanies=Array.from(new Set(data.scopeEmployees.map(e=>e.company))).sort();
+                const selectedCompanies=companyDisplayOrder(new Set(data.scopeEmployees.map(e=>e.company).filter(Boolean)));
                 const allUsed=stats.reduce((n,x)=>n+x.used,0);
                 const allRow=`<div class="metric-company-all ${reportMetricCompany==='All'?'is-active':''}" onclick="setReportMetricCompany('All')">
                     <span><i class="fa-solid fa-building mr-1"></i>All Companies</span>
@@ -12388,7 +12388,7 @@
    PWA SERVICE WORKER
    ========================================================== */
 
-console.log('Attendance build: 2026-09-17-hq-dashboard-order-v2');
+console.log('Attendance build: 2026-09-17-hq-first-dhs-last-report-v1');
 
 if ('serviceWorker' in navigator) {
 
