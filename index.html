@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Attendance Dashboard</title>
-    <meta name="app-build" content="2026-09-17-report-multi-company-v1">
+    <meta name="app-build" content="2026-09-17-scan-dedupe-v1">
     <!-- Photo mapping: Staff ID primary, Name/File Name fallback -->
         <!-- PWA -->
     <meta name="theme-color" content="#2563eb">
@@ -564,7 +564,7 @@
 
         #scanView .summary-bar {
             display: grid;
-            grid-template-columns: repeat(6, minmax(0, 1fr));
+            grid-template-columns: repeat(7, minmax(0, 1fr));
             gap: 10px;
             margin-bottom: 16px;
         }
@@ -601,6 +601,7 @@
 
         #scanView .icon-total::before { content: "\f0c0"; }
         #scanView .icon-present::before { content: "\f14a"; }
+        #scanView .icon-dayoff::before { content: "\f236"; }
         #scanView .icon-ontime::before { content: "\f017"; }
         #scanView .icon-late5::before { content: "\f071"; }
         #scanView .icon-late30::before { content: "\f0f3"; }
@@ -609,6 +610,7 @@
 
         #scanView .icon-total { background: #eff6ff; color: #2563eb; }
         #scanView .icon-present { background: #dcfce7; color: #16a34a; }
+        #scanView .icon-dayoff { background: #fef3c7; color: #b45309; }
         #scanView .icon-ontime { background: #f0fdf4; color: #15803d; }
         #scanView .icon-late5 { background: #ffedd5; color: #c2410c; }
         #scanView .icon-late30 { background: #fee2e2; color: #b91c1c; }
@@ -2532,6 +2534,46 @@
             font-weight: 600;
             outline: none;
         }
+        #reportView .report-search-wrap {
+            position: relative;
+        }
+        #reportView .report-search-wrap .search-icon {
+            position: absolute;
+            left: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 11px;
+            pointer-events: none;
+        }
+        #reportView .report-search-wrap .report-control {
+            padding-left: 31px;
+            padding-right: 30px;
+        }
+        #reportView .report-search-clear {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 9px;
+        }
+        #reportView .report-search-clear:hover {
+            background: #e2e8f0;
+            color: #475569;
+        }
+        #reportView .metric-search-row {
+            padding: 10px 12px;
+            border-bottom: 1px solid #eef2f7;
+            background: #fff;
+        }
+
         #reportView .report-control:focus {
             background: #fff;
             border-color: #2563eb;
@@ -2704,6 +2746,736 @@
         #reportView .report-metric-row.metric-up .report-total-cell { color: #be123c; }
         #reportView .report-metric-row.metric-late .report-total-cell { color: #c2410c; }
         #reportView .report-metric-row.metric-utilization .report-total-cell { color: #4338ca; }
+
+
+
+        #reportView .report-metric-label-inner {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:8px;
+        }
+        #reportView .report-metric-open {
+            display:inline-flex;
+            align-items:center;
+            gap:5px;
+            padding:3px 6px;
+            border-radius:999px;
+            background:#ffffff;
+            border:1px solid #dbeafe;
+            color:#2563eb;
+            font-size:7px;
+            font-weight:900;
+            white-space:nowrap;
+        }
+        #reportView .report-metric-row:hover .report-metric-open {
+            background:#eff6ff;
+        }
+        #reportView .report-metric-row {
+            cursor: pointer;
+        }
+        #reportView .report-metric-row.is-active td {
+            box-shadow: inset 0 2px 0 rgba(37,99,235,.18), inset 0 -2px 0 rgba(37,99,235,.18);
+        }
+        #reportView .report-metric-row.is-active .report-metric-label {
+            padding-left: 14px;
+            position: relative;
+        }
+        #reportView .report-metric-row.is-active .report-metric-label::after {
+            content: "VIEWING";
+            margin-left: 8px;
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 5px;
+            border-radius: 999px;
+            background: #dbeafe;
+            color: #1d4ed8;
+            font-size: 7px;
+            font-weight: 900;
+            letter-spacing: .4px;
+            vertical-align: middle;
+        }
+        #reportView .metric-drilldown {
+            position: fixed;
+            inset: 0;
+            z-index: 9990;
+            background: rgba(15,23,42,.38);
+            backdrop-filter: blur(2px);
+            margin: 0;
+            padding: 18px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #reportView .metric-drilldown.hidden { display: none !important; }
+
+        #employeeModal.report-nested-profile {
+            position: absolute !important;
+            inset: 0 !important;
+            z-index: 120 !important;
+            width: 100% !important;
+            height: 100% !important;
+            padding: 18px !important;
+            background: rgba(15,23,42,.48) !important;
+            backdrop-filter: blur(3px);
+            border-radius: inherit;
+        }
+        #employeeModal.report-nested-profile #modalContent {
+            width: min(760px, 94%) !important;
+            max-height: calc(100% - 20px) !important;
+            box-shadow: 0 28px 80px rgba(15,23,42,.30);
+            border: 1px solid #dbe3ec;
+        }
+        @media (max-width:700px) {
+            #employeeModal.report-nested-profile {
+                padding: 8px !important;
+                border-radius: 0;
+            }
+            #employeeModal.report-nested-profile #modalContent {
+                width: 100% !important;
+                max-height: 100% !important;
+                border-radius: 12px !important;
+            }
+        }
+
+        #employeeModal.report-nested-profile .nested-report-context { display:inline-flex !important; }
+
+        #reportEmployeeMetricModal {
+            position: absolute;
+            inset: 0;
+            z-index: 140;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+            background: rgba(15,23,42,.50);
+            backdrop-filter: blur(3px);
+            border-radius: inherit;
+        }
+        #reportEmployeeMetricModal.hidden { display:none !important; }
+        #reportEmployeeMetricModal .employee-report-shell {
+            width: min(1180px, 95%);
+            max-height: calc(100% - 20px);
+            background: #fff;
+            border: 1px solid #dbe3ec;
+            border-radius: 14px;
+            box-shadow: 0 28px 80px rgba(15,23,42,.30);
+            overflow: hidden;
+            display:flex;
+            flex-direction:column;
+        }
+        #reportEmployeeMetricModal .employee-report-body {
+            overflow-y:auto;
+            min-height:0;
+            padding:12px;
+        }
+        #reportEmployeeMetricModal .employee-report-kpis {
+            display:grid;
+            grid-template-columns:repeat(4,minmax(0,1fr));
+            gap:9px;
+            margin-bottom:12px;
+        }
+        #reportEmployeeMetricModal .employee-leave-type-strip {
+            display:grid;
+            grid-template-columns:repeat(4,minmax(0,1fr));
+            gap:8px;
+            margin-bottom:12px;
+        }
+        #reportEmployeeMetricModal .employee-leave-type-card {
+            border:1px solid #e2e8f0;
+            border-radius:11px;
+            background:#fff;
+            overflow:hidden;
+        }
+        #reportEmployeeMetricModal .employee-leave-type-card .type-head {
+            padding:8px 10px;
+            font-size:8px;
+            font-weight:900;
+            text-transform:uppercase;
+            letter-spacing:.4px;
+            color:#475569;
+            border-bottom:1px solid rgba(226,232,240,.9);
+        }
+        #reportEmployeeMetricModal .employee-leave-type-card .type-grid {
+            display:grid;
+            grid-template-columns:repeat(3,minmax(0,1fr));
+        }
+        #reportEmployeeMetricModal .employee-leave-type-card .type-cell {
+            padding:9px 6px;
+            text-align:center;
+            border-right:1px solid #edf2f7;
+        }
+        #reportEmployeeMetricModal .employee-leave-type-card .type-cell:last-child { border-right:0; }
+        #reportEmployeeMetricModal .employee-leave-type-card .cell-label {
+            display:block;
+            font-size:7px;
+            font-weight:800;
+            color:#94a3b8;
+            text-transform:uppercase;
+            letter-spacing:.25px;
+        }
+        #reportEmployeeMetricModal .employee-leave-type-card .cell-value {
+            display:block;
+            margin-top:3px;
+            font-size:16px;
+            line-height:1;
+            font-weight:900;
+            color:#0f172a;
+        }
+        #reportEmployeeMetricModal .employee-leave-type-card .type-note {
+            padding:6px 10px;
+            border-top:1px solid #edf2f7;
+            font-size:7px;
+            color:#94a3b8;
+        }
+        #reportEmployeeMetricModal .employee-leave-type-card.type-al { border-color:#bfdbfe; background:#f8fbff; }
+        #reportEmployeeMetricModal .employee-leave-type-card.type-sl { border-color:#99f6e4; background:#f6fffd; }
+        #reportEmployeeMetricModal .employee-leave-type-card.type-sp { border-color:#e9d5ff; background:#fcfaff; }
+        #reportEmployeeMetricModal .employee-leave-type-card.type-up { border-color:#fecdd3; background:#fff9fa; }
+        #reportEmployeeMetricModal .employee-leave-type-card.type-up .type-grid { grid-template-columns:1fr; }
+        #reportEmployeeMetricModal .employee-leave-type-card.type-up .type-cell { border-right:0; }
+
+        #reportEmployeeMetricModal .employee-service-strip {
+            display:flex;
+            flex-wrap:wrap;
+            align-items:center;
+            gap:6px;
+            margin-top:5px;
+        }
+        #reportEmployeeMetricModal .employee-service-pill {
+            display:inline-flex;
+            align-items:center;
+            gap:5px;
+            padding:4px 7px;
+            border-radius:999px;
+            border:1px solid #e2e8f0;
+            background:#fff;
+            color:#475569;
+            font-size:7px;
+            font-weight:800;
+            white-space:nowrap;
+        }
+        @media(max-width:900px){
+            #reportEmployeeMetricModal .employee-leave-type-strip { grid-template-columns:repeat(2,minmax(0,1fr)); }
+        }
+        @media(max-width:560px){
+            #reportEmployeeMetricModal .employee-leave-type-strip { grid-template-columns:1fr; }
+        }
+
+        #reportEmployeeMetricModal .employee-report-kpi {
+            border:1px solid #e2e8f0;
+            border-radius:10px;
+            background:#f8fafc;
+            padding:10px 11px;
+        }
+        #reportEmployeeMetricModal .employee-report-kpi .label {
+            font-size:8px;
+            font-weight:900;
+            color:#64748b;
+            text-transform:uppercase;
+            letter-spacing:.4px;
+        }
+        #reportEmployeeMetricModal .employee-report-kpi .value {
+            margin-top:4px;
+            font-size:20px;
+            line-height:1;
+            font-weight:900;
+            color:#0f172a;
+        }
+        #reportEmployeeMetricModal .employee-report-kpi .hint {
+            margin-top:4px;
+            font-size:8px;
+            color:#94a3b8;
+        }
+
+        #reportEmployeeMetricModal .employee-late-strip {
+            display:grid;
+            grid-template-columns:repeat(3,minmax(0,1fr));
+            gap:8px;
+            margin-bottom:12px;
+        }
+        #reportEmployeeMetricModal .employee-late-card {
+            border:1px solid #fde68a;
+            border-radius:10px;
+            background:#fffbeb;
+            padding:9px 10px;
+        }
+        #reportEmployeeMetricModal .employee-late-card.severe {
+            border-color:#fed7aa;
+            background:#fff7ed;
+        }
+        #reportEmployeeMetricModal .employee-late-card.total {
+            border-color:#cbd5e1;
+            background:#f8fafc;
+        }
+        #reportEmployeeMetricModal .employee-late-card .late-label {
+            font-size:8px;
+            font-weight:900;
+            text-transform:uppercase;
+            letter-spacing:.35px;
+            color:#64748b;
+        }
+        #reportEmployeeMetricModal .employee-late-card .late-value {
+            margin-top:4px;
+            font-size:18px;
+            line-height:1;
+            font-weight:900;
+            color:#0f172a;
+        }
+        #reportEmployeeMetricModal .employee-late-card .late-sub {
+            margin-top:3px;
+            font-size:7px;
+            color:#94a3b8;
+        }
+
+        #reportEmployeeMetricModal .employee-report-month-card {
+            cursor:pointer;
+            transition:background-color .15s ease, border-color .15s ease, transform .15s ease;
+        }
+        #reportEmployeeMetricModal .employee-report-month-card:hover {
+            background:#f8fbff;
+            border-color:#bfdbfe;
+            transform:translateY(-1px);
+        }
+        #reportEmployeeMetricModal .employee-report-month-card .month-open {
+            color:#2563eb;
+            font-size:7px;
+            font-weight:900;
+            margin-left:6px;
+        }
+
+        #reportEmployeeDayModal {
+            position:absolute;
+            inset:0;
+            z-index:160;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:18px;
+            background:rgba(15,23,42,.52);
+            backdrop-filter:blur(3px);
+            border-radius:inherit;
+        }
+        #reportEmployeeDayModal.hidden { display:none !important; }
+        #reportEmployeeDayModal .day-report-shell {
+            width:min(980px,95%);
+            max-height:calc(100% - 20px);
+            background:#fff;
+            border:1px solid #dbe3ec;
+            border-radius:14px;
+            box-shadow:0 28px 80px rgba(15,23,42,.30);
+            overflow:hidden;
+            display:flex;
+            flex-direction:column;
+        }
+        #reportEmployeeDayModal .day-report-body {
+            overflow-y:auto;
+            min-height:0;
+        }
+        #reportEmployeeDayModal .day-row {
+            display:grid;
+            grid-template-columns:78px 1fr 80px;
+            gap:10px;
+            align-items:center;
+            padding:10px 12px;
+            border-bottom:1px solid #f1f5f9;
+        }
+        #reportEmployeeDayModal .day-row:last-child { border-bottom:0; }
+        #reportEmployeeDayModal .day-date {
+            font-size:10px;
+            font-weight:900;
+            color:#334155;
+        }
+        #reportEmployeeDayModal .day-badges {
+            display:flex;
+            flex-wrap:wrap;
+            gap:4px;
+        }
+        #reportEmployeeDayModal .day-badge {
+            display:inline-flex;
+            align-items:center;
+            padding:3px 6px;
+            border-radius:999px;
+            font-size:8px;
+            font-weight:800;
+            border:1px solid #e2e8f0;
+            background:#f8fafc;
+            color:#475569;
+        }
+        #reportEmployeeDayModal .day-badge.al { background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8; }
+        #reportEmployeeDayModal .day-badge.sl { background:#f0fdfa;border-color:#99f6e4;color:#0f766e; }
+        #reportEmployeeDayModal .day-badge.sp { background:#faf5ff;border-color:#e9d5ff;color:#7e22ce; }
+        #reportEmployeeDayModal .day-badge.up { background:#fff1f2;border-color:#fecdd3;color:#be123c; }
+        #reportEmployeeDayModal .day-badge.late { background:#fffbeb;border-color:#fde68a;color:#a16207; }
+        #reportEmployeeDayModal .day-badge.late30 { background:#fff7ed;border-color:#fed7aa;color:#c2410c; }
+        #reportEmployeeDayModal .day-total {
+            text-align:right;
+            font-size:9px;
+            font-weight:900;
+            color:#334155;
+        }
+        @media(max-width:700px){
+            #reportEmployeeMetricModal .employee-late-strip { grid-template-columns:1fr; }
+            #reportEmployeeDayModal { padding:8px; }
+            #reportEmployeeDayModal .day-report-shell { width:100%; max-height:100%; }
+            #reportEmployeeDayModal .day-row { grid-template-columns:64px 1fr; }
+            #reportEmployeeDayModal .day-total { grid-column:2; text-align:left; }
+        }
+        #reportEmployeeMetricModal .employee-report-chart-card {
+            border:1px solid #e2e8f0;
+            border-radius:10px;
+            overflow:hidden;
+            background:#fff;
+            margin-bottom:12px;
+        }
+        #reportEmployeeMetricModal .employee-report-chart {
+            height:240px;
+            display:grid;
+            grid-template-columns:repeat(12,minmax(42px,1fr));
+            gap:8px;
+            align-items:end;
+            padding:20px 14px 10px;
+            overflow-x:auto;
+        }
+        #reportEmployeeMetricModal .employee-chart-legend {
+            display:flex;
+            flex-wrap:wrap;
+            align-items:center;
+            gap:10px;
+            padding:8px 12px;
+            border-bottom:1px solid #eef2f7;
+            background:#fff;
+        }
+        #reportEmployeeMetricModal .employee-chart-legend-item {
+            display:inline-flex;
+            align-items:center;
+            gap:5px;
+            font-size:8px;
+            font-weight:800;
+            color:#475569;
+        }
+        #reportEmployeeMetricModal .employee-chart-dot {
+            width:8px;
+            height:8px;
+            border-radius:2px;
+            flex:0 0 auto;
+        }
+        #reportEmployeeMetricModal .employee-stacked-track {
+            height:145px;
+            display:flex;
+            flex-direction:column-reverse;
+            justify-content:flex-start;
+            border-radius:6px 6px 3px 3px;
+            overflow:hidden;
+            background:
+                linear-gradient(to top, rgba(226,232,240,.5) 1px, transparent 1px);
+            background-size:100% 25%;
+        }
+        #reportEmployeeMetricModal .employee-stacked-segment {
+            width:68%;
+            margin:0 auto;
+            min-height:0;
+            transition:height .25s ease;
+        }
+        #reportEmployeeMetricModal .employee-stacked-segment.al { background:#3b82f6; }
+        #reportEmployeeMetricModal .employee-stacked-segment.sl { background:#14b8a6; }
+        #reportEmployeeMetricModal .employee-stacked-segment.sp { background:#a855f7; }
+        #reportEmployeeMetricModal .employee-stacked-segment.up { background:#fb7185; }
+
+        #reportEmployeeMetricModal .employee-report-month-details {
+            display:grid;
+            grid-template-columns:repeat(3,minmax(0,1fr));
+            gap:8px;
+        }
+        #reportEmployeeMetricModal .employee-report-month-card {
+            border:1px solid #e2e8f0;
+            border-radius:9px;
+            background:#fff;
+            padding:9px;
+        }
+        #reportEmployeeMetricModal .employee-report-month-card .month-title {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:8px;
+            font-size:9px;
+            font-weight:900;
+            color:#334155;
+            margin-bottom:6px;
+        }
+        #reportEmployeeMetricModal .employee-report-date-list {
+            display:flex;
+            flex-wrap:wrap;
+            gap:4px;
+        }
+        @media(max-width:800px){
+            #reportEmployeeMetricModal { padding:8px; }
+            #reportEmployeeMetricModal .employee-report-shell { width:100%; max-height:100%; }
+            #reportEmployeeMetricModal .employee-report-kpis { grid-template-columns:repeat(2,minmax(0,1fr)); }
+            #reportEmployeeMetricModal .employee-report-month-details { grid-template-columns:1fr; }
+        }
+
+        #employeeModal.report-nested-profile #modalContent > div:first-child { padding-top: 30px !important; }
+
+
+        #reportView .metric-drilldown-shell {
+            position: relative;
+            width: min(1500px, 96vw);
+            height: min(900px, 94vh);
+            background: #ffffff;
+            border: 1px solid #dbe3ec;
+            border-radius: 16px;
+            box-shadow: 0 24px 70px rgba(15,23,42,.22);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        #reportView .metric-drilldown-body {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+        }
+        #reportView .metric-chart-card {
+            margin: 0 12px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: #ffffff;
+            overflow: hidden;
+        }
+        #reportView .metric-chart-head {
+            padding: 9px 11px;
+            border-bottom: 1px solid #eef2f7;
+            background: #f8fafc;
+            font-size: 10px;
+            font-weight: 900;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        #reportView .metric-bar-chart {
+            height: 220px;
+            display: grid;
+            grid-template-columns: repeat(12, minmax(42px,1fr));
+            gap: 8px;
+            align-items: end;
+            padding: 18px 14px 10px;
+            overflow-x: auto;
+        }
+        #reportView .metric-bar-wrap {
+            min-width: 42px;
+            height: 185px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: stretch;
+            gap: 5px;
+        }
+        #reportView .metric-bar-value {
+            text-align: center;
+            font-size: 8px;
+            font-weight: 900;
+            color: #334155;
+            line-height: 1;
+        }
+        #reportView .metric-bar-track {
+            height: 145px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            border-radius: 6px 6px 3px 3px;
+            background:
+                linear-gradient(to top, rgba(226,232,240,.5) 1px, transparent 1px);
+            background-size: 100% 25%;
+        }
+        #reportView .metric-bar {
+            width: 68%;
+            min-height: 3px;
+            border-radius: 6px 6px 2px 2px;
+            background: #3b82f6;
+            transition: height .25s ease;
+        }
+        #reportView .metric-bar-label {
+            text-align: center;
+            font-size: 8px;
+            font-weight: 800;
+            color: #94a3b8;
+            text-transform: uppercase;
+        }
+        @media (max-width: 700px) {
+            #reportView .metric-drilldown { padding: 0; align-items: stretch; }
+            #reportView .metric-drilldown-shell {
+                width: 100vw;
+                height: 100vh;
+                max-height: 100vh;
+                border-radius: 0;
+                border: 0;
+            }
+            #reportView .metric-bar-chart { height: 200px; }
+        }
+        #reportView .metric-drilldown-tabs {
+            display: flex;
+            gap: 4px;
+            padding: 10px 12px 0;
+            overflow-x: auto;
+            scrollbar-width: none;
+            border-bottom: 1px solid #eef2f7;
+        }
+        #reportView .metric-drilldown-tabs::-webkit-scrollbar { display:none; }
+        #reportView .metric-tab {
+            flex: 0 0 auto;
+            border: 0;
+            background: transparent;
+            color: #64748b;
+            padding: 9px 10px 8px;
+            border-bottom: 2px solid transparent;
+            font-size: 10px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        #reportView .metric-tab.is-active {
+            color: #2563eb;
+            border-bottom-color: #2563eb;
+        }
+        #reportView .metric-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4,minmax(0,1fr));
+            gap: 9px;
+            padding: 12px;
+        }
+        #reportView .metric-kpi {
+            min-height: 66px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: #f8fafc;
+            padding: 10px 11px;
+        }
+        #reportView .metric-kpi .label {
+            font-size: 8px;
+            font-weight: 800;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+        }
+        #reportView .metric-kpi .value {
+            margin-top: 4px;
+            font-size: 20px;
+            line-height: 1;
+            font-weight: 900;
+            color: #0f172a;
+        }
+        #reportView .metric-kpi .hint {
+            margin-top: 4px;
+            font-size: 8px;
+            color: #94a3b8;
+        }
+        #reportView .metric-month-grid {
+            display:grid;
+            grid-template-columns:repeat(12,minmax(54px,1fr));
+            gap:5px;
+            padding:0 12px 12px;
+            overflow-x:auto;
+        }
+        #reportView .metric-month-cell {
+            min-width:54px;
+            border:1px solid #edf2f7;
+            border-radius:8px;
+            background:#fff;
+            padding:7px 5px;
+            text-align:center;
+        }
+        #reportView .metric-month-cell .m { font-size:8px;color:#94a3b8;font-weight:800;text-transform:uppercase; }
+        #reportView .metric-month-cell .v { margin-top:3px;font-size:12px;color:#1e293b;font-weight:900; }
+        #reportView .metric-detail-split {
+            display:grid;
+            grid-template-columns:minmax(250px,.8fr) minmax(0,2fr);
+            gap:12px;
+            padding:0 12px 12px;
+        }
+        #reportView .metric-detail-card {
+            border:1px solid #e2e8f0;
+            border-radius:10px;
+            overflow:hidden;
+            background:#fff;
+        }
+        #reportView .metric-detail-card-head {
+            padding:9px 11px;
+            border-bottom:1px solid #eef2f7;
+            background:#f8fafc;
+            font-size:10px;
+            font-weight:900;
+            color:#334155;
+        }
+        #reportView .metric-company-row {
+            display:grid;
+            grid-template-columns:minmax(0,1fr) auto;
+            gap:10px;
+            padding:9px 11px;
+            border-bottom:1px solid #f1f5f9;
+            font-size:10px;
+        }
+        #reportView .metric-company-row {
+            cursor:pointer;
+            transition:background-color .15s ease, border-color .15s ease;
+        }
+        #reportView .metric-company-row:hover {
+            background:#f8fbff;
+        }
+        #reportView .metric-company-row.is-active {
+            background:#eff6ff;
+            box-shadow:inset 3px 0 0 #3b82f6;
+        }
+        #reportView .metric-company-row .company-filter-hint {
+            color:#2563eb;
+            font-size:7px;
+            font-weight:900;
+            opacity:0;
+            transition:opacity .15s ease;
+        }
+        #reportView .metric-company-row:hover .company-filter-hint,
+        #reportView .metric-company-row.is-active .company-filter-hint {
+            opacity:1;
+        }
+        #reportView .metric-company-all {
+            cursor:pointer;
+            padding:8px 11px;
+            border-bottom:1px solid #eef2f7;
+            background:#f8fafc;
+            font-size:8px;
+            font-weight:900;
+            color:#64748b;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:8px;
+        }
+        #reportView .metric-company-all:hover,
+        #reportView .metric-company-all.is-active {
+            background:#eff6ff;
+            color:#2563eb;
+        }
+
+        #reportView .metric-company-row:last-child {border-bottom:0;}
+        #reportView .metric-employee-table tbody tr {cursor:pointer;}
+        #reportView .metric-employee-table tbody tr:hover {background:#f8fafc;}
+        #reportView .metric-date-chips {display:flex;flex-wrap:wrap;gap:3px;}
+        #reportView .metric-date-chip {
+            display:inline-flex;
+            padding:2px 5px;
+            border-radius:999px;
+            background:#f1f5f9;
+            color:#475569;
+            font-size:7px;
+            font-weight:700;
+            white-space:nowrap;
+        }
+        @media(max-width:900px){
+            #reportView .metric-kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+            #reportView .metric-detail-split{grid-template-columns:1fr;}
+        }
 
         @media (max-width: 700px) {
             #reportView { padding-bottom: 20px; }
@@ -3346,6 +4118,23 @@
                             <select id="reportDepartmentSelect" onchange="renderReport()" class="report-control"><option value="All">All Departments</option></select>
                         </div>
                     </div>
+                    <div class="mt-4 rounded-xl border border-blue-100 bg-blue-50/50 p-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                            <div class="shrink-0">
+                                <div class="text-[10px] font-extrabold uppercase tracking-wider text-blue-700">
+                                    <i class="fa-solid fa-magnifying-glass mr-1"></i>Search Employees
+                                </div>
+                                <div class="text-[9px] text-slate-500 mt-0.5">Search this report by employee name, ID, department, position or company.</div>
+                            </div>
+                            <div class="report-search-wrap flex-1">
+                                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                                <input id="reportSearchInput" type="text" class="report-control bg-white" placeholder="Search employee name, Staff ID, position, department..." oninput="setReportSearch(this.value)">
+                                <button id="reportSearchClear" type="button" class="report-search-clear hidden" onclick="clearReportSearch()" title="Clear search"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                            <span class="shrink-0 inline-flex items-center rounded-full bg-white border border-blue-100 px-2 py-1 text-[8px] font-extrabold text-blue-700">REPORT SEARCH v2</span>
+                        </div>
+                    </div>
+
                     <div class="mt-3 flex items-center justify-between gap-3">
                         <div>
                             <p id="reportPeriodLabel" class="text-[10px] sm:text-xs font-semibold text-slate-500">—</p>
@@ -3360,7 +4149,13 @@
 
 <section class="report-section">
                 <div class="report-section-head">
-                    <div><h2 class="report-section-title">Company Summary</h2><p class="report-section-subtitle">AL, SL, SP, UP, lateness and paid leave utilization side-by-side. Paid Leave Utilization = (AL + SL + SP used) ÷ available AL + SL + SP.</p></div>
+                    <div>
+                        <h2 class="report-section-title">Company Summary</h2>
+                        <p class="report-section-subtitle">AL, SL, SP, UP, lateness and paid leave utilization side-by-side. Paid Leave Utilization = (AL + SL + SP used) ÷ available AL + SL + SP.</p>
+                        <div class="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-blue-100 bg-blue-50 px-2.5 py-1.5 text-[9px] font-extrabold text-blue-700">
+                            <i class="fa-solid fa-hand-pointer"></i> Click any metric row below to open its detailed analysis
+                        </div>
+                    </div>
                     <span id="reportSummaryHint" class="text-[9px] font-bold text-slate-400 bg-slate-50 border rounded-full px-2 py-1"></span>
                 </div>
                 <div class="overflow-x-auto custom-scrollbar">
@@ -3369,6 +4164,144 @@
                         <tbody id="reportSummaryBody" class="divide-y divide-slate-100"></tbody>
                     </table>
                 </div>
+            </section>
+
+            <section id="reportMetricDrilldown" class="metric-drilldown hidden" onclick="if(event.target===this) closeReportMetricDetail()">
+                <div class="metric-drilldown-shell">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-3 border-b border-slate-100 bg-slate-50/80 shrink-0">
+                    <div>
+                        <div id="reportMetricTitle" class="text-sm font-extrabold text-slate-800">Metric Detail</div>
+                        <div id="reportMetricSubtitle" class="text-[9px] text-slate-400 mt-0.5">Choose AL, SL, SP, UP, Total Lateness, or Paid Leave Utilization from the Company Summary above.</div>
+                    </div>
+                    <button id="reportMetricCloseBtn" type="button" onclick="closeReportMetricDetail()" class="text-[10px] font-bold text-slate-600 hover:text-slate-800 border border-slate-200 bg-white rounded-lg px-3 py-2"><i class="fa-solid fa-xmark mr-1"></i>Close Detail</button>
+                </div>
+<div id="reportMetricContent" class="metric-drilldown-body">
+                <div id="reportMetricTabs" class="metric-drilldown-tabs"></div>
+                <div id="reportMetricKpis" class="metric-kpi-grid"></div>
+                <div class="metric-chart-card">
+                    <div class="metric-chart-head">
+                        <span><i class="fa-solid fa-chart-column text-blue-500 mr-1.5"></i>Monthly Usage</span>
+                        <span id="reportMetricChartTotal" class="text-[8px] text-slate-400"></span>
+                    </div>
+                    <div id="reportMetricChart" class="metric-bar-chart"></div>
+                </div>
+                <div id="reportMetricMonths" class="metric-month-grid"></div>
+                <div class="metric-detail-split">
+                    <div class="metric-detail-card">
+                        <div class="metric-detail-card-head">Company Breakdown</div>
+                        <div id="reportMetricCompanyBreakdown"></div>
+                    </div>
+                    <div class="metric-detail-card">
+                        <div class="metric-detail-card-head flex items-center justify-between gap-2">
+                            <span id="reportMetricEmployeeTitle">Employee Detail</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[8px] font-extrabold text-blue-700 bg-blue-50 border border-blue-100 rounded-full px-2 py-1">
+                                    <i class="fa-solid fa-chart-column mr-1"></i>Click employee → Usage Report
+                                </span>
+                                <span id="reportMetricEmployeeCount" class="text-[8px] text-slate-400 font-bold"></span>
+                            </div>
+                        </div>
+                        <div class="metric-search-row bg-blue-50/40">
+                            <div class="grid grid-cols-1 md:grid-cols-[1fr_230px] gap-2 items-end">
+                                <div>
+                                    <div class="text-[9px] font-extrabold text-blue-700 mb-1">
+                                        <i class="fa-solid fa-magnifying-glass mr-1"></i>Find employee
+                                    </div>
+                                    <div class="report-search-wrap">
+                                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                                        <input id="reportMetricSearchInput" type="text" class="report-control bg-white" placeholder="Search name or Staff ID inside this detail..." oninput="setReportMetricSearch(this.value)">
+                                        <button id="reportMetricSearchClear" type="button" class="report-search-clear hidden" onclick="clearReportMetricSearch()" title="Clear search"><i class="fa-solid fa-xmark"></i></button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="text-[9px] font-extrabold text-blue-700 mb-1">
+                                        <i class="fa-solid fa-building-user mr-1"></i>Department
+                                    </div>
+                                    <select id="reportMetricDepartmentSelect" class="report-control bg-white" onchange="setReportMetricDepartment(this.value)">
+                                        <option value="All">All Departments</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto custom-scrollbar">
+                            <table class="metric-employee-table min-w-[760px] w-full text-[10px]">
+                                <thead id="reportMetricEmployeeHead" class="bg-slate-50 text-slate-500"></thead>
+                                <tbody id="reportMetricEmployeeBody" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                </div>
+                            
+                <div id="reportEmployeeMetricModal" class="hidden" onclick="if(event.target===this) closeReportEmployeeMetricDetail()">
+                    <div class="employee-report-shell">
+                        <div class="px-4 py-3 border-b border-slate-100 bg-slate-50/80 flex items-center justify-between gap-3 shrink-0">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div id="reportEmployeeMetricAvatar" class="w-11 h-11 rounded-full bg-slate-100 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center font-extrabold text-slate-500"></div>
+                                <div class="min-w-0">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <h3 id="reportEmployeeMetricName" class="text-sm font-extrabold text-slate-900 truncate">Employee</h3>
+                                        <span id="reportEmployeeMetricCode" class="text-[8px] font-extrabold rounded-full border border-blue-100 bg-blue-50 text-blue-700 px-2 py-1">AL</span>
+                                    </div>
+                                    <div id="reportEmployeeMetricMeta" class="text-[9px] text-slate-400 mt-0.5"></div>
+                                    <div class="employee-service-strip">
+                                        <span class="employee-service-pill"><i class="fa-solid fa-calendar-day text-blue-500"></i><span id="reportEmployeeJoinDate">Join Date: —</span></span>
+                                        <span class="employee-service-pill"><i class="fa-solid fa-hourglass-half text-indigo-500"></i><span id="reportEmployeeSeniority">Seniority: —</span></span>
+                                        <span class="inline-flex items-center rounded-full bg-emerald-50 border border-emerald-100 px-2 py-1 text-[7px] font-extrabold text-emerald-700">EMPLOYEE USAGE REPORT v5</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" onclick="closeReportEmployeeMetricDetail()" class="text-[10px] font-bold text-slate-600 hover:text-slate-800 border border-slate-200 bg-white rounded-lg px-3 py-2">
+                                <i class="fa-solid fa-arrow-left mr-1"></i>Back to Report
+                            </button>
+                        </div>
+
+                        <div class="employee-report-body custom-scrollbar">
+                            <div id="reportEmployeeSelectedMetricNote" class="hidden mb-2 rounded-lg border border-blue-100 bg-blue-50 px-3 py-2 text-[8px] font-bold text-blue-700"></div>
+                            <div id="reportEmployeeLeaveTypeStrip" class="employee-leave-type-strip"></div>
+                            <div id="reportEmployeeLateStrip" class="employee-late-strip"></div>
+
+                            <div class="employee-report-chart-card">
+                                <div class="metric-chart-head">
+                                    <span><i class="fa-solid fa-chart-column text-blue-500 mr-1.5"></i><span id="reportEmployeeMetricChartTitle">Monthly Leave Usage by Type</span></span>
+                                    <span id="reportEmployeeMetricChartTotal" class="text-[8px] text-slate-400"></span>
+                                </div>
+                                <div class="employee-chart-legend">
+                                    <span class="employee-chart-legend-item"><span class="employee-chart-dot" style="background:#3b82f6"></span>AL</span>
+                                    <span class="employee-chart-legend-item"><span class="employee-chart-dot" style="background:#14b8a6"></span>SL</span>
+                                    <span class="employee-chart-legend-item"><span class="employee-chart-dot" style="background:#a855f7"></span>SP</span>
+                                    <span class="employee-chart-legend-item"><span class="employee-chart-dot" style="background:#fb7185"></span>UP</span>
+                                    <span class="ml-auto text-[8px] text-slate-400">Stacked monthly total</span>
+                                </div>
+                                <div id="reportEmployeeMetricChart" class="employee-report-chart"></div>
+                            </div>
+
+                            <div class="metric-detail-card">
+                                <div class="metric-detail-card-head flex items-center justify-between gap-2">
+                                    <span>Jan–Dec Usage Detail</span>
+                                    <span id="reportEmployeeMetricPeriod" class="text-[8px] text-slate-400"></span>
+                                </div>
+                                <div id="reportEmployeeMetricMonths" class="employee-report-month-details p-3"></div>
+                            </div>
+                        </div>
+                    </div>
+                
+                        <div id="reportEmployeeDayModal" class="hidden" onclick="if(event.target===this) closeReportEmployeeDayDetail()">
+                            <div class="day-report-shell">
+                                <div class="px-4 py-3 border-b border-slate-100 bg-slate-50/80 flex items-center justify-between gap-3 shrink-0">
+                                    <div>
+                                        <div id="reportEmployeeDayTitle" class="text-sm font-extrabold text-slate-900">Daily Detail</div>
+                                        <div id="reportEmployeeDaySubtitle" class="text-[9px] text-slate-400 mt-0.5"></div>
+                                    </div>
+                                    <button type="button" onclick="closeReportEmployeeDayDetail()" class="text-[10px] font-bold text-slate-600 hover:text-slate-800 border border-slate-200 bg-white rounded-lg px-3 py-2">
+                                        <i class="fa-solid fa-arrow-left mr-1"></i>Back to Employee
+                                    </button>
+                                </div>
+                                <div id="reportEmployeeDayBody" class="day-report-body custom-scrollbar"></div>
+                            </div>
+                        </div>
+</div>
+</div>
             </section>
 
             <section class="grid grid-cols-1 xl:grid-cols-2 gap-5 mb-5">
@@ -3443,8 +4376,16 @@
     <div class="card">
       <div class="card-icon icon-total">👥</div>
       <div class="card-content">
-        <div class="title">Total Staff</div>
+        <div class="title">Total Active Staff</div>
         <div class="val" id="cntTotal">0</div>
+      </div>
+    </div>
+
+    <div class="card scan-summary-clickable" onclick="openScanStatusPanel('dayOff')">
+      <div class="card-icon icon-dayoff">🛏️</div>
+      <div class="card-content">
+        <div class="title">Day Off</div>
+        <div class="val" id="cntDayOff">0</div>
       </div>
     </div>
 
@@ -3545,6 +4486,9 @@
     <div id="employeeModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-2 sm:p-4 opacity-0 transition-opacity duration-300">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[95vh] sm:max-h-[90vh] transform scale-95 transition-transform duration-300" id="modalContent">
             <div class="flex justify-between items-start p-4 sm:p-6 border-b border-slate-100 shrink-0 relative bg-white">
+                <div class="nested-report-context absolute left-4 top-2 hidden text-[8px] font-extrabold uppercase tracking-wider text-blue-600 bg-blue-50 border border-blue-100 rounded-full px-2 py-1">
+                    Employee Profile · Report Detail
+                </div>
                 <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
                 <div class="flex items-center space-x-3 sm:space-x-4">
                     <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-blue-50 text-blue-600 border-4 border-blue-100 shadow-md flex items-center justify-center text-3xl font-bold shrink-0 cursor-pointer hover:ring-4 ring-blue-300 transition-all overflow-hidden" id="modalAvatar" onclick="if(this.querySelector('img')) openImagePreview(event, this.querySelector('img').src)">A</div>
@@ -3845,7 +4789,7 @@
         let selectedCompanies = []; let selectedCalendarCompanies = []; let selectedDailyCompanies = []; let selectedCalendarRowCompany = 'ITC'; let selectedCalendarRowDepartments = null; let selectedCalendarRowMonth = new Date().getMonth(); let selectedCalendarRowYear = new Date().getFullYear(); const attendanceDataYear = new Date().getFullYear();
         let selectedDepartments = null; // null = all departments; otherwise array of selected department names
         let selectedStatuses = ['Active']; let selectedDashboardYear = attendanceDataYear; let selectedDashboardMonth = 'All'; let selectedDashboardWarning = 'All'; let searchQuery = ''; let dailySearchQuery = '';
-        let reportMode='monthly'; let reportSubtab='warnings'; let reportInitialized=false; let selectedReportCompanies=[];
+        let reportMode='monthly'; let reportSubtab='warnings'; let reportInitialized=false; let selectedReportCompanies=[]; let reportMetricFocus=null; let reportDetailScrollBeforeEmployee=0; let employeeModalOriginalParent=null; let employeeModalOriginalNextSibling=null; let reportSearchQuery=''; let reportMetricSearchQuery=''; let reportMetricDepartment='All'; let reportMetricCompany='All';
         let currentSortColumn = 'id'; let isSortAscending = true;
         let leaveHistoryByEmployee = {}; let dailyLeaveRecords = []; let currentDailyGroupedData = {}; 
         let currentCalendarDate = new Date(); let selectedCalendarDate = new Date().getDate();
@@ -7435,6 +8379,9 @@
             }
             updateReportCompanyDropdownUI();
             syncReportDepartments();
+            const reportSearch=document.getElementById('reportSearchInput');
+            if(reportSearch && reportSearch.value!==reportSearchQuery) reportSearch.value=reportSearchQuery;
+            document.getElementById('reportSearchClear')?.classList.toggle('hidden',!reportSearchQuery);
             renderReport();
         };
 
@@ -7483,6 +8430,86 @@
         window.setReportMode=function(mode){reportMode=['monthly','year','custom'].includes(mode)?mode:'monthly';updateReportModeControls();renderReport();};
         window.setReportSubtab=function(tab){reportSubtab=tab==='performance'?'performance':'warnings';document.getElementById('reportWarningsPanel')?.classList.toggle('hidden',reportSubtab!=='warnings');document.getElementById('reportPerformancePanel')?.classList.toggle('hidden',reportSubtab!=='performance');const w=document.getElementById('reportSubWarnings'),p=document.getElementById('reportSubPerformance');if(w)w.className=`report-subtab-btn ${reportSubtab==='warnings'?'is-active':''}`;if(p)p.className=`report-subtab-btn ${reportSubtab==='performance'?'is-active':''}`;};
 
+
+        function reportEmployeeMatchesSearch(emp, query=reportSearchQuery){
+            const q=String(query||'').trim().toLowerCase();
+            if(!q) return true;
+            const hay=[
+                emp?.name,
+                emp?.displayId,
+                emp?.id,
+                emp?.company,
+                emp?.department,
+                emp?.position
+            ].filter(Boolean).join(' ').toLowerCase();
+            return hay.includes(q);
+        }
+
+        window.setReportSearch=function(value){
+            reportSearchQuery=String(value||'').trim();
+            const clear=document.getElementById('reportSearchClear');
+            clear?.classList.toggle('hidden',!reportSearchQuery);
+            renderReport();
+        };
+
+        window.clearReportSearch=function(){
+            reportSearchQuery='';
+            const input=document.getElementById('reportSearchInput');
+            if(input) input.value='';
+            document.getElementById('reportSearchClear')?.classList.add('hidden');
+            renderReport();
+        };
+
+        window.setReportMetricSearch=function(value){
+            reportMetricSearchQuery=String(value||'').trim();
+            const clear=document.getElementById('reportMetricSearchClear');
+            clear?.classList.toggle('hidden',!reportMetricSearchQuery);
+            const data=getReportData();
+            renderReportMetricDetail(data);
+        };
+
+        window.clearReportMetricSearch=function(){
+            reportMetricSearchQuery='';
+            const input=document.getElementById('reportMetricSearchInput');
+            if(input) input.value='';
+            document.getElementById('reportMetricSearchClear')?.classList.add('hidden');
+            const data=getReportData();
+            renderReportMetricDetail(data);
+        };
+
+        window.setReportMetricDepartment=function(value){
+            reportMetricDepartment=value||'All';
+            const data=getReportData();
+            renderReportMetricDetail(data);
+        };
+
+        window.setReportMetricCompany=function(company){
+            reportMetricCompany=(reportMetricCompany===company && company!=='All')?'All':(company||'All');
+            const data=getReportData();
+            renderReportMetricDetail(data);
+        };
+
+        function syncReportMetricDepartments(data,key){
+            const sel=document.getElementById('reportMetricDepartmentSelect');
+            if(!sel) return;
+
+            const stats=reportMetricEmployeeStats(data,key);
+            const depts=Array.from(new Set(
+                stats
+                    .filter(x=>x.used>0)
+                    .filter(x=>reportMetricCompany==='All'||x.emp?.company===reportMetricCompany)
+                    .map(x=>x.emp?.department)
+                    .filter(Boolean)
+            )).sort();
+
+            const keep=reportMetricDepartment;
+            sel.innerHTML='<option value="All">All Departments</option>'+
+                depts.map(d=>`<option value="${reportEscapeHtml(d)}">${reportEscapeHtml(d)}</option>`).join('');
+
+            reportMetricDepartment=(keep==='All'||depts.includes(keep))?keep:'All';
+            sel.value=reportMetricDepartment;
+        }
+
         function getReportEmployeeScope(){
             const d=document.getElementById('reportDepartmentSelect')?.value||'All';
             const today=new Date();
@@ -7492,7 +8519,8 @@
                 const isCurrentStaff=isEmploymentVisible(e,today);
                 return isCurrentStaff &&
                     companySet.has(e.company) &&
-                    (d==='All'||e.department===d);
+                    (d==='All'||e.department===d) &&
+                    reportEmployeeMatchesSearch(e);
             });
         }
         function reportRecordDate(r){const y=Number(r.year||attendanceDataYear),mi=monthNames.findIndex(m=>String(r.month||'').toLowerCase().startsWith(m.substring(0,3).toLowerCase()));if(mi<0)return null;const d=new Date(y,mi,Number(r.day||1));return isNaN(d.getTime())?null:d;}
@@ -7556,8 +8584,550 @@
             const metrics=[['AL','Annual Leave (AL)'],['SL','Sick Leave (SL)'],['SP','Special Leave (SP)'],['UP','Unpaid Leave (UP)'],['late','Total Lateness'],['utilization','Paid Leave Utilization %']];
             const stats=(c,recs)=>{const es=data.scopeEmployees.filter(e=>e.company===c),ids=new Set(es.map(e=>e.id));return calculateReportStats(recs.filter(r=>ids.has(r.staffId)),es);};const ta=calculateReportStats(data.aRecords,data.scopeEmployees),tb=data.period.mode==='year'?calculateReportStats(data.bRecords,data.scopeEmployees):null;
             const fmt=(key,a,b=null)=>{const av=key==='utilization'?`${a.toFixed(1)}%`:mobileDashboardFormatNumber(a);if(b===null)return av;const bv=key==='utilization'?`${b.toFixed(1)}%`:mobileDashboardFormatNumber(b);return `<b>${av}</b><span class="text-slate-300 mx-1">/</span><span class="text-slate-500">${bv}</span>`;};
-            body.innerHTML=metrics.map(([k,l])=>{const rowClass=k==='AL'?'metric-al':k==='SL'?'metric-sl':k==='SP'?'metric-sp':k==='UP'?'metric-up':k==='late'?'metric-late':'metric-utilization';return`<tr class="report-metric-row ${rowClass}"><td class="report-metric-label px-3 py-3">${l}</td>${disp.map(c=>{if(c==='—')return'<td class="text-center px-3 py-3">—</td>';const a=stats(c,data.aRecords),b=data.period.mode==='year'?stats(c,data.bRecords):null;return`<td class="text-center px-3 py-3 font-semibold">${fmt(k,Number(a[k]||0),b?Number(b[k]||0):null)}</td>`;}).join('')}<td class="report-total-cell text-center px-3 py-3">${fmt(k,Number(ta[k]||0),tb?Number(tb[k]||0):null)}</td></tr>`;}).join('');
+            body.innerHTML=metrics.map(([k,l])=>{const rowClass=k==='AL'?'metric-al':k==='SL'?'metric-sl':k==='SP'?'metric-sp':k==='UP'?'metric-up':k==='late'?'metric-late':'metric-utilization';const active=reportMetricFocus===k?'is-active':'';return`<tr class="report-metric-row ${rowClass} ${active}" onclick="setReportMetricFocus('${k}')"><td class="report-metric-label px-3 py-3"><div class="report-metric-label-inner"><span>${l}</span><span class="report-metric-open">Details <i class="fa-solid fa-chevron-right"></i></span></div></td>${disp.map(c=>{if(c==='—')return'<td class="text-center px-3 py-3">—</td>';const a=stats(c,data.aRecords),b=data.period.mode==='year'?stats(c,data.bRecords):null;return`<td class="text-center px-3 py-3 font-semibold">${fmt(k,Number(a[k]||0),b?Number(b[k]||0):null)}</td>`;}).join('')}<td class="report-total-cell text-center px-3 py-3">${fmt(k,Number(ta[k]||0),tb?Number(tb[k]||0):null)}</td></tr>`;}).join('');
             const h=document.getElementById('reportSummaryHint');if(h)h.textContent=data.period.mode==='year'?`${data.period.yearA} / ${data.period.yearB}`:data.period.label;
+        }
+
+
+
+
+
+        function reportEmployeeSeniorityText(joinDateValue){
+            if(!joinDateValue || joinDateValue==='N/A') return '—';
+            const join=new Date(joinDateValue);
+            if(isNaN(join.getTime())) return '—';
+            const now=new Date();
+            if(join>now) return 'Not started';
+
+            let years=now.getFullYear()-join.getFullYear();
+            let months=now.getMonth()-join.getMonth();
+            let days=now.getDate()-join.getDate();
+
+            if(days<0){
+                months--;
+                const prevMonthDays=new Date(now.getFullYear(),now.getMonth(),0).getDate();
+                days+=prevMonthDays;
+            }
+            if(months<0){
+                years--;
+                months+=12;
+            }
+
+            const parts=[];
+            if(years>0) parts.push(`${years}y`);
+            if(months>0 || years>0) parts.push(`${months}m`);
+            if(years===0 && months===0) parts.push(`${Math.max(days,0)}d`);
+            return parts.join(' ');
+        }
+
+
+        function reportEmployeeLateTotals(empId,period){
+            const totals={late5:0,late30:0,total:0};
+            dailyLeaveRecords.forEach(r=>{
+                if(r.staffId!==empId) return;
+                const d=reportRecordDate(r);
+                if(!d || !period.testA(d)) return;
+                const l=r.leaves||{};
+                totals.late5+=Number(l.Late5m||0);
+                totals.late30+=Number(l.Late3m||0);
+            });
+            totals.total=totals.late5+totals.late30;
+            return totals;
+        }
+
+        function reportEmployeeMonthDailyData(empId,monthIndex,period){
+            const rows=[];
+            dailyLeaveRecords.forEach(r=>{
+                if(r.staffId!==empId) return;
+                const d=reportRecordDate(r);
+                if(!d || !period.testA(d) || d.getMonth()!==monthIndex) return;
+                const l=r.leaves||{};
+                const AL=Number(l.AL||0),SL=Number(l.SL||0),SP=Number(l.SP||0),UP=Number(l.UP||0);
+                const late5=Number(l.Late5m||0),late30=Number(l.Late3m||0);
+                if(!(AL||SL||SP||UP||late5||late30)) return;
+                rows.push({date:d,AL,SL,SP,UP,late5,late30});
+            });
+            return rows.sort((a,b)=>a.date-b.date);
+        }
+
+        function reportEmployeeLeaveTypeTotals(empId,period){
+            const totals={AL:0,SL:0,SP:0,UP:0};
+            dailyLeaveRecords.forEach(r=>{
+                if(r.staffId!==empId) return;
+                const d=reportRecordDate(r);
+                if(!d || !period.testA(d)) return;
+                const l=r.leaves||{};
+                totals.AL+=Number(l.AL||0);
+                totals.SL+=Number(l.SL||0);
+                totals.SP+=Number(l.SP||0);
+                totals.UP+=Number(l.UP||0);
+            });
+            return totals;
+        }
+
+
+        function reportEmployeeLeaveTypeMonthData(empId,period){
+            const months=Array.from({length:12},(_,i)=>({month:i,AL:0,SL:0,SP:0,UP:0,total:0}));
+            dailyLeaveRecords.forEach(r=>{
+                if(r.staffId!==empId) return;
+                const d=reportRecordDate(r);
+                if(!d || !period.testA(d)) return;
+                const l=r.leaves||{};
+                const m=months[d.getMonth()];
+                m.AL+=Number(l.AL||0);
+                m.SL+=Number(l.SL||0);
+                m.SP+=Number(l.SP||0);
+                m.UP+=Number(l.UP||0);
+                m.total=m.AL+m.SL+m.SP+m.UP;
+            });
+            return months;
+        }
+
+        function reportEmployeeMetricMonthData(empId,key,period){
+            const months=Array.from({length:12},(_,i)=>({month:i,total:0,dates:[]}));
+            dailyLeaveRecords.forEach(r=>{
+                if(r.staffId!==empId) return;
+                const d=reportRecordDate(r);
+                if(!d || !period.testA(d)) return;
+                const v=reportMetricValueFromRecord(r,key);
+                if(v<=0) return;
+                months[d.getMonth()].total+=v;
+                months[d.getMonth()].dates.push({
+                    date:d,
+                    label:`${String(d.getDate()).padStart(2,'0')} ${monthNames[d.getMonth()].slice(0,3)}`,
+                    value:v
+                });
+            });
+            return months;
+        }
+
+        window.openReportEmployeeMetricDetail=function(empId){
+            if(!reportMetricFocus || !reportMetricMeta[reportMetricFocus]) return;
+            const emp=allEmployees.find(e=>e.id===empId);
+            if(!emp) return;
+
+            const modal=document.getElementById('reportEmployeeMetricModal');
+            if(!modal) return;
+
+            const data=getReportData();
+            const key=reportMetricFocus;
+            const meta=reportMetricMeta[key];
+            const leaveTypeTotals=reportEmployeeLeaveTypeTotals(emp.id,data.period);
+            const lateTotals=reportEmployeeLateTotals(emp.id,data.period);
+            const leaveTypeMonthData=reportEmployeeLeaveTypeMonthData(emp.id,data.period);
+            const monthData=reportEmployeeMetricMonthData(emp.id,key,data.period);
+            const totalUsed=monthData.reduce((n,m)=>n+m.total,0);
+
+            let available=0,remaining=0;
+            if(key==='utilization'){
+                available=Number(emp.leaves?.available?.AL||0)+Number(emp.leaves?.available?.SL||0)+Number(emp.leaves?.available?.SP||0);
+                remaining=Number(emp.leaves?.remaining?.AL||0)+Number(emp.leaves?.remaining?.SL||0)+Number(emp.leaves?.remaining?.SP||0);
+            }else if(['AL','SL','SP'].includes(key)){
+                available=Number(emp.leaves?.available?.[key]||0);
+                remaining=Number(emp.leaves?.remaining?.[key]||0);
+            }
+            const pct=available>0?totalUsed/available*100:0;
+            const monthsUsed=monthData.filter(m=>m.total>0).length;
+
+            const avatar=document.getElementById('reportEmployeeMetricAvatar');
+            if(avatar) avatar.innerHTML=reportStaffAvatarHtml(emp,'w-full h-full');
+
+            const name=document.getElementById('reportEmployeeMetricName');
+            const code=document.getElementById('reportEmployeeMetricCode');
+            const metaLine=document.getElementById('reportEmployeeMetricMeta');
+            const periodLine=document.getElementById('reportEmployeeMetricPeriod');
+            if(name) name.textContent=emp.name;
+            if(code) code.textContent=meta.short;
+            if(metaLine) metaLine.textContent=`${emp.displayId} • ${emp.company} • ${emp.department||''} • ${emp.position||''}`;
+            if(periodLine) periodLine.textContent=data.period.label;
+
+            const joinEl=document.getElementById('reportEmployeeJoinDate');
+            const seniorityEl=document.getElementById('reportEmployeeSeniority');
+            if(joinEl) joinEl.textContent=`Join Date: ${emp.joinDate||'—'}`;
+            if(seniorityEl) seniorityEl.textContent=`Seniority: ${reportEmployeeSeniorityText(emp.joinDate)}`;
+
+            const selectedNote=document.getElementById('reportEmployeeSelectedMetricNote');
+            if(selectedNote){
+                selectedNote.classList.remove('hidden');
+                if(meta.kind==='leave'){
+                    selectedNote.textContent=`Viewing ${meta.label}: ${mobileDashboardFormatNumber(totalUsed)} used in ${data.period.label}.`;
+                }else if(meta.kind==='utilization'){
+                    selectedNote.textContent=`Viewing Paid Leave Utilization: ${mobileDashboardFormatNumber(totalUsed)} paid leave used (AL + SL + SP) in ${data.period.label}.`;
+                }else if(meta.kind==='late'){
+                    selectedNote.textContent=`Viewing Total Lateness: ${mobileDashboardFormatNumber(totalUsed)} late occurrences in ${data.period.label}.`;
+                }else{
+                    selectedNote.textContent=`Viewing ${meta.label}: ${mobileDashboardFormatNumber(totalUsed)} used in ${data.period.label}.`;
+                }
+            }
+
+            const typeStrip=document.getElementById('reportEmployeeLeaveTypeStrip');
+            if(typeStrip){
+                const typeMeta=[
+                    ['AL','Annual Leave','type-al'],
+                    ['SL','Sick Leave','type-sl'],
+                    ['SP','Special Leave','type-sp']
+                ];
+                const paidCards=typeMeta.map(([leaveCode,label,cls])=>{
+                    const avail=Number(emp.leaves?.available?.[leaveCode]||0);
+                    const used=Number(leaveTypeTotals[leaveCode]||0);
+                    const remaining=Number(emp.leaves?.remaining?.[leaveCode]||0);
+                    return `<div class="employee-leave-type-card ${cls}">
+                        <div class="type-head">${leaveCode} · ${reportEscapeHtml(label)}</div>
+                        <div class="type-grid">
+                            <div class="type-cell"><span class="cell-label">Available</span><span class="cell-value">${mobileDashboardFormatNumber(avail)}</span></div>
+                            <div class="type-cell"><span class="cell-label">Used</span><span class="cell-value">${mobileDashboardFormatNumber(used)}</span></div>
+                            <div class="type-cell"><span class="cell-label">Remaining</span><span class="cell-value">${mobileDashboardFormatNumber(remaining)}</span></div>
+                        </div>
+                        <div class="type-note">Used = selected report period · Available/Remaining = current balance</div>
+                    </div>`;
+                }).join('');
+                const upCard=`<div class="employee-leave-type-card type-up">
+                    <div class="type-head">UP · Unpaid Leave</div>
+                    <div class="type-grid">
+                        <div class="type-cell"><span class="cell-label">Used</span><span class="cell-value">${mobileDashboardFormatNumber(leaveTypeTotals.UP||0)}</span></div>
+                    </div>
+                    <div class="type-note">UP has no entitlement or remaining balance</div>
+                </div>`;
+                typeStrip.innerHTML=paidCards+upCard;
+            }
+
+            const lateStrip=document.getElementById('reportEmployeeLateStrip');
+            if(lateStrip){
+                lateStrip.innerHTML=`<div class="employee-late-card">
+                    <div class="late-label">L · Late &gt;5m</div>
+                    <div class="late-value">${mobileDashboardFormatNumber(lateTotals.late5)}</div>
+                    <div class="late-sub">Occurrences in ${reportEscapeHtml(data.period.label)}</div>
+                </div>
+                <div class="employee-late-card severe">
+                    <div class="late-label">L' · Late &gt;30m</div>
+                    <div class="late-value">${mobileDashboardFormatNumber(lateTotals.late30)}</div>
+                    <div class="late-sub">Occurrences in ${reportEscapeHtml(data.period.label)}</div>
+                </div>
+                <div class="employee-late-card total">
+                    <div class="late-label">Total Lateness</div>
+                    <div class="late-value">${mobileDashboardFormatNumber(lateTotals.total)}</div>
+                    <div class="late-sub">L + L' combined</div>
+                </div>`;
+            }
+
+            const maxMonth=Math.max(...leaveTypeMonthData.map(m=>m.total),0);
+            const chart=document.getElementById('reportEmployeeMetricChart');
+            const chartTotal=document.getElementById('reportEmployeeMetricChartTotal');
+            const chartTitle=document.getElementById('reportEmployeeMetricChartTitle');
+            const allLeaveTotal=leaveTypeMonthData.reduce((n,m)=>n+m.total,0);
+            if(chartTitle) chartTitle.textContent='Monthly Leave Usage by Type';
+            if(chartTotal) chartTotal.textContent=`All Leave ${mobileDashboardFormatNumber(allLeaveTotal)}`;
+            if(chart){
+                chart.innerHTML=leaveTypeMonthData.map(m=>{
+                    const totalPct=maxMonth>0?(m.total/maxMonth)*100:0;
+                    const segmentHeight=(v)=>m.total>0?(v/m.total)*totalPct:0;
+                    const title=`${monthNames[m.month]} — AL ${mobileDashboardFormatNumber(m.AL)}, SL ${mobileDashboardFormatNumber(m.SL)}, SP ${mobileDashboardFormatNumber(m.SP)}, UP ${mobileDashboardFormatNumber(m.UP)}`;
+                    return `<div class="metric-bar-wrap" title="${reportEscapeHtml(title)}">
+                        <div class="metric-bar-value">${mobileDashboardFormatNumber(m.total)}</div>
+                        <div class="employee-stacked-track">
+                            <div class="employee-stacked-segment al" style="height:${segmentHeight(m.AL)}%" title="AL ${mobileDashboardFormatNumber(m.AL)}"></div>
+                            <div class="employee-stacked-segment sl" style="height:${segmentHeight(m.SL)}%" title="SL ${mobileDashboardFormatNumber(m.SL)}"></div>
+                            <div class="employee-stacked-segment sp" style="height:${segmentHeight(m.SP)}%" title="SP ${mobileDashboardFormatNumber(m.SP)}"></div>
+                            <div class="employee-stacked-segment up" style="height:${segmentHeight(m.UP)}%" title="UP ${mobileDashboardFormatNumber(m.UP)}"></div>
+                        </div>
+                        <div class="metric-bar-label">${monthNames[m.month].slice(0,3)}</div>
+                    </div>`;
+                }).join('');
+            }
+
+            const monthsBox=document.getElementById('reportEmployeeMetricMonths');
+            if(monthsBox){
+                monthsBox.innerHTML=monthData.map(m=>{
+                    const dates=m.dates
+                        .slice()
+                        .sort((a,b)=>a.date-b.date)
+                        .map(d=>`<span class="metric-date-chip">${reportEscapeHtml(d.label)}${d.value!==1?` · ${mobileDashboardFormatNumber(d.value)}`:''}</span>`)
+                        .join('');
+                    return `<div class="employee-report-month-card" onclick="openReportEmployeeDayDetail('${String(emp.id).replace(/'/g,"\\'")}',${m.month})">
+                        <div class="month-title"><span>${monthNames[m.month]} <span class="month-open">View Days <i class="fa-solid fa-chevron-right"></i></span></span><span>${mobileDashboardFormatNumber(m.total)}</span></div>
+                        <div class="employee-report-date-list">${dates||'<span class="text-[8px] text-slate-300">No usage</span>'}</div>
+                    </div>`;
+                }).join('');
+            }
+
+            modal.classList.remove('hidden');
+        };
+
+
+        window.openReportEmployeeDayDetail=function(empId,monthIndex){
+            const emp=allEmployees.find(e=>e.id===empId);
+            if(!emp) return;
+            const modal=document.getElementById('reportEmployeeDayModal');
+            if(!modal) return;
+
+            const data=getReportData();
+            const rows=reportEmployeeMonthDailyData(emp.id,monthIndex,data.period);
+            const title=document.getElementById('reportEmployeeDayTitle');
+            const subtitle=document.getElementById('reportEmployeeDaySubtitle');
+            const body=document.getElementById('reportEmployeeDayBody');
+
+            if(title) title.textContent=`${emp.name} — ${monthNames[monthIndex]} Daily Detail`;
+            if(subtitle) subtitle.textContent=`Leave and lateness by day • ${data.period.label}`;
+
+            if(body){
+                if(!rows.length){
+                    body.innerHTML='<div class="p-8 text-center text-xs text-slate-400">No leave or lateness records for this month.</div>';
+                }else{
+                    body.innerHTML=rows.map(r=>{
+                        const badges=[];
+                        if(r.AL) badges.push(`<span class="day-badge al">AL ${mobileDashboardFormatNumber(r.AL)}</span>`);
+                        if(r.SL) badges.push(`<span class="day-badge sl">SL ${mobileDashboardFormatNumber(r.SL)}</span>`);
+                        if(r.SP) badges.push(`<span class="day-badge sp">SP ${mobileDashboardFormatNumber(r.SP)}</span>`);
+                        if(r.UP) badges.push(`<span class="day-badge up">UP ${mobileDashboardFormatNumber(r.UP)}</span>`);
+                        if(r.late5) badges.push(`<span class="day-badge late">L &gt;5m ${mobileDashboardFormatNumber(r.late5)}</span>`);
+                        if(r.late30) badges.push(`<span class="day-badge late30">L' &gt;30m ${mobileDashboardFormatNumber(r.late30)}</span>`);
+                        const leaveTotal=r.AL+r.SL+r.SP+r.UP;
+                        const lateTotal=r.late5+r.late30;
+                        return `<div class="day-row">
+                            <div class="day-date">${String(r.date.getDate()).padStart(2,'0')} ${monthNames[r.date.getMonth()].slice(0,3)}</div>
+                            <div class="day-badges">${badges.join('')}</div>
+                            <div class="day-total">${leaveTotal?`${mobileDashboardFormatNumber(leaveTotal)} leave`:''}${leaveTotal&&lateTotal?' · ':''}${lateTotal?`${mobileDashboardFormatNumber(lateTotal)} late`:''}</div>
+                        </div>`;
+                    }).join('');
+                }
+            }
+            modal.classList.remove('hidden');
+        };
+
+        window.closeReportEmployeeDayDetail=function(){
+            document.getElementById('reportEmployeeDayModal')?.classList.add('hidden');
+        };
+
+        window.closeReportEmployeeMetricDetail=function(){
+            document.getElementById('reportEmployeeDayModal')?.classList.add('hidden');
+            document.getElementById('reportEmployeeMetricModal')?.classList.add('hidden');
+        };
+
+        const reportMetricMeta={
+            AL:{label:'Annual Leave (AL)',short:'AL',kind:'leave',availableKey:'AL'},
+            SL:{label:'Sick Leave (SL)',short:'SL',kind:'leave',availableKey:'SL'},
+            SP:{label:'Special Leave (SP)',short:'SP',kind:'leave',availableKey:'SP'},
+            UP:{label:'Unpaid Leave (UP)',short:'UP',kind:'up'},
+            late:{label:'Total Lateness',short:'Late',kind:'late'},
+            utilization:{label:'Paid Leave Utilization',short:'Paid Utilization',kind:'utilization'}
+        };
+
+        function reportMetricValueFromRecord(r,key){
+            const l=r?.leaves||{};
+            if(key==='late') return Number(l.Late5m||0)+Number(l.Late3m||0);
+            if(key==='utilization') return Number(l.AL||0)+Number(l.SL||0)+Number(l.SP||0);
+            return Number(l[key]||0);
+        }
+
+        function reportMetricEmployeeStats(data,key){
+            const map={};
+            data.scopeEmployees.forEach(emp=>{
+                const available=key==='utilization'
+                    ? Number(emp.leaves?.available?.AL||0)+Number(emp.leaves?.available?.SL||0)+Number(emp.leaves?.available?.SP||0)
+                    : ['AL','SL','SP'].includes(key)?Number(emp.leaves?.available?.[key]||0):0;
+                const remaining=key==='utilization'
+                    ? Number(emp.leaves?.remaining?.AL||0)+Number(emp.leaves?.remaining?.SL||0)+Number(emp.leaves?.remaining?.SP||0)
+                    : ['AL','SL','SP'].includes(key)?Number(emp.leaves?.remaining?.[key]||0):0;
+                map[emp.id]={emp,used:0,available,remaining,dates:[]};
+            });
+            data.aRecords.forEach(r=>{
+                const x=map[r.staffId];if(!x)return;
+                const v=reportMetricValueFromRecord(r,key);
+                if(v<=0)return;
+                x.used+=v;
+                const d=reportRecordDate(r);
+                if(d){
+                    const dateLabel=`${String(d.getDate()).padStart(2,'0')} ${monthNames[d.getMonth()].slice(0,3)}`;
+                    x.dates.push({date:d,label:dateLabel,value:v});
+                }
+            });
+            return Object.values(map);
+        }
+
+        function reportMetricMonthTotals(data,key){
+            const vals=Array(12).fill(0);
+            data.aRecords.forEach(r=>{
+                const d=reportRecordDate(r);if(!d)return;
+                vals[d.getMonth()]+=reportMetricValueFromRecord(r,key);
+            });
+            return vals;
+        }
+
+        window.setReportMetricFocus=function(key){
+            if(!reportMetricMeta[key])return;
+            reportMetricFocus=key;
+            reportMetricSearchQuery='';
+            reportMetricDepartment='All';
+            reportMetricCompany='All';
+            const metricSearch=document.getElementById('reportMetricSearchInput'); if(metricSearch) metricSearch.value='';
+            document.getElementById('reportMetricSearchClear')?.classList.add('hidden');
+            const data=getReportData();
+            renderReportSummary(data);
+            renderReportMetricDetail(data);
+            const panel=document.getElementById('reportMetricDrilldown');
+            if(panel){
+                panel.classList.remove('hidden');
+                document.body.classList.add('modal-open');
+                const body=panel.querySelector('.metric-drilldown-body');
+                if(body) body.scrollTop=0;
+            }
+        };
+
+        window.closeReportMetricDetail=function(){
+            reportMetricFocus=null;
+            reportMetricCompany='All';
+            reportMetricDepartment='All';
+            reportMetricSearchQuery='';
+            document.getElementById('reportEmployeeMetricModal')?.classList.add('hidden');
+            document.getElementById('reportMetricDrilldown')?.classList.add('hidden');
+            document.body.classList.remove('modal-open');
+            const data=getReportData();
+            renderReportSummary(data);
+        };
+
+        function renderReportMetricDetail(data){
+            const panel=document.getElementById('reportMetricDrilldown');
+            if(!panel)return;
+            if(!reportMetricFocus||!reportMetricMeta[reportMetricFocus]){
+                panel.classList.add('hidden');
+                return;
+            }
+            panel.classList.remove('hidden');
+
+            const key=reportMetricFocus,meta=reportMetricMeta[key];
+            const title=document.getElementById('reportMetricTitle');
+            const subtitle=document.getElementById('reportMetricSubtitle');
+            if(title)title.textContent=`${meta.label} Detail`;
+            if(subtitle)subtitle.textContent=`Focused analysis for ${data.period.label} using the selected companies and department.`;
+
+            const tabs=document.getElementById('reportMetricTabs');
+            if(tabs)tabs.innerHTML=Object.entries(reportMetricMeta).map(([k,m])=>`<button type="button" class="metric-tab ${k===key?'is-active':''}" onclick="setReportMetricFocus('${k}')">${m.short}</button>`).join('');
+
+            const stats=reportMetricEmployeeStats(data,key);
+            syncReportMetricDepartments(data,key);
+            const usedStats=stats
+                .filter(x=>x.used>0)
+                .filter(x=>reportMetricCompany==='All'||x.emp?.company===reportMetricCompany)
+                .filter(x=>reportMetricDepartment==='All'||x.emp?.department===reportMetricDepartment)
+                .filter(x=>reportEmployeeMatchesSearch(x.emp, reportMetricSearchQuery))
+                .sort((a,b)=>b.used-a.used);
+            const totalUsed=usedStats.reduce((n,x)=>n+x.used,0);
+            const employeeCount=usedStats.length;
+            const avg=employeeCount?totalUsed/employeeCount:0;
+            const top=usedStats[0]||null;
+            const totalAvailable=stats.reduce((n,x)=>n+x.available,0);
+            const totalRemaining=stats.reduce((n,x)=>n+x.remaining,0);
+            const utilization=totalAvailable>0?totalUsed/totalAvailable*100:0;
+
+            let kpis=[];
+            if(meta.kind==='leave'){
+                kpis=[
+                    ['Used in Period',mobileDashboardFormatNumber(totalUsed),meta.short+' days'],
+                    ['Employees Used',employeeCount,`of ${stats.length} staff`],
+                    ['Average per User',mobileDashboardFormatNumber(avg),'among users'],
+                    ['Current Available',mobileDashboardFormatNumber(totalAvailable),`Remaining ${mobileDashboardFormatNumber(totalRemaining)}`]
+                ];
+            }else if(meta.kind==='utilization'){
+                kpis=[
+                    ['Paid Leave Used',mobileDashboardFormatNumber(totalUsed),'AL + SL + SP'],
+                    ['Available Entitlement',mobileDashboardFormatNumber(totalAvailable),'Current staff'],
+                    ['Remaining',mobileDashboardFormatNumber(totalRemaining),'Current balance'],
+                    ['Utilization',`${utilization.toFixed(1)}%`,'Used ÷ available']
+                ];
+            }else{
+                kpis=[
+                    [meta.kind==='late'?'Late Occurrences':'UP Used',mobileDashboardFormatNumber(totalUsed),data.period.label],
+                    ['Employees Affected',employeeCount,`of ${stats.length} staff`],
+                    ['Average per User',mobileDashboardFormatNumber(avg),'among affected staff'],
+                    ['Highest User',top?mobileDashboardFormatNumber(top.used):'0',top?top.emp.name:'No usage']
+                ];
+            }
+            const kpiBox=document.getElementById('reportMetricKpis');
+            if(kpiBox)kpiBox.innerHTML=kpis.map(([l,v,h])=>`<div class="metric-kpi"><div class="label">${reportEscapeHtml(l)}</div><div class="value">${reportEscapeHtml(v)}</div><div class="hint">${reportEscapeHtml(h)}</div></div>`).join('');
+
+            const monthVals=reportMetricMonthTotals(data,key);
+            const monthBox=document.getElementById('reportMetricMonths');
+            if(monthBox)monthBox.innerHTML=monthNames.map((m,i)=>`<div class="metric-month-cell"><div class="m">${m.slice(0,3)}</div><div class="v">${mobileDashboardFormatNumber(monthVals[i])}</div></div>`).join('');
+
+            const chart=document.getElementById('reportMetricChart');
+            const chartTotal=document.getElementById('reportMetricChartTotal');
+            const maxMonth=Math.max(...monthVals,0);
+            const monthTotal=monthVals.reduce((a,b)=>a+b,0);
+            if(chartTotal)chartTotal.textContent=`Total ${mobileDashboardFormatNumber(monthTotal)}`;
+            if(chart){
+                chart.innerHTML=monthNames.map((m,i)=>{
+                    const v=Number(monthVals[i]||0);
+                    const pct=maxMonth>0?Math.max(v>0?4:0,(v/maxMonth)*100):0;
+                    return `<div class="metric-bar-wrap" title="${reportEscapeHtml(m)}: ${mobileDashboardFormatNumber(v)}">
+                        <div class="metric-bar-value">${mobileDashboardFormatNumber(v)}</div>
+                        <div class="metric-bar-track"><div class="metric-bar" style="height:${pct}%"></div></div>
+                        <div class="metric-bar-label">${m.slice(0,3)}</div>
+                    </div>`;
+                }).join('');
+            }
+
+            const companyBox=document.getElementById('reportMetricCompanyBreakdown');
+            if(companyBox){
+                const selectedCompanies=Array.from(new Set(data.scopeEmployees.map(e=>e.company))).sort();
+                const allUsed=stats.reduce((n,x)=>n+x.used,0);
+                const allRow=`<div class="metric-company-all ${reportMetricCompany==='All'?'is-active':''}" onclick="setReportMetricCompany('All')">
+                    <span><i class="fa-solid fa-building mr-1"></i>All Companies</span>
+                    <span>${mobileDashboardFormatNumber(allUsed)}</span>
+                </div>`;
+                const companyRows=selectedCompanies.map(c=>{
+                    const ids=new Set(data.scopeEmployees.filter(e=>e.company===c).map(e=>e.id));
+                    const companyStats=stats.filter(x=>ids.has(x.emp.id));
+                    const companyUsed=companyStats.reduce((n,x)=>n+x.used,0);
+                    const companyAvailable=companyStats.reduce((n,x)=>n+x.available,0);
+                    const second=meta.kind==='utilization'
+                        ?`${companyAvailable>0?(companyUsed/companyAvailable*100).toFixed(1):'0.0'}%`
+                        :`${companyStats.filter(x=>x.used>0).length} staff`;
+                    const js=String(c).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+                    return `<div class="metric-company-row ${reportMetricCompany===c?'is-active':''}" onclick="setReportMetricCompany('${js}')">
+                        <div>
+                            <div class="font-extrabold text-slate-700 flex items-center gap-1">${getCompanyLogo(c)} ${reportEscapeHtml(c)}</div>
+                            <div class="text-[8px] text-slate-400 mt-0.5">${second} <span class="company-filter-hint">• Click to filter</span></div>
+                        </div>
+                        <div class="font-extrabold text-slate-900">${mobileDashboardFormatNumber(companyUsed)}</div>
+                    </div>`;
+                }).join('');
+                companyBox.innerHTML=selectedCompanies.length?allRow+companyRows:'<div class="p-4 text-center text-[10px] text-slate-400">No company data.</div>';
+            }
+
+            const head=document.getElementById('reportMetricEmployeeHead');
+            const body=document.getElementById('reportMetricEmployeeBody');
+            const count=document.getElementById('reportMetricEmployeeCount');
+            const employeeTitle=document.getElementById('reportMetricEmployeeTitle');
+            if(employeeTitle)employeeTitle.textContent=`Employee Detail — ${meta.short}`;
+            if(count)count.textContent=`${employeeCount} employee${employeeCount===1?'':'s'} with usage${reportMetricCompany!=='All'?` • ${reportMetricCompany}`:''}${reportMetricDepartment!=='All'?` • ${reportMetricDepartment}`:''}${reportMetricSearchQuery?' • matching search':''}`;
+
+            if(head){
+                if(meta.kind==='leave'){
+                    head.innerHTML='<tr><th class="text-left px-3 py-2">Employee</th><th class="text-left px-3 py-2">Company / Dept</th><th class="text-center px-3 py-2">Used</th><th class="text-center px-3 py-2">Available</th><th class="text-center px-3 py-2">Remaining</th><th class="text-center px-3 py-2">% Used</th><th class="text-left px-3 py-2">Dates Used</th><th class="text-center px-3 py-2">Report</th></tr>';
+                }else if(meta.kind==='utilization'){
+                    head.innerHTML='<tr><th class="text-left px-3 py-2">Employee</th><th class="text-left px-3 py-2">Company / Dept</th><th class="text-center px-3 py-2">Paid Used</th><th class="text-center px-3 py-2">Available</th><th class="text-center px-3 py-2">Remaining</th><th class="text-center px-3 py-2">Utilization</th><th class="text-left px-3 py-2">Paid Leave Dates</th><th class="text-center px-3 py-2">Report</th></tr>';
+                }else{
+                    head.innerHTML=`<tr><th class="text-left px-3 py-2">Employee</th><th class="text-left px-3 py-2">Company / Dept</th><th class="text-center px-3 py-2">${meta.kind==='late'?'Late Count':'UP Used'}</th><th class="text-left px-3 py-2">Dates</th><th class="text-center px-3 py-2">Report</th></tr>`;
+                }
+            }
+
+            if(body){
+                if(!usedStats.length){
+                    body.innerHTML=`<tr><td colspan="8" class="p-8 text-center text-slate-400">No ${reportEscapeHtml(meta.short)} usage in this period.</td></tr>`;
+                }else{
+                    body.innerHTML=usedStats.map(x=>{
+                        const eid=String(x.emp.id||'').replace(/'/g,"\\'");
+                        const pct=x.available>0?x.used/x.available*100:0;
+                        const dates=x.dates.slice().sort((a,b)=>a.date-b.date).map(d=>`<span class="metric-date-chip">${reportEscapeHtml(d.label)}${d.value!==1?` · ${mobileDashboardFormatNumber(d.value)}`:''}</span>`).join('');
+                        const person=`<div class="flex items-center gap-2">${reportStaffAvatarHtml(x.emp,'w-8 h-8')}<div class="min-w-0"><div class="font-extrabold text-slate-800 truncate">${reportEscapeHtml(x.emp.name)}</div><div class="text-[8px] text-slate-400">${reportEscapeHtml(x.emp.displayId)}</div></div></div>`;
+                        const metaCell=`${reportEscapeHtml(x.emp.company)}<div class="text-[8px] text-slate-400">${reportEscapeHtml(x.emp.department||'')}</div>`;
+                        if(meta.kind==='leave'||meta.kind==='utilization'){
+                            return `<tr onclick="event.stopPropagation();openReportEmployeeMetricDetail('${eid}')" class="hover:bg-blue-50/40"><td class="px-3 py-2">${person}</td><td class="px-3 py-2">${metaCell}</td><td class="text-center px-3 py-2 font-extrabold">${mobileDashboardFormatNumber(x.used)}</td><td class="text-center px-3 py-2">${mobileDashboardFormatNumber(x.available)}</td><td class="text-center px-3 py-2">${mobileDashboardFormatNumber(x.remaining)}</td><td class="text-center px-3 py-2 font-bold">${x.available>0?pct.toFixed(1)+'%':'—'}</td><td class="px-3 py-2"><div class="metric-date-chips">${dates}</div></td><td class="text-center px-3 py-2"><button type="button" onclick="event.stopPropagation();openReportEmployeeMetricDetail('${eid}')" class="inline-flex items-center gap-1 rounded-lg border border-blue-200 bg-blue-50 px-2 py-1 text-[8px] font-extrabold text-blue-700 hover:bg-blue-100"><i class="fa-solid fa-chart-column"></i>Usage</button></td></tr>`;
+                        }
+                        return `<tr onclick="event.stopPropagation();openReportEmployeeMetricDetail('${eid}')" class="hover:bg-blue-50/40"><td class="px-3 py-2">${person}</td><td class="px-3 py-2">${metaCell}</td><td class="text-center px-3 py-2 font-extrabold">${mobileDashboardFormatNumber(x.used)}</td><td class="px-3 py-2"><div class="metric-date-chips">${dates}</div></td><td class="text-center px-3 py-2"><button type="button" onclick="event.stopPropagation();openReportEmployeeMetricDetail('${eid}')" class="inline-flex items-center gap-1 rounded-lg border border-blue-200 bg-blue-50 px-2 py-1 text-[8px] font-extrabold text-blue-700 hover:bg-blue-100"><i class="fa-solid fa-chart-column"></i>Usage</button></td></tr>`;
+                    }).join('');
+                }
+            }
         }
 
         function renderReportWatchlist(data){
@@ -7565,7 +9135,7 @@
             const periodRecs=data.aRecords||[],map={};data.scopeEmployees.forEach(e=>map[e.id]={emp:e,leave:0,late:0});
             periodRecs.forEach(r=>{const x=map[r.staffId];if(!x)return;const l=r.leaves||{};x.leave+=Number(l.AL||0)+Number(l.SL||0)+Number(l.SP||0)+Number(l.UP||0);x.late+=Number(l.Late5m||0)+Number(l.Late3m||0);});
             const row=(x,t,i)=>{const v=t==='leave'?x.leave:x.late;const eid=String(x.emp.id||'').replace(/'/g,"\\'");return`<div class="report-watch-row px-4 py-3 flex items-center gap-3" onclick="openModalById('${eid}')"><div class="w-7 h-7 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-[10px] font-extrabold">${i}</div>${reportStaffAvatarHtml(x.emp,'w-9 h-9')}<div class="min-w-0 flex-1"><div class="text-xs font-bold text-slate-800 truncate">${reportEscapeHtml(x.emp.name)}</div><div class="text-[9px] text-slate-400 truncate">${reportEscapeHtml(x.emp.displayId)} • ${reportEscapeHtml(x.emp.company)} • ${reportEscapeHtml(x.emp.department||'')}</div></div><div class="text-sm font-extrabold ${t==='leave'?'text-blue-600':'text-orange-600'}">${mobileDashboardFormatNumber(v)}</div></div>`;};
-            const leave=Object.values(map).filter(x=>x.leave>0).sort((a,b)=>b.leave-a.leave).slice(0,8),late=Object.values(map).filter(x=>x.late>0).sort((a,b)=>b.late-a.late).slice(0,8),le=document.getElementById('reportLeaveWatchlist'),la=document.getElementById('reportLateWatchlist');
+            const leave=Object.values(map).filter(x=>x.leave>0).sort((a,b)=>b.leave-a.leave).slice(0,10),late=Object.values(map).filter(x=>x.late>0).sort((a,b)=>b.late-a.late).slice(0,10),le=document.getElementById('reportLeaveWatchlist'),la=document.getElementById('reportLateWatchlist');
             if(le)le.innerHTML=leave.length?leave.map((x,i)=>row(x,'leave',i+1)).join(''):'<div class="p-6 text-center text-xs text-slate-400">No leave usage in this period.</div>';if(la)la.innerHTML=late.length?late.map((x,i)=>row(x,'late',i+1)).join(''):'<div class="p-6 text-center text-xs text-slate-400">No lateness recorded in this period.</div>';
         }
 
@@ -7589,11 +9159,11 @@
             const data=getReportData(),lab=document.getElementById('reportPeriodLabel'),d=document.getElementById('reportDepartmentSelect')?.value||'All';
             const list=Array.from(companies).filter(Boolean).sort();
             const companyLabel=selectedReportCompanies.length===list.length?'All Companies':selectedReportCompanies.length===1?selectedReportCompanies[0]:selectedReportCompanies.length?`${selectedReportCompanies.length} Companies`:'No Companies';
-            if(lab)lab.textContent=`${data.period.label} • ${companyLabel} • ${d==='All'?'All Departments':d} • ${data.scopeEmployees.length} current staff`;
+            if(lab)lab.textContent=`${data.period.label} • ${companyLabel} • ${d==='All'?'All Departments':d} • ${data.scopeEmployees.length} current staff${reportSearchQuery?` • Search result for "${reportSearchQuery}"`:''}`;
             const leaveTitle=document.getElementById('reportLeaveWatchTitle'),lateTitle=document.getElementById('reportLateWatchTitle');
-            if(leaveTitle)leaveTitle.textContent=`Most Leave Used — ${data.period.label}`;
-            if(lateTitle)lateTitle.textContent=`Most Late — ${data.period.label}`;
-            renderReportCompanyKpis(data);renderReportSummary(data);renderReportWatchlist(data);renderReportWarnings(data);renderReportPerformance(data);setReportSubtab(reportSubtab);
+            if(leaveTitle)leaveTitle.textContent=`Top 10 Leave Used — ${data.period.label}`;
+            if(lateTitle)lateTitle.textContent=`Top 10 Most Late — ${data.period.label}`;
+            renderReportCompanyKpis(data);renderReportSummary(data);renderReportMetricDetail(data);renderReportWatchlist(data);renderReportWarnings(data);renderReportPerformance(data);setReportSubtab(reportSubtab);
         };
         window.resetReportFilters=function(){
             reportMode='monthly';
@@ -7602,6 +9172,9 @@
             if(b)b.value=String(now.getFullYear()-1);
             if(m)m.value='All';
             selectedReportCompanies=Array.from(companies).filter(Boolean).sort();
+            reportSearchQuery='';
+            const searchInput=document.getElementById('reportSearchInput'); if(searchInput) searchInput.value='';
+            document.getElementById('reportSearchClear')?.classList.add('hidden');
             updateReportCompanyDropdownUI();
             syncReportDepartments();
             const d=document.getElementById('reportDepartmentSelect');if(d)d.value='All';
@@ -7687,7 +9260,7 @@
                 }))
                 .filter(x=>x['Leave Used']>0)
                 .sort((a,b)=>b['Leave Used']-a['Leave Used'])
-                .slice(0,8);
+                .slice(0,10);
 
             const lateWatch=Object.values(staffMap)
                 .map(x=>({
@@ -7699,7 +9272,7 @@
                 }))
                 .filter(x=>x.Lateness>0)
                 .sort((a,b)=>b.Lateness-a.Lateness)
-                .slice(0,8);
+                .slice(0,10);
 
             const performanceRows=Object.values(staffMap)
                 .map(x=>{
@@ -7730,6 +9303,7 @@
                 {Field:'Report Period',Value:data.period.label},
                 {Field:'Company Filter',Value:company},
                 {Field:'Department Filter',Value:department==='All'?'All Departments':department},
+                {Field:'Staff Search',Value:reportSearchQuery||'None'},
                 {Field:'Current Staff Included',Value:data.scopeEmployees.length},
                 {Field:'Employment Scope',Value:'Current staff only; former staff excluded after Last Working Day'},
                 {Field:'Paid Leave Utilization Formula',Value:'(AL + SL + SP used) / available AL + SL + SP x 100'}
@@ -7875,7 +9449,7 @@
                     y
                 );
 
-                y=pdfSectionTitle(doc,`Most Leave Used — ${full.data.period.label}`,y);
+                y=pdfSectionTitle(doc,`Top 10 Leave Used — ${full.data.period.label}`,y);
                 y=pdfSimpleTable(
                     doc,
                     ['Staff','ID','Company','Dept','Leave','AL','SL','SP','UP'],
@@ -7884,7 +9458,7 @@
                     y
                 );
 
-                y=pdfSectionTitle(doc,`Most Late — ${full.data.period.label}`,y);
+                y=pdfSectionTitle(doc,`Top 10 Most Late — ${full.data.period.label}`,y);
                 y=pdfSimpleTable(
                     doc,
                     ['Staff','ID','Company','Department','Lateness'],
@@ -7932,6 +9506,21 @@
             }
         };
 
+
+        document.addEventListener('keydown',function(e){
+            if(e.key!=='Escape') return;
+            const dayReport=document.getElementById('reportEmployeeDayModal');
+            if(dayReport && !dayReport.classList.contains('hidden')){
+                closeReportEmployeeDayDetail();
+                return;
+            }
+            const employeeReport=document.getElementById('reportEmployeeMetricModal');
+            if(employeeReport && !employeeReport.classList.contains('hidden')){
+                closeReportEmployeeMetricDetail();
+                return;
+            }
+            if(reportMetricFocus) closeReportMetricDetail();
+        });
 
         document.addEventListener('click',function(e){
             const btn=document.getElementById('reportCompanyDropdownBtn');
@@ -8480,8 +10069,18 @@
             });
         }
 
-        window.openModalById=id=>{window.currentModalEmployeeId=id; let e=allEmployees.find(x=>x.id===id); if(e)openModal(e);};
-        function openModal(e) {
+        window.openModalById=id=>{
+            window.currentModalEmployeeId=id;
+            const reportPanel=document.getElementById('reportMetricDrilldown');
+            const reportIsOpen=reportPanel && !reportPanel.classList.contains('hidden');
+            if(reportIsOpen){
+                const reportBody=reportPanel.querySelector('.metric-drilldown-body');
+                reportDetailScrollBeforeEmployee=reportBody ? reportBody.scrollTop : 0;
+            }
+            let e=allEmployees.find(x=>x.id===id);
+            if(e)openModal(e, {fromReportDetail:reportIsOpen});
+        };
+        function openModal(e, options = {}) {
             window.currentModalEmployeeId = e?.id || window.currentModalEmployeeId || '';
             let avatarContent = staffPhotoImgHtml(e, 'w-full h-full object-cover', e.name || 'Avatar') || e.name[0];
             document.getElementById('modalAvatar').innerHTML = avatarContent;
@@ -8621,10 +10220,68 @@
                     }
                 }
             });
-            const md=document.getElementById('employeeModal'), co=document.getElementById('modalContent'); md.classList.remove('hidden'); setTimeout(()=>{md.classList.remove('opacity-0');co.classList.remove('scale-95');document.body.classList.add('modal-open');},10);
+            const md=document.getElementById('employeeModal'), co=document.getElementById('modalContent');
+            const reportPanel=document.getElementById('reportMetricDrilldown');
+            const reportIsOpen=!!(reportPanel && !reportPanel.classList.contains('hidden'));
+            const nestedFromReport=options?.fromReportDetail || reportIsOpen;
+
+            md.classList.toggle('report-nested-profile', nestedFromReport);
+            md.dataset.openedFromReportDetail = nestedFromReport ? '1' : '0';
+
+            if(nestedFromReport){
+                const shell=reportPanel?.querySelector('.metric-drilldown-shell');
+                if(shell){
+                    if(!employeeModalOriginalParent){
+                        employeeModalOriginalParent=md.parentNode;
+                        employeeModalOriginalNextSibling=md.nextSibling;
+                    }
+                    shell.appendChild(md);
+                }
+            }
+
+            md.classList.remove('hidden');
+            setTimeout(()=>{
+                md.classList.remove('opacity-0');
+                co.classList.remove('scale-95');
+                document.body.classList.add('modal-open');
+            },10);
         }
         
-        window.closeModal=function(){const md=document.getElementById('employeeModal'),co=document.getElementById('modalContent'); md.classList.add('opacity-0');co.classList.add('scale-95'); if(document.getElementById('deptModal').classList.contains('hidden'))document.body.classList.remove('modal-open'); setTimeout(()=>md.classList.add('hidden'),300);};
+        window.closeModal=function(){
+            const md=document.getElementById('employeeModal'),co=document.getElementById('modalContent');
+            const openedFromReport=md?.dataset?.openedFromReportDetail==='1';
+            const reportPanel=document.getElementById('reportMetricDrilldown');
+            const reportStillOpen=!!(reportPanel && !reportPanel.classList.contains('hidden'));
+
+            md.classList.add('opacity-0');
+            co.classList.add('scale-95');
+
+            if(!openedFromReport && document.getElementById('deptModal').classList.contains('hidden') && !reportStillOpen){
+                document.body.classList.remove('modal-open');
+            }
+
+            setTimeout(()=>{
+                md.classList.add('hidden');
+                md.classList.remove('report-nested-profile');
+                md.dataset.openedFromReportDetail='0';
+
+                if(employeeModalOriginalParent){
+                    if(employeeModalOriginalNextSibling && employeeModalOriginalNextSibling.parentNode===employeeModalOriginalParent){
+                        employeeModalOriginalParent.insertBefore(md, employeeModalOriginalNextSibling);
+                    }else{
+                        employeeModalOriginalParent.appendChild(md);
+                    }
+                }
+
+                if(openedFromReport && reportStillOpen){
+                    document.body.classList.add('modal-open');
+                    const reportBody=reportPanel.querySelector('.metric-drilldown-body');
+                    if(reportBody){
+                        reportBody.scrollTop=reportDetailScrollBeforeEmployee||0;
+                    }
+                }
+            },300);
+        };
         window.openDeptModal=function(c,d){const md=document.getElementById('deptModal'),co=document.getElementById('deptModalContent'),tb=document.getElementById('deptModalTableBody'); document.getElementById('deptModalTitle').innerText=d; document.getElementById('deptModalCompany').innerHTML=`${getCompanyLogo(c)} ${c}`; tb.innerHTML=''; let s=allEmployees.filter(e=>e.company===c&&e.department===d&&isEmploymentVisible(e)).sort((a,b)=>a.name.localeCompare(b.name)); s.forEach(e=>{let tr=document.createElement('tr'); tr.className="hover:bg-blue-50 cursor-pointer border-b"; tr.onclick=()=>{closeDeptModal();setTimeout(()=>openModal(e),300);}; tr.innerHTML=`<td class="px-4 py-3">${e.displayId}</td><td class="px-4 py-3 font-bold">${e.name}</td><td class="px-4 py-3 text-xs">${e.position}</td>`; tb.appendChild(tr);}); md.classList.remove('hidden'); setTimeout(()=>{md.classList.remove('opacity-0');co.classList.remove('scale-95');document.body.classList.add('modal-open');},10);};
         window.closeDeptModal=function(){const md=document.getElementById('deptModal'),co=document.getElementById('deptModalContent'); md.classList.add('opacity-0');co.classList.add('scale-95'); document.body.classList.remove('modal-open'); setTimeout(()=>md.classList.add('hidden'),300);};
         
@@ -9876,12 +11533,29 @@
           if (targetEmp) {
             const scanVal = row[scanTimeIdx] || fullDateTime.split(' ')[1];
             const branchVal = (row[0] || '').trim();
+
             if (scanVal) {
-              targetEmp.scans.push(scanVal);
-              const scanMins = parseTimeToMinutes(scanVal);
-              targetEmp.scanEntries.push({ time: scanVal, branch: branchVal, mins: scanMins });
-              if (scanMins !== null && (targetEmp.latestScanMins === null || scanMins > targetEmp.latestScanMins)) {
-                targetEmp.latestScanMins = scanMins;
+              // Deduplicate exact duplicate scans from Attendance Log.
+              // Same Scanner User ID + same exact scan time on the selected date = one real scan,
+              // regardless of how many duplicate source rows exist.
+              // This must happen BEFORE organizeScans(), otherwise one duplicated real scan
+              // can incorrectly fill two slots such as Morning In + Evening Out.
+              if (!targetEmp._seenExactScanKeys) targetEmp._seenExactScanKeys = new Set();
+
+              const dedupeUserKey = String(empId || targetEmp.id || empName || '').trim().toUpperCase();
+              const dedupeTimeKey = String(scanVal || '').trim();
+              const exactScanKey = `${dedupeUserKey}||${dedupeTimeKey}`;
+
+              if (!targetEmp._seenExactScanKeys.has(exactScanKey)) {
+                targetEmp._seenExactScanKeys.add(exactScanKey);
+
+                targetEmp.scans.push(scanVal);
+                const scanMins = parseTimeToMinutes(scanVal);
+                targetEmp.scanEntries.push({ time: scanVal, branch: branchVal, mins: scanMins });
+
+                if (scanMins !== null && (targetEmp.latestScanMins === null || scanMins > targetEmp.latestScanMins)) {
+                  targetEmp.latestScanMins = scanMins;
+                }
               }
             }
           }
@@ -10027,6 +11701,43 @@
     return getDailyAttendanceCode(staffId, dateStr);
   }
 
+
+  // Scan Activity staff objects come from the live scan source and may not
+  // contain the same photo fields as the canonical employee record.
+  // Resolve by Staff ID first so Scan Activity always uses the same photo
+  // mapping as Dashboard / Report / employee profile.
+  function getScanCanonicalEmployee(staff) {
+    try {
+      const norm = (typeof normalizeId === 'function')
+        ? normalizeId(staff?.id || staff?.displayId || '')
+        : String(staff?.id || staff?.displayId || '').replace(/[^a-zA-Z0-9-]/g, '').toUpperCase();
+
+      if (Array.isArray(allEmployees) && allEmployees.length) {
+        if (norm) {
+          const byId = allEmployees.find(emp => {
+            const empNorm = (typeof normalizeId === 'function')
+              ? normalizeId(emp?.id || emp?.displayId || '')
+              : String(emp?.id || emp?.displayId || '').replace(/[^a-zA-Z0-9-]/g, '').toUpperCase();
+            return empNorm && empNorm === norm;
+          });
+          if (byId) return byId;
+        }
+
+        // Only use name as a fallback when it uniquely identifies one employee.
+        const scanName = String(staff?.name || '').trim().toLowerCase();
+        if (scanName) {
+          const matches = allEmployees.filter(emp =>
+            String(emp?.name || '').trim().toLowerCase() === scanName
+          );
+          if (matches.length === 1) return matches[0];
+        }
+      }
+    } catch (err) {
+      console.warn('Scan Activity canonical employee lookup failed:', err);
+    }
+    return staff;
+  }
+
   function renderDashboard(staffList) {
     const tbody = document.getElementById('attendanceTable');
     tbody.innerHTML = '';
@@ -10093,6 +11804,21 @@
         staff.id,
         document.getElementById('dateSelect').value
       ) || halfDayLeaveCodes.some(code => /^H-/.test(code));
+      // Defensive second layer: keep only one instance of an exact duplicate time
+      // before scan-slot organization. This protects Scan Activity even if duplicates
+      // enter staff.scans from another source in the future.
+      staff.scans = Array.from(new Set((staff.scans || []).map(v => String(v || '').trim()).filter(Boolean)));
+
+      if (Array.isArray(staff.scanEntries)) {
+        const seenEntryKeys = new Set();
+        staff.scanEntries = staff.scanEntries.filter(entry => {
+          const key = `${String(staff.id || '').trim().toUpperCase()}||${String(entry?.time || '').trim()}`;
+          if (seenEntryKeys.has(key)) return false;
+          seenEntryKeys.add(key);
+          return true;
+        });
+      }
+
       const sortedScanMins = staff.scans
         .map(scan => parseTimeToMinutes(scan))
         .filter(mins => mins !== null)
@@ -10112,7 +11838,21 @@
       // Daily Attendance is checked first so leave status controls how scans
       // are interpreted and displayed.
 
-      const hasLeaveCode = !!dailyAttendanceCode && dailyAttendanceCode !== 'P';
+      const dailyCodePartsForSchedule = String(dailyAttendanceCode || '')
+        .split('/')
+        .map(v => v.trim())
+        .filter(Boolean);
+
+      // Only codes that actually remove/cover a scheduled work period should
+      // suppress missing-scan placeholders. L / L' are attendance results,
+      // not leave, so a late morning scan must still show Pending Scan for
+      // later scheduled scans whose time has not arrived yet.
+      const scheduleBlockingCodes = new Set([
+        'AL','H-AL','SL','H-SL','SP','H-SP','UP','H-UP',
+        'A','H-A','D','H-D','Off','H-Off','H','H-Hol','OT','H-OT'
+      ]);
+      const hasLeaveCode = dailyCodePartsForSchedule.some(code => scheduleBlockingCodes.has(code));
+
       // Staff whose scheduled work starts at noon or later do not have a
       // Morning In requirement. Their first applicable scan belongs in Lunch In.
       const lateStartStaff = (staff.shiftType === '2X' && startMins >= 720) || isPartTime;
@@ -10327,8 +12067,11 @@
       tr.innerHTML = `
         <td>
           <div class="staff-cell-wrap">
-            ${staffPhotoImgHtml(staff, 'staff-photo', staff.name || 'Staff', true)
-              || `<div class="staff-photo-placeholder">${String(staff.name || '?').trim().charAt(0).toUpperCase()}</div>`}
+            ${(() => {
+              const photoEmp = getScanCanonicalEmployee(staff);
+              return staffPhotoImgHtml(photoEmp, 'staff-photo', staff.name || 'Staff', true)
+                || `<div class="staff-photo-placeholder">${String(staff.name || '?').trim().charAt(0).toUpperCase()}</div>`;
+            })()}
             <div class="min-w-0">
               <div class="staff-name-main flex items-center gap-1">${staff.name}${warningInlineIndicatorHtml(staff.id,{year:new Date(document.getElementById('dateSelect').value+'T00:00:00').getFullYear()})}</div>
               <div class="staff-meta-line">${staff.id || '-'} &nbsp;•&nbsp; ${staff.company || '-'}</div>
@@ -10398,8 +12141,9 @@
     const tbody = document.getElementById('attendanceTable');
     const rows = tbody.getElementsByTagName('tr');
 
-    let cntTotal = 0, cntPresent = 0, cntLeave = 0, cntOnTime = 0, cntNotScanned = 0, cntLate5 = 0, cntLate30 = 0;
+    let cntTotal = 0, cntDayOff = 0, cntPresent = 0, cntLeave = 0, cntOnTime = 0, cntNotScanned = 0, cntLate5 = 0, cntLate30 = 0;
     const leaveCodes = new Set(['AL','H-AL','SL','H-SL','SP','H-SP','UP','H-UP']);
+    const dayOffCodes = new Set(['D','H-D','Off','H-Off']);
 
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
@@ -10452,6 +12196,7 @@
         if (primaryCode === 'P' || hasAnyScan) cntPresent++;
 
         if (dailyCodes.some(code => leaveCodes.has(code))) cntLeave++;
+        if (dailyCodes.some(code => dayOffCodes.has(code))) cntDayOff++;
 
         if (primaryStatus.includes('ON TIME')) cntOnTime++;
         else if (primaryCode === 'P' && primaryStatus.includes('NOT SCANNED')) cntNotScanned++;
@@ -10463,6 +12208,8 @@
     }
 
     document.getElementById('cntTotal').innerText = cntTotal;
+    const dayOffEl = document.getElementById('cntDayOff');
+    if (dayOffEl) dayOffEl.innerText = cntDayOff;
     document.getElementById('cntPresent').innerText = cntPresent;
     document.getElementById('cntLeave').innerText = cntLeave;
     document.getElementById('cntOnTime').innerText = cntOnTime;
@@ -10473,15 +12220,17 @@
 
 
   function openScanStatusPanel(status) {
-    const labels = { leave: 'On Leave', pending: 'Pending Scan', notScanned: 'Not Scanned', late: 'Late', late30: 'Late 30+' };
+    const labels = { dayOff: 'Day Off', leave: 'On Leave', pending: 'Pending Scan', notScanned: 'Not Scanned', late: 'Late', late30: 'Late 30+' };
     const panel = document.getElementById('scanStatusPanel');
     const list = document.getElementById('scanStatusPanelList');
     const rows = Array.from(document.querySelectorAll('#attendanceTable tr')).filter(r => r.style.display !== 'none' && r.querySelectorAll('td').length);
     const leaveCodes = new Set(['AL','H-AL','SL','H-SL','SP','H-SP','UP','H-UP']);
+    const dayOffCodes = new Set(['D','H-D','Off','H-Off']);
     const matches = rows.filter(row => {
       const cells = row.querySelectorAll('td');
       const codes = Array.from(cells[1]?.querySelectorAll('.code-badge') || []).map(b => b.textContent.trim());
       const morning = (cells[2]?.textContent || '').trim();
+      if (status === 'dayOff') return codes.some(c => dayOffCodes.has(c));
       if (status === 'leave') return codes.some(c => leaveCodes.has(c));
       const primaryStatus = row.dataset.primaryStatus || morning;
       const primaryCode = codes[0] || '';
@@ -10495,11 +12244,12 @@
     document.getElementById('scanStatusPanelCount').textContent = matches.length + ' staff';
     list.innerHTML = matches.length ? matches.map(row => {
       const cells = row.querySelectorAll('td');
-      const staff = cells[0]; const photo = staff.querySelector('img');
+      const staff = cells[0];
       const name = staff.querySelector('.staff-name-main')?.textContent || 'Staff';
       const meta = staff.querySelector('.staff-meta-line')?.textContent || '';
       const initial = name.trim().charAt(0).toUpperCase();
       const id = meta.split('•')[0].trim();
+      const canonicalEmp = getScanCanonicalEmployee({ id, name });
       const safeId = String(id).replace(/'/g, "\\'");
       const codes = Array.from(cells[1]?.querySelectorAll('.code-badge') || []).map(b => b.textContent.trim());
       const leaveType = row.dataset.leaveType || codes.join(' / ') || '-';
@@ -10522,11 +12272,12 @@
       };
       const leaveTypeHtml = codes.length ? `<span class="leave-code-group">${codes.map(code => `<span class="code-badge ${leaveBadgeClass(code)}">${code}</span>`).join('')}</span>` : '-';
       let detail = '';
+      if (status === 'dayOff') detail = `<div class="scan-status-detail"><i class="fa-solid fa-bed"></i> Day Off: <strong>${leaveTypeHtml}</strong></div>`;
       if (status === 'leave') detail = `<div class="scan-status-detail"><i class="fa-solid fa-calendar-day"></i> Leave: <strong>${leaveTypeHtml}</strong></div>`;
       if (status === 'pending') detail = `<div class="scan-status-detail"><i class="fa-solid fa-hourglass-half"></i> Due: <strong>${missedTime}</strong></div>`;
       if (status === 'notScanned') detail = `<div class="scan-status-detail"><i class="fa-solid fa-clock"></i> Missed: <strong>${missedTime}</strong></div>`;
       if (status === 'late' || status === 'late30') detail = `<div class="scan-status-detail"><i class="fa-solid fa-fingerprint"></i> Scan: <strong>${scanTime}</strong></div>`;
-      return `<div class="scan-status-profile" onclick="openScanPanelStaff('${safeId}')">${photo ? `<img src="${photo.src}" class="w-12 h-12 rounded-full object-cover border">` : `<div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500">${initial}</div>`}<div class="min-w-0 flex-1"><div class="font-bold text-slate-800 truncate flex items-center gap-1">${name}${warningInlineIndicatorHtml(id,{year:new Date(document.getElementById('dateSelect').value+'T00:00:00').getFullYear()})}</div><div class="text-xs text-slate-500 mt-1 truncate">${meta}</div>${detail}</div></div>`;
+      return `<div class="scan-status-profile" onclick="openScanPanelStaff('${safeId}')">${staffPhotoImgHtml(canonicalEmp, 'w-12 h-12 rounded-full object-cover border border-slate-200 bg-slate-100 shrink-0', name || 'Staff photo') || `<div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500">${initial}</div>`}<div class="min-w-0 flex-1"><div class="font-bold text-slate-800 truncate flex items-center gap-1">${name}${warningInlineIndicatorHtml(id,{year:new Date(document.getElementById('dateSelect').value+'T00:00:00').getFullYear()})}</div><div class="text-xs text-slate-500 mt-1 truncate">${meta}</div>${detail}</div></div>`;
     }).join('') : `<div class="col-span-full text-center text-slate-500 py-10">No staff found in this status.</div>`;
     panel.classList.remove('hidden');
   }
@@ -10549,7 +12300,7 @@
    PWA SERVICE WORKER
    ========================================================== */
 
-console.log('Attendance build: 2026-09-17-report-multi-company-v1');
+console.log('Attendance build: 2026-09-17-scan-dedupe-v1');
 
 if ('serviceWorker' in navigator) {
 
