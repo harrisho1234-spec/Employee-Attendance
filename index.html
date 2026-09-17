@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Attendance Dashboard</title>
-    <meta name="app-build" content="2026-09-17-hq-first-dhs-last-report-v1">
+    <meta name="app-build" content="2026-09-17-report-watchlist-compact-font-v1">
     <!-- Photo mapping: Staff ID primary, Name/File Name fallback -->
         <!-- PWA -->
     <meta name="theme-color" content="#2563eb">
@@ -2854,6 +2854,70 @@
             border-radius: inherit;
         }
         #reportEmployeeMetricModal.hidden { display:none !important; }
+
+        #reportEmployeeMetricModal.watchlist-standalone {
+            position: fixed !important;
+            inset: 0 !important;
+            z-index: 10080 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            padding: 12px !important;
+            border-radius: 0 !important;
+        }
+
+        #reportEmployeeMetricModal.watchlist-standalone .employee-report-shell {
+            width: min(1180px, 92vw) !important;
+            max-height: 92vh !important;
+        }
+        #reportEmployeeMetricModal.watchlist-standalone .employee-report-shell,
+        #reportEmployeeMetricModal.watchlist-standalone .employee-report-shell * {
+            font-size: inherit;
+        }
+        #reportEmployeeMetricModal.watchlist-standalone .employee-report-shell {
+            font-size: 10px !important;
+        }
+        #reportEmployeeMetricModal.watchlist-standalone #reportEmployeeMetricName {
+            font-size: 14px !important;
+        }
+        #reportEmployeeMetricModal.watchlist-standalone #reportEmployeeMetricMeta,
+        #reportEmployeeMetricModal.watchlist-standalone .employee-service-pill,
+        #reportEmployeeMetricModal.watchlist-standalone .type-note,
+        #reportEmployeeMetricModal.watchlist-standalone .late-sub,
+        #reportEmployeeMetricModal.watchlist-standalone .metric-chart-head,
+        #reportEmployeeMetricModal.watchlist-standalone .metric-bar-label,
+        #reportEmployeeMetricModal.watchlist-standalone .metric-bar-value,
+        #reportEmployeeMetricModal.watchlist-standalone .month-title,
+        #reportEmployeeMetricModal.watchlist-standalone .metric-date-chip {
+            font-size: 8px !important;
+        }
+        #reportEmployeeMetricModal.watchlist-standalone .type-head,
+        #reportEmployeeMetricModal.watchlist-standalone .late-label,
+        #reportEmployeeMetricModal.watchlist-standalone .cell-label {
+            font-size: 7px !important;
+        }
+        #reportEmployeeMetricModal.watchlist-standalone .cell-value,
+        #reportEmployeeMetricModal.watchlist-standalone .late-value {
+            font-size: 16px !important;
+        }
+        #reportEmployeeMetricModal.watchlist-standalone .employee-report-body {
+            padding: 10px !important;
+        }
+        #reportEmployeeMetricModal.watchlist-standalone .employee-leave-type-strip,
+        #reportEmployeeMetricModal.watchlist-standalone .employee-late-strip {
+            gap: 7px !important;
+            margin-bottom: 10px !important;
+        }
+        #reportEmployeeMetricModal.watchlist-standalone .employee-report-chart {
+            height: 220px !important;
+        }
+        #reportEmployeeMetricModal.watchlist-standalone .employee-report-month-details {
+            gap: 7px !important;
+        }
+        #reportEmployeeMetricModal.watchlist-standalone .employee-report-month-card {
+            padding: 8px !important;
+        }
+
+
         #reportEmployeeMetricModal .employee-report-shell {
             width: min(1180px, 95%);
             max-height: calc(100% - 20px);
@@ -4789,7 +4853,7 @@
         let selectedCompanies = []; let selectedCalendarCompanies = []; let selectedDailyCompanies = []; let selectedCalendarRowCompany = 'ITC'; let selectedCalendarRowDepartments = null; let selectedCalendarRowMonth = new Date().getMonth(); let selectedCalendarRowYear = new Date().getFullYear(); const attendanceDataYear = new Date().getFullYear();
         let selectedDepartments = null; // null = all departments; otherwise array of selected department names
         let selectedStatuses = ['Active']; let selectedDashboardYear = attendanceDataYear; let selectedDashboardMonth = 'All'; let selectedDashboardWarning = 'All'; let searchQuery = ''; let dailySearchQuery = '';
-        let reportMode='monthly'; let reportSubtab='warnings'; let reportInitialized=false; let selectedReportCompanies=[]; let reportMetricFocus=null; let reportDetailScrollBeforeEmployee=0; let employeeModalOriginalParent=null; let employeeModalOriginalNextSibling=null; let reportSearchQuery=''; let reportMetricSearchQuery=''; let reportMetricDepartment='All'; let reportMetricCompany='All';
+        let reportMode='monthly'; let reportSubtab='warnings'; let reportInitialized=false; let selectedReportCompanies=[]; let reportMetricFocus=null; let reportDetailScrollBeforeEmployee=0; let employeeModalOriginalParent=null; let employeeModalOriginalNextSibling=null; let reportSearchQuery=''; let reportMetricSearchQuery=''; let reportMetricDepartment='All'; let reportMetricCompany='All'; let reportEmployeeMetricStandalone=false; let reportEmployeeMetricOriginalParent=null; let reportEmployeeMetricOriginalNextSibling=null;
         let currentSortColumn = 'id'; let isSortAscending = true;
         let leaveHistoryByEmployee = {}; let dailyLeaveRecords = []; let currentDailyGroupedData = {}; 
         let currentCalendarDate = new Date(); let selectedCalendarDate = new Date().getDate();
@@ -8949,7 +9013,32 @@
 
         window.closeReportEmployeeMetricDetail=function(){
             document.getElementById('reportEmployeeDayModal')?.classList.add('hidden');
-            document.getElementById('reportEmployeeMetricModal')?.classList.add('hidden');
+
+            const modal=document.getElementById('reportEmployeeMetricModal');
+            if(!modal) return;
+
+            modal.classList.add('hidden');
+
+            if(reportEmployeeMetricStandalone){
+                modal.classList.remove('watchlist-standalone');
+
+                if(reportEmployeeMetricOriginalParent){
+                    if(reportEmployeeMetricOriginalNextSibling &&
+                       reportEmployeeMetricOriginalNextSibling.parentNode===reportEmployeeMetricOriginalParent){
+                        reportEmployeeMetricOriginalParent.insertBefore(modal,reportEmployeeMetricOriginalNextSibling);
+                    }else{
+                        reportEmployeeMetricOriginalParent.appendChild(modal);
+                    }
+                }
+
+                reportEmployeeMetricStandalone=false;
+                reportMetricFocus=null;
+
+                const parentDetail=document.getElementById('reportMetricDrilldown');
+                if(!parentDetail || parentDetail.classList.contains('hidden')){
+                    document.body.classList.remove('modal-open');
+                }
+            }
         };
 
         const reportMetricMeta={
@@ -9179,11 +9268,50 @@
             }
         }
 
+
+        window.openReportWatchlistEmployeeDetail=function(empId,type){
+            const metricKey = type==='late' ? 'late' : 'utilization';
+            const employeeModal=document.getElementById('reportEmployeeMetricModal');
+            if(!employeeModal) return;
+
+            // Watchlist rows open ONLY the employee usage report.
+            // Do not open the underlying AL/SL/Paid Utilization metric-detail popup.
+            reportEmployeeMetricStandalone=true;
+            reportMetricFocus=metricKey;
+
+            if(!reportEmployeeMetricOriginalParent){
+                reportEmployeeMetricOriginalParent=employeeModal.parentNode;
+                reportEmployeeMetricOriginalNextSibling=employeeModal.nextSibling;
+            }
+
+            document.body.appendChild(employeeModal);
+            employeeModal.classList.add('watchlist-standalone');
+
+            openReportEmployeeMetricDetail(empId);
+            document.body.classList.add('modal-open');
+
+            const code=document.getElementById('reportEmployeeMetricCode');
+            const note=document.getElementById('reportEmployeeSelectedMetricNote');
+
+            if(type==='leave'){
+                if(code) code.textContent='Leave Overview';
+                if(note){
+                    const emp=allEmployees.find(e=>e.id===empId);
+                    const data=getReportData();
+                    const totals=emp?reportEmployeeLeaveTypeTotals(emp.id,data.period):null;
+                    const total=totals ? Number(totals.AL||0)+Number(totals.SL||0)+Number(totals.SP||0)+Number(totals.UP||0) : 0;
+                    note.textContent=`Viewing Total Leave Usage: ${mobileDashboardFormatNumber(total)} used in ${data.period.label} (AL + SL + SP + UP).`;
+                }
+            }else{
+                if(code) code.textContent='Late';
+            }
+        };
+
         function renderReportWatchlist(data){
             // Watchlist follows the currently selected report period.
             const periodRecs=data.aRecords||[],map={};data.scopeEmployees.forEach(e=>map[e.id]={emp:e,leave:0,late:0});
             periodRecs.forEach(r=>{const x=map[r.staffId];if(!x)return;const l=r.leaves||{};x.leave+=Number(l.AL||0)+Number(l.SL||0)+Number(l.SP||0)+Number(l.UP||0);x.late+=Number(l.Late5m||0)+Number(l.Late3m||0);});
-            const row=(x,t,i)=>{const v=t==='leave'?x.leave:x.late;const eid=String(x.emp.id||'').replace(/'/g,"\\'");return`<div class="report-watch-row px-4 py-3 flex items-center gap-3" onclick="openModalById('${eid}')"><div class="w-7 h-7 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-[10px] font-extrabold">${i}</div>${reportStaffAvatarHtml(x.emp,'w-9 h-9')}<div class="min-w-0 flex-1"><div class="text-xs font-bold text-slate-800 truncate">${reportEscapeHtml(x.emp.name)}</div><div class="text-[9px] text-slate-400 truncate">${reportEscapeHtml(x.emp.displayId)} • ${reportEscapeHtml(x.emp.company)} • ${reportEscapeHtml(x.emp.department||'')}</div></div><div class="text-sm font-extrabold ${t==='leave'?'text-blue-600':'text-orange-600'}">${mobileDashboardFormatNumber(v)}</div></div>`;};
+            const row=(x,t,i)=>{const v=t==='leave'?x.leave:x.late;const eid=String(x.emp.id||'').replace(/'/g,"\\'");return`<div class="report-watch-row px-4 py-3 flex items-center gap-3 cursor-pointer hover:bg-blue-50/40" onclick="openReportWatchlistEmployeeDetail('${eid}','${t}')"><div class="w-7 h-7 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-[10px] font-extrabold">${i}</div>${reportStaffAvatarHtml(x.emp,'w-9 h-9')}<div class="min-w-0 flex-1"><div class="text-xs font-bold text-slate-800 truncate">${reportEscapeHtml(x.emp.name)}</div><div class="text-[9px] text-slate-400 truncate">${reportEscapeHtml(x.emp.displayId)} • ${reportEscapeHtml(x.emp.company)} • ${reportEscapeHtml(x.emp.department||'')}</div></div><div class="flex items-center gap-2"><div class="text-sm font-extrabold ${t==='leave'?'text-blue-600':'text-orange-600'}">${mobileDashboardFormatNumber(v)}</div><span class="hidden sm:inline-flex items-center gap-1 rounded-full border border-blue-100 bg-blue-50 px-2 py-1 text-[7px] font-extrabold text-blue-700"><i class="fa-solid fa-chart-column"></i>Details</span></div></div>`;};
             const leave=Object.values(map).filter(x=>x.leave>0).sort((a,b)=>b.leave-a.leave).slice(0,10),late=Object.values(map).filter(x=>x.late>0).sort((a,b)=>b.late-a.late).slice(0,10),le=document.getElementById('reportLeaveWatchlist'),la=document.getElementById('reportLateWatchlist');
             if(le)le.innerHTML=leave.length?leave.map((x,i)=>row(x,'leave',i+1)).join(''):'<div class="p-6 text-center text-xs text-slate-400">No leave usage in this period.</div>';if(la)la.innerHTML=late.length?late.map((x,i)=>row(x,'late',i+1)).join(''):'<div class="p-6 text-center text-xs text-slate-400">No lateness recorded in this period.</div>';
         }
@@ -12388,7 +12516,7 @@
    PWA SERVICE WORKER
    ========================================================== */
 
-console.log('Attendance build: 2026-09-17-hq-first-dhs-last-report-v1');
+console.log('Attendance build: 2026-09-17-report-watchlist-compact-font-v1');
 
 if ('serviceWorker' in navigator) {
 
