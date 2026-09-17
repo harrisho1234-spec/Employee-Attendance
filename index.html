@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Attendance Dashboard</title>
-    <meta name="app-build" content="2026-09-17-probation-details-v1">
+    <meta name="app-build" content="2026-09-17-report-multi-company-v1">
     <!-- Photo mapping: Staff ID primary, Name/File Name fallback -->
         <!-- PWA -->
     <meta name="theme-color" content="#2563eb">
@@ -2465,6 +2465,256 @@
                 font-size: 20px !important;
             }
         }
+
+        /* ===================== Report Tab — integrated app theme ===================== */
+        #reportView {
+            --report-border: #e2e8f0;
+            --report-muted: #64748b;
+            --report-blue: #2563eb;
+        }
+        #reportView .report-page-head {
+            background: #ffffff;
+            border: 1px solid var(--report-border);
+            border-radius: 12px;
+            padding: 18px 20px;
+            box-shadow: 0 1px 3px rgba(15,23,42,.05);
+            margin-bottom: 16px;
+        }
+        #reportView .report-filter-bar {
+            background: #ffffff;
+            border: 1px solid var(--report-border);
+            border-radius: 12px;
+            padding: 14px;
+            box-shadow: 0 1px 3px rgba(15,23,42,.04);
+            margin-bottom: 16px;
+        }
+        #reportView .report-segment {
+            display: inline-flex;
+            padding: 3px;
+            border: 1px solid #dbe3ec;
+            border-radius: 10px;
+            background: #f8fafc;
+            gap: 3px;
+        }
+        #reportView .report-mode-btn {
+            border: 0 !important;
+            border-radius: 7px !important;
+            min-height: 34px;
+            padding: 0 11px !important;
+            background: transparent !important;
+            color: #64748b !important;
+            box-shadow: none !important;
+        }
+        #reportView .report-mode-btn.is-active {
+            background: #ffffff !important;
+            color: #2563eb !important;
+            box-shadow: 0 1px 3px rgba(15,23,42,.10) !important;
+        }
+        #reportView .report-control-label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 10px;
+            line-height: 1;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .45px;
+            color: #64748b;
+        }
+        #reportView .report-control {
+            width: 100%;
+            min-height: 40px;
+            padding: 8px 10px;
+            border: 1px solid #dbe3ec;
+            border-radius: 9px;
+            background: #f8fafc;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 600;
+            outline: none;
+        }
+        #reportView .report-control:focus {
+            background: #fff;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37,99,235,.08);
+        }
+        #reportView #reportCompanyDropdownBtn {
+            cursor: pointer;
+        }
+        #reportView #reportCompanyDropdownMenu label {
+            user-select: none;
+        }
+        #reportView .report-company-check-count {
+            margin-left: auto;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: #2563eb;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            font-size: 9px;
+            font-weight: 800;
+        }
+
+        #reportView .report-company-kpis {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 9px;
+            margin-bottom: 16px;
+        }
+        #reportView .report-company-card {
+            min-height: 64px;
+            border: 1px solid #e2e8f0;
+            border-radius: 11px;
+            background: #ffffff;
+            padding: 10px 12px;
+            text-align: left;
+            box-shadow: 0 1px 2px rgba(15,23,42,.03);
+            cursor: pointer;
+            transition: .16s ease;
+        }
+        #reportView .report-company-card:hover {
+            border-color: #bfdbfe;
+            background: #f8fbff;
+            transform: translateY(-1px);
+        }
+        #reportView .report-company-card.is-active {
+            border-color: #93c5fd;
+            background: #eff6ff;
+            box-shadow: 0 0 0 1px rgba(37,99,235,.05);
+        }
+        #reportView .report-company-label {
+            color: #64748b;
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .35px;
+        }
+        #reportView .report-company-value {
+            color: #0f172a;
+            font-size: 20px;
+            font-weight: 800;
+            margin-top: 3px;
+            line-height: 1;
+        }
+        #reportView .report-section {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(15,23,42,.04);
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+        #reportView .report-section-head {
+            padding: 13px 15px;
+            border-bottom: 1px solid #eef2f7;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        #reportView .report-section-title {
+            color: #1e293b;
+            font-size: 13px;
+            font-weight: 800;
+        }
+        #reportView .report-section-subtitle {
+            color: #94a3b8;
+            font-size: 9px;
+            margin-top: 2px;
+        }
+        #reportView .report-watch-row,
+        #reportView .report-drill-row {
+            cursor: pointer;
+            transition: background-color .15s ease;
+        }
+        #reportView .report-watch-row:hover,
+        #reportView .report-drill-row:hover {
+            background: #f8fafc;
+        }
+        #reportView .report-summary-company {
+            cursor: pointer;
+            transition: background-color .15s ease, color .15s ease;
+        }
+        #reportView .report-summary-company:hover {
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+        #reportView .report-subtabs {
+            display: flex;
+            gap: 4px;
+            overflow-x: auto;
+            padding: 0 12px;
+            border-bottom: 1px solid #eef2f7;
+        }
+        #reportView .report-subtab-btn {
+            padding: 11px 9px 9px;
+            white-space: nowrap;
+            border-bottom: 2px solid transparent;
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+        }
+        #reportView .report-subtab-btn.is-active {
+            color: #2563eb;
+            border-bottom-color: #2563eb;
+        }
+        #reportView .report-export-btn {
+            min-height: 38px;
+            padding: 0 12px;
+            border-radius: 9px;
+            font-size: 11px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #reportView .report-metric-row td {
+            transition: background-color .15s ease;
+        }
+        #reportView .report-metric-row:hover td {
+            filter: brightness(.99);
+        }
+        #reportView .report-metric-label {
+            font-weight: 800;
+            border-left: 3px solid transparent;
+        }
+        #reportView .report-metric-row.metric-al td { background: #f8fbff; }
+        #reportView .report-metric-row.metric-al .report-metric-label { color: #1d4ed8; border-left-color: #60a5fa; }
+        #reportView .report-metric-row.metric-sl td { background: #f5fffd; }
+        #reportView .report-metric-row.metric-sl .report-metric-label { color: #0f766e; border-left-color: #2dd4bf; }
+        #reportView .report-metric-row.metric-sp td { background: #fbf8ff; }
+        #reportView .report-metric-row.metric-sp .report-metric-label { color: #7e22ce; border-left-color: #c084fc; }
+        #reportView .report-metric-row.metric-up td { background: #fff8fa; }
+        #reportView .report-metric-row.metric-up .report-metric-label { color: #be123c; border-left-color: #fb7185; }
+        #reportView .report-metric-row.metric-late td { background: #fffaf5; }
+        #reportView .report-metric-row.metric-late .report-metric-label { color: #c2410c; border-left-color: #fb923c; }
+        #reportView .report-metric-row.metric-utilization td { background: #f7f8ff; }
+        #reportView .report-metric-row.metric-utilization .report-metric-label { color: #4338ca; border-left-color: #818cf8; }
+        #reportView .report-metric-row .report-total-cell {
+            font-weight: 900;
+            font-size: 12px;
+        }
+        #reportView .report-metric-row.metric-al .report-total-cell { color: #1d4ed8; }
+        #reportView .report-metric-row.metric-sl .report-total-cell { color: #0f766e; }
+        #reportView .report-metric-row.metric-sp .report-total-cell { color: #7e22ce; }
+        #reportView .report-metric-row.metric-up .report-total-cell { color: #be123c; }
+        #reportView .report-metric-row.metric-late .report-total-cell { color: #c2410c; }
+        #reportView .report-metric-row.metric-utilization .report-total-cell { color: #4338ca; }
+
+        @media (max-width: 700px) {
+            #reportView { padding-bottom: 20px; }
+            #reportView .report-page-head { padding: 13px; border-radius: 14px; }
+            #reportView .report-filter-bar { padding: 11px; border-radius: 14px; }
+            #reportView .report-company-kpis { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+            #reportView .report-company-card { min-height: 58px; }
+            #reportView .report-section { border-radius: 14px; }
+            #reportView .report-section-head { padding: 11px 12px; }
+        }
+
 </style>
 </head>
 <body class="text-slate-800 h-screen flex flex-col" data-active-tab="daily">
@@ -2489,7 +2739,8 @@
             <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-inactive pb-3 px-2 transition-all whitespace-nowrap text-sm sm:text-base">Dashboard View</button>
             <button onclick="switchTab('calendar')" id="tab-calendar" class="tab-inactive pb-3 px-2 transition-all whitespace-nowrap text-sm sm:text-base">Calendar View</button>
             <button onclick="switchTab('daily')" id="tab-daily" class="tab-active pb-3 px-2 transition-all whitespace-nowrap text-sm sm:text-base border-b-2 border-blue-600 text-blue-600">Daily Attendance</button>
-            <button onclick="switchTab('org')" id="tab-org" class="tab-inactive pb-3 px-2 transition-all whitespace-nowrap text-sm sm:text-base">Org Chart <span class="bg-blue-100 text-blue-700 text-[10px] px-1.5 py-0.5 rounded ml-1 font-bold">NEW</span></button>
+            <button onclick="switchTab('org')" id="tab-org" class="tab-inactive pb-3 px-2 transition-all whitespace-nowrap text-sm sm:text-base">Org Chart</button>
+            <button onclick="switchTab('report')" id="tab-report" class="tab-inactive pb-3 px-2 transition-all whitespace-nowrap text-sm sm:text-base">Report <span class="bg-emerald-100 text-emerald-700 text-[10px] px-1.5 py-0.5 rounded ml-1 font-bold">NEW</span></button>
             <button onclick="switchTab('scan')" id="tab-scan" class="tab-inactive pb-3 px-2 transition-all whitespace-nowrap text-sm sm:text-base">Scan Activity</button>
             </div>
             <div class="hidden sm:flex items-center gap-2 pb-3 shrink-0 text-[10px] text-slate-400">
@@ -3019,7 +3270,152 @@
         </div>
 
         <!-- SCAN ACTIVITY VIEW -->
-        <div id="scanView" class="hidden">
+        
+        <!-- REPORT VIEW -->
+        <div id="reportView" class="hidden max-w-[95rem] mx-auto pb-10">
+            <section class="report-page-head">
+                <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center"><i class="fa-solid fa-chart-column"></i></div>
+                        <div>
+                            <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900">Attendance Report</h1>
+                            <div class="flex flex-wrap items-center gap-2 mt-1">
+                                <p class="text-xs text-slate-500">Cross-company leave, lateness and disciplinary reporting.</p>
+                                <span class="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-1 text-[9px] font-extrabold text-emerald-700">
+                                    <i class="fa-solid fa-user-check"></i> Current Staff Only
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" onclick="exportReportExcel()" class="report-export-btn bg-white border border-slate-200 text-emerald-700 hover:bg-emerald-50"><i class="fa-solid fa-file-excel mr-1.5"></i>Export Full Excel</button>
+                        <button type="button" onclick="exportReportPdf()" class="report-export-btn bg-white border border-slate-200 text-slate-700 hover:bg-slate-50"><i class="fa-solid fa-file-pdf mr-1.5"></i>Export Full PDF</button>
+                    </div>
+                </div>
+
+                </section>
+
+            <section class="report-filter-bar">
+                    <div class="report-segment mb-4">
+                        <button id="reportModeMonthly" class="report-mode-btn is-active" onclick="setReportMode('monthly')">Monthly</button>
+                        <button id="reportModeYear" class="report-mode-btn" onclick="setReportMode('year')">Year-to-Year</button>
+                        <button id="reportModeCustom" class="report-mode-btn" onclick="setReportMode('custom')">Custom Dates</button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3">
+                        <div id="reportMonthlyControls">
+                            <label class="report-control-label">Month / Period</label>
+                            <select id="reportMonthSelect" onchange="renderReport()" class="report-control"></select>
+                        </div>
+                        <div id="reportYearAControl">
+                            <label id="reportYearALabel" class="report-control-label">Year</label>
+                            <select id="reportYearA" onchange="renderReport()" class="report-control"></select>
+                        </div>
+                        <div id="reportYearBControl" class="hidden">
+                            <label class="report-control-label">Compare With</label>
+                            <select id="reportYearB" onchange="renderReport()" class="report-control"></select>
+                        </div>
+                        <div id="reportCustomFromControl" class="hidden">
+                            <label class="report-control-label">From</label>
+                            <input id="reportDateFrom" type="date" onchange="renderReport()" class="report-control">
+                        </div>
+                        <div id="reportCustomToControl" class="hidden">
+                            <label class="report-control-label">To</label>
+                            <input id="reportDateTo" type="date" onchange="renderReport()" class="report-control">
+                        </div>
+                        <div>
+                            <label class="report-control-label">Company</label>
+                            <div class="relative filter-dropdown">
+                                <button id="reportCompanyDropdownBtn" type="button" onclick="toggleReportCompanyDropdown(event)" class="report-control flex items-center justify-between gap-2 text-left">
+                                    <span id="reportCompanyDropdownLabel" class="truncate">All Companies</span>
+                                    <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
+                                </button>
+                                <div id="reportCompanyDropdownMenu" class="hidden absolute left-0 top-full mt-1 z-40 w-full min-w-[220px] bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden">
+                                    <div class="p-2 border-b border-slate-100">
+                                        <label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-slate-50 cursor-pointer">
+                                            <input id="reportSelectAllCompanies" type="checkbox" class="rounded text-blue-600 focus:ring-blue-500" checked onchange="handleReportSelectAllCompanies(this.checked)">
+                                            <span class="text-xs font-bold text-slate-700">All Companies</span>
+                                        </label>
+                                    </div>
+                                    <div id="reportCompanyCheckboxList" class="p-2 max-h-56 overflow-y-auto custom-scrollbar"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="report-control-label">Department</label>
+                            <select id="reportDepartmentSelect" onchange="renderReport()" class="report-control"><option value="All">All Departments</option></select>
+                        </div>
+                    </div>
+                    <div class="mt-3 flex items-center justify-between gap-3">
+                        <div>
+                            <p id="reportPeriodLabel" class="text-[10px] sm:text-xs font-semibold text-slate-500">—</p>
+                            <p class="mt-1 text-[9px] text-slate-400">Former staff are excluded. Resigned staff remain included only until their Last Working Day.</p>
+                        </div>
+                        <button onclick="resetReportFilters()" class="text-[10px] font-bold text-blue-600 hover:text-blue-700">Reset Filters</button>
+                    </div>
+                </section>
+
+            
+            <div id="reportCompanyKpis" class="report-company-kpis"></div>
+
+<section class="report-section">
+                <div class="report-section-head">
+                    <div><h2 class="report-section-title">Company Summary</h2><p class="report-section-subtitle">AL, SL, SP, UP, lateness and paid leave utilization side-by-side. Paid Leave Utilization = (AL + SL + SP used) ÷ available AL + SL + SP.</p></div>
+                    <span id="reportSummaryHint" class="text-[9px] font-bold text-slate-400 bg-slate-50 border rounded-full px-2 py-1"></span>
+                </div>
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="min-w-[760px] w-full text-xs border-collapse">
+                        <thead id="reportSummaryHead" class="bg-slate-50 text-slate-600"></thead>
+                        <tbody id="reportSummaryBody" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="grid grid-cols-1 xl:grid-cols-2 gap-5 mb-5">
+                <div class="report-section">
+                    <div class="report-section-head"><h2 class="report-section-title"><i class="fa-solid fa-person-walking-arrow-right text-blue-500 mr-1.5"></i><span id="reportLeaveWatchTitle">Most Leave Used This Month</span></h2><p class="report-section-subtitle">Paid leave + unpaid leave.</p></div>
+                    <div id="reportLeaveWatchlist" class="divide-y divide-slate-100"></div>
+                </div>
+                <div class="report-section">
+                    <div class="report-section-head"><h2 class="report-section-title"><i class="fa-solid fa-clock text-orange-500 mr-1.5"></i><span id="reportLateWatchTitle">Most Late This Month</span></h2><p class="report-section-subtitle">Total L and L' occurrences.</p></div>
+                    <div id="reportLateWatchlist" class="divide-y divide-slate-100"></div>
+                </div>
+            </section>
+
+            <section class="report-section">
+                <div class="report-subtabs">
+                        <button id="reportSubWarnings" onclick="setReportSubtab('warnings')" class="report-subtab-btn is-active">Warnings & FIC</button>
+                        <button id="reportSubPerformance" onclick="setReportSubtab('performance')" class="report-subtab-btn">Attendance & Performance</button>
+                    </div>
+
+                <div id="reportWarningsPanel" class="p-4">
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                        <div class="rounded-xl border bg-yellow-50/60 border-yellow-100 p-3"><div class="text-[9px] font-bold text-yellow-700 uppercase">Verbal</div><div id="reportWarnVerbal" class="text-xl font-extrabold text-yellow-800 mt-1">0</div></div>
+                        <div class="rounded-xl border bg-orange-50/60 border-orange-100 p-3"><div class="text-[9px] font-bold text-orange-700 uppercase">Written</div><div id="reportWarnWritten" class="text-xl font-extrabold text-orange-800 mt-1">0</div></div>
+                        <div class="rounded-xl border bg-red-50/60 border-red-100 p-3"><div class="text-[9px] font-bold text-red-700 uppercase">Final</div><div id="reportWarnFinal" class="text-xl font-extrabold text-red-800 mt-1">0</div></div>
+                        <div class="rounded-xl border bg-indigo-50/60 border-indigo-100 p-3"><div class="text-[9px] font-bold text-indigo-700 uppercase">FIC</div><div id="reportWarnFic" class="text-xl font-extrabold text-indigo-800 mt-1">0</div></div>
+                    </div>
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="min-w-[720px] w-full text-xs">
+                            <thead class="bg-slate-50 text-slate-500"><tr><th class="text-left px-3 py-2">Staff</th><th class="text-left px-3 py-2">Company</th><th class="text-left px-3 py-2">Department</th><th class="text-center px-3 py-2">Verbal</th><th class="text-center px-3 py-2">Written</th><th class="text-center px-3 py-2">Final</th><th class="text-center px-3 py-2">FIC</th><th class="text-left px-3 py-2">Latest Action</th></tr></thead>
+                            <tbody id="reportWarningsBody" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="reportPerformancePanel" class="hidden p-4">
+                    <div class="rounded-xl border border-blue-100 bg-blue-50/50 px-3 py-2 mb-4 text-[10px] text-blue-700"><i class="fa-solid fa-circle-info mr-1"></i>Attendance signals and warning/FIC records are shown together for analysis; this does not assume one caused the other.</div>
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="min-w-[860px] w-full text-xs">
+                            <thead class="bg-slate-50 text-slate-500"><tr><th class="text-left px-3 py-2">Staff</th><th class="text-left px-3 py-2">Company / Dept</th><th class="text-center px-3 py-2">Paid Leave</th><th class="text-center px-3 py-2">UP</th><th class="text-center px-3 py-2">Late</th><th class="text-center px-3 py-2">Absence</th><th class="text-center px-3 py-2">Warnings</th><th class="text-center px-3 py-2">FIC</th><th class="text-left px-3 py-2">Signal</th></tr></thead>
+                            <tbody id="reportPerformanceBody" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+<div id="scanView" class="hidden">
 
 <div class="container">
   <div class="dashboard-header-card">
@@ -3449,6 +3845,7 @@
         let selectedCompanies = []; let selectedCalendarCompanies = []; let selectedDailyCompanies = []; let selectedCalendarRowCompany = 'ITC'; let selectedCalendarRowDepartments = null; let selectedCalendarRowMonth = new Date().getMonth(); let selectedCalendarRowYear = new Date().getFullYear(); const attendanceDataYear = new Date().getFullYear();
         let selectedDepartments = null; // null = all departments; otherwise array of selected department names
         let selectedStatuses = ['Active']; let selectedDashboardYear = attendanceDataYear; let selectedDashboardMonth = 'All'; let selectedDashboardWarning = 'All'; let searchQuery = ''; let dailySearchQuery = '';
+        let reportMode='monthly'; let reportSubtab='warnings'; let reportInitialized=false; let selectedReportCompanies=[];
         let currentSortColumn = 'id'; let isSortAscending = true;
         let leaveHistoryByEmployee = {}; let dailyLeaveRecords = []; let currentDailyGroupedData = {}; 
         let currentCalendarDate = new Date(); let selectedCalendarDate = new Date().getDate();
@@ -4348,6 +4745,7 @@
             renderCalendarSummary(monthNames[currentCalendarDate.getMonth()]);
             renderDailyAttendance();
             if(oC.size>0) window.renderOrgChart(Array.from(oC).sort()[0]);
+            if ((document.body.dataset.activeTab || '') === 'report' && typeof renderReport === 'function') renderReport();
         }
 
         window.switchTab = function(id) {
@@ -4362,7 +4760,7 @@
             // Close any open filter dropdown menus so they do not visually carry across tabs.
             document.querySelectorAll('.filter-dropdown > div[id$="DropdownMenu"]').forEach(menu => menu.classList.add('hidden'));
 
-            ['dashboard','calendar','daily','org','scan'].forEach(t => {
+            ['dashboard','calendar','daily','org','report','scan'].forEach(t => {
                 const v=document.getElementById(t+'View'), b=document.getElementById('tab-'+t);
                 if(v)v.classList.add('hidden'); if(b)b.className="tab-inactive pb-3 px-2 whitespace-nowrap text-sm sm:text-base";
             });
@@ -4380,6 +4778,9 @@
             } else if(id==='calendar') renderCalendar(); else if(id==='daily') renderDailyAttendance(); else if(id==='org'&&currentOrgCompany) {
                 if(orgPanzoom) { orgPanzoom.destroy(); orgPanzoom = null; }
                 setTimeout(() => { if(document.getElementById('orgView').classList.contains('hidden') === false) drawAndPanzoom(); }, 50);
+            } else if(id==='report') {
+                if (typeof initializeReportControls === 'function') initializeReportControls();
+                if (typeof renderReport === 'function') renderReport();
             } else if(id==='scan') {
                 if(typeof fetchLiveData === 'function') fetchLiveData();
             }
@@ -6966,6 +7367,578 @@
         };
 
         document.getElementById('mobileDashboardSearch')?.addEventListener('input', e => mobileDashboardSetSearch(e.target.value));
+
+
+
+        /* ===================== REPORT TAB ===================== */
+
+        function reportStaffAvatarHtml(emp, size='w-9 h-9') {
+            const photo = staffPhotoImgHtml(emp, `${size} rounded-full object-cover border border-slate-200 bg-slate-100 shrink-0`, emp?.name || 'Staff photo');
+            if (photo) return photo;
+            const initial = String(emp?.name || '?').trim().charAt(0).toUpperCase() || '?';
+            return `<div class="${size} rounded-full border border-slate-200 bg-slate-100 text-slate-500 shrink-0 flex items-center justify-center text-[11px] font-extrabold">${reportEscapeHtml(initial)}</div>`;
+        }
+
+
+        function reportEscapeHtml(value){return String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+        function getReportAvailableYears(){
+            const years=new Set([new Date().getFullYear(),attendanceDataYear,new Date().getFullYear()-1]);
+            dailyLeaveRecords.forEach(r=>{const y=Number(r.year||attendanceDataYear);if(Number.isFinite(y))years.add(y);});
+            Object.keys(staffWarnings||{}).forEach(id=>warningNormalizeRecord(id).history.forEach(h=>{const y=Number(warningEntryYear(h));if(Number.isFinite(y))years.add(y);}));
+            return Array.from(years).sort((a,b)=>b-a);
+        }
+
+        function updateReportCompanyDropdownUI(){
+            const list=Array.from(companies).filter(Boolean).sort();
+            const label=document.getElementById('reportCompanyDropdownLabel');
+            const all=document.getElementById('reportSelectAllCompanies');
+            const box=document.getElementById('reportCompanyCheckboxList');
+            const valid=selectedReportCompanies.filter(c=>list.includes(c));
+            selectedReportCompanies=valid.length||selectedReportCompanies.length===0?valid:[...list];
+
+            if(box){
+                box.innerHTML=list.map(c=>{
+                    const checked=selectedReportCompanies.includes(c);
+                    const val=reportEscapeHtml(c);
+                    return `<label class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-slate-50 cursor-pointer">
+                        <input type="checkbox" value="${val}" class="report-company-checkbox rounded text-blue-600 focus:ring-blue-500" ${checked?'checked':''} onchange="handleReportCompanyCheck('${String(c).replace(/\\/g,'\\\\').replace(/'/g,"\\'")}',this.checked)">
+                        <span class="flex items-center min-w-0 flex-1 text-xs font-semibold text-slate-700">${getCompanyLogo(c)}<span class="truncate">${reportEscapeHtml(c)}</span></span>
+                    </label>`;
+                }).join('');
+            }
+
+            if(all){
+                all.checked=list.length>0&&selectedReportCompanies.length===list.length;
+                all.indeterminate=selectedReportCompanies.length>0&&selectedReportCompanies.length<list.length;
+            }
+
+            if(label){
+                if(selectedReportCompanies.length===list.length) label.textContent='All Companies';
+                else if(selectedReportCompanies.length===0) label.textContent='No Companies';
+                else if(selectedReportCompanies.length===1) label.textContent=selectedReportCompanies[0];
+                else label.textContent=`${selectedReportCompanies.length} Companies`;
+            }
+        }
+
+        window.toggleReportCompanyDropdown=function(event){
+            event?.stopPropagation?.();
+            const menu=document.getElementById('reportCompanyDropdownMenu');
+            if(menu) menu.classList.toggle('hidden');
+        };
+
+        window.handleReportCompanyCheck=function(company,checked){
+            if(checked){
+                if(!selectedReportCompanies.includes(company)) selectedReportCompanies.push(company);
+            }else{
+                selectedReportCompanies=selectedReportCompanies.filter(c=>c!==company);
+            }
+            updateReportCompanyDropdownUI();
+            syncReportDepartments();
+            renderReport();
+        };
+
+        window.handleReportSelectAllCompanies=function(checked){
+            selectedReportCompanies=checked?Array.from(companies).filter(Boolean).sort():[];
+            updateReportCompanyDropdownUI();
+            syncReportDepartments();
+            renderReport();
+        };
+
+        function initializeReportControls(){
+            const years=getReportAvailableYears(), yearA=document.getElementById('reportYearA'), yearB=document.getElementById('reportYearB'), month=document.getElementById('reportMonthSelect');
+            if(yearA){const keep=Number(yearA.value)||new Date().getFullYear();yearA.innerHTML=years.map(y=>`<option value="${y}">${y}</option>`).join('');yearA.value=years.includes(keep)?String(keep):String(years[0]);}
+            if(yearB){const def=new Date().getFullYear()-1,keep=Number(yearB.value)||def;yearB.innerHTML=years.map(y=>`<option value="${y}">${y}</option>`).join('');yearB.value=years.includes(keep)?String(keep):String(years[Math.min(1,years.length-1)]);}
+            if(month&&!month.options.length){month.innerHTML='<option value="All">Whole Year</option>'+monthNames.map((m,i)=>`<option value="${i}">${m}</option>`).join('');month.value='All';}
+
+            const list=Array.from(companies).filter(Boolean).sort();
+            if(!selectedReportCompanies.length&&list.length) selectedReportCompanies=[...list];
+            updateReportCompanyDropdownUI();
+            syncReportDepartments();
+
+            if(!reportInitialized){const now=new Date(),pad=n=>String(n).padStart(2,'0');const from=document.getElementById('reportDateFrom'),to=document.getElementById('reportDateTo');if(from)from.value=`${now.getFullYear()}-${pad(now.getMonth()+1)}-01`;if(to)to.value=`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(new Date(now.getFullYear(),now.getMonth()+1,0).getDate())}`;reportInitialized=true;}
+            updateReportModeControls();
+        }
+
+        window.syncReportDepartments=function(){
+            const sel=document.getElementById('reportDepartmentSelect');if(!sel)return;const keep=sel.value||'All';
+            const list=Array.from(companies).filter(Boolean).sort();
+            const selectedSet=new Set(selectedReportCompanies.length?selectedReportCompanies:list);
+            const depts=Array.from(new Set(allEmployees
+                .filter(e=>isEmploymentVisible(e,new Date()))
+                .filter(e=>selectedSet.has(e.company))
+                .map(e=>e.department)
+                .filter(Boolean))).sort();
+            sel.innerHTML='<option value="All">All Departments</option>'+depts.map(d=>`<option value="${reportEscapeHtml(d)}">${reportEscapeHtml(d)}</option>`).join('');
+            sel.value=depts.includes(keep)?keep:'All';
+        };
+
+        function updateReportModeControls(){
+            [['reportModeMonthly','monthly'],['reportModeYear','year'],['reportModeCustom','custom']].forEach(([id,mode])=>{const el=document.getElementById(id);if(el)el.className=`report-mode-btn ${reportMode===mode?'is-active':''}`;});
+            const show=(id,on)=>document.getElementById(id)?.classList.toggle('hidden',!on);
+            show('reportMonthlyControls',reportMode==='monthly');show('reportYearAControl',reportMode!=='custom');show('reportYearBControl',reportMode==='year');show('reportCustomFromControl',reportMode==='custom');show('reportCustomToControl',reportMode==='custom');
+            const l=document.getElementById('reportYearALabel');if(l)l.textContent=reportMode==='year'?'Primary Year':'Year';
+        }
+
+        window.setReportMode=function(mode){reportMode=['monthly','year','custom'].includes(mode)?mode:'monthly';updateReportModeControls();renderReport();};
+        window.setReportSubtab=function(tab){reportSubtab=tab==='performance'?'performance':'warnings';document.getElementById('reportWarningsPanel')?.classList.toggle('hidden',reportSubtab!=='warnings');document.getElementById('reportPerformancePanel')?.classList.toggle('hidden',reportSubtab!=='performance');const w=document.getElementById('reportSubWarnings'),p=document.getElementById('reportSubPerformance');if(w)w.className=`report-subtab-btn ${reportSubtab==='warnings'?'is-active':''}`;if(p)p.className=`report-subtab-btn ${reportSubtab==='performance'?'is-active':''}`;};
+
+        function getReportEmployeeScope(){
+            const d=document.getElementById('reportDepartmentSelect')?.value||'All';
+            const today=new Date();
+            const companySet=new Set(selectedReportCompanies);
+
+            return allEmployees.filter(e=>{
+                const isCurrentStaff=isEmploymentVisible(e,today);
+                return isCurrentStaff &&
+                    companySet.has(e.company) &&
+                    (d==='All'||e.department===d);
+            });
+        }
+        function reportRecordDate(r){const y=Number(r.year||attendanceDataYear),mi=monthNames.findIndex(m=>String(r.month||'').toLowerCase().startsWith(m.substring(0,3).toLowerCase()));if(mi<0)return null;const d=new Date(y,mi,Number(r.day||1));return isNaN(d.getTime())?null:d;}
+
+        function getReportPeriodConfig(){
+            const yA=Number(document.getElementById('reportYearA')?.value||new Date().getFullYear()),yB=Number(document.getElementById('reportYearB')?.value||(yA-1)),monthValue=document.getElementById('reportMonthSelect')?.value??String(new Date().getMonth()),mi=monthValue==='All'?'All':Number(monthValue),fr=document.getElementById('reportDateFrom')?.value||'',tr=document.getElementById('reportDateTo')?.value||'';
+            if(reportMode==='monthly'){
+                if(mi==='All')return{mode:'monthly',yearA:yA,yearB:null,monthIndex:'All',label:`Whole Year ${yA}`,testA:d=>d&&d.getFullYear()===yA,testB:()=>false};
+                return{mode:'monthly',yearA:yA,yearB:null,monthIndex:mi,label:`${monthNames[mi]} ${yA}`,testA:d=>d&&d.getFullYear()===yA&&d.getMonth()===mi,testB:()=>false};
+            }
+            if(reportMode==='year')return{mode:'year',yearA:yA,yearB:yB,label:`${yA} vs ${yB}`,testA:d=>d&&d.getFullYear()===yA,testB:d=>d&&d.getFullYear()===yB};
+            const f=fr?new Date(fr+'T00:00:00'):null,t=tr?new Date(tr+'T23:59:59'):null;return{mode:'custom',yearA:null,yearB:null,label:`${fr||'Start'} → ${tr||'End'}`,testA:d=>d&&(!f||d>=f)&&(!t||d<=t),testB:()=>false};
+        }
+
+        function blankReportStats(){return{AL:0,SL:0,SP:0,UP:0,A:0,Late5m:0,Late3m:0,OT:0,D:0,paid:0,late:0,available:0,utilization:0};}
+        function calculateReportStats(records,employees){const s=blankReportStats();records.forEach(r=>{const l=r.leaves||{};['AL','SL','SP','UP','A','Late5m','Late3m','OT','D'].forEach(k=>s[k]+=Number(l[k]||0));});s.paid=s.AL+s.SL+s.SP;s.late=s.Late5m+s.Late3m;s.available=employees.reduce((n,e)=>n+Number(e.leaves?.available?.AL||0)+Number(e.leaves?.available?.SL||0)+Number(e.leaves?.available?.SP||0),0);s.utilization=s.available>0?s.paid/s.available*100:0;return s;}
+        function getReportData(){const scopeEmployees=getReportEmployeeScope(),ids=new Set(scopeEmployees.map(e=>e.id)),period=getReportPeriodConfig(),recs=dailyLeaveRecords.filter(r=>ids.has(r.staffId));return{scopeEmployees,period,aRecords:recs.filter(r=>period.testA(reportRecordDate(r))),bRecords:period.mode==='year'?recs.filter(r=>period.testB(reportRecordDate(r))):[]};}
+
+
+        window.filterReportByCompanyCard=function(company){
+            const list=Array.from(companies).filter(Boolean).sort();
+            if(company==='All'){
+                selectedReportCompanies=[...list];
+            }else{
+                if(selectedReportCompanies.includes(company)){
+                    selectedReportCompanies=selectedReportCompanies.filter(c=>c!==company);
+                }else{
+                    selectedReportCompanies.push(company);
+                }
+            }
+            updateReportCompanyDropdownUI();
+            syncReportDepartments();
+            renderReport();
+        };
+
+        function renderReportCompanyKpis(data){
+            const box=document.getElementById('reportCompanyKpis');if(!box)return;
+            const list=Array.from(companies).filter(Boolean).sort();
+            const allSelected=list.length>0&&selectedReportCompanies.length===list.length;
+            const dept=document.getElementById('reportDepartmentSelect')?.value||'All';
+            const allCount=data.scopeEmployees.length;
+
+            let html=`<button class="report-company-card ${allSelected?'is-active':''}" onclick="filterReportByCompanyCard('All')"><div class="report-company-label"><i class="fa-solid fa-users mr-1"></i>All Companies</div><div class="report-company-value">${allCount}</div></button>`;
+
+            list.forEach(c=>{
+                const count=allEmployees.filter(e=>
+                    isEmploymentVisible(e,new Date()) &&
+                    e.company===c &&
+                    (dept==='All'||e.department===dept)
+                ).length;
+                const js=String(c).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+                const active=selectedReportCompanies.includes(c);
+                html+=`<button class="report-company-card ${active?'is-active':''}" onclick="filterReportByCompanyCard('${js}')"><div class="report-company-label truncate">${getCompanyLogo(c)} ${reportEscapeHtml(c)}</div><div class="report-company-value">${count}</div></button>`;
+            });
+            box.innerHTML=html;
+        }
+
+        function renderReportSummary(data){
+            const cs=Array.from(new Set(data.scopeEmployees.map(e=>e.company).filter(Boolean))).sort(),head=document.getElementById('reportSummaryHead'),body=document.getElementById('reportSummaryBody');if(!head||!body)return;const disp=cs.length?cs:['—'];
+            head.innerHTML=`<tr><th class="text-left px-3 py-3 border-b">Metric</th>${disp.map(c=>{const js=String(c).replace(/\\/g,'\\\\').replace(/'/g,"\\'");return`<th onclick="${c==='—'?'':'filterReportByCompanyCard(\''+js+'\')'}" class="report-summary-company text-center px-3 py-3 border-b min-w-[110px]">${reportEscapeHtml(c)}</th>`;}).join('')}<th onclick="filterReportByCompanyCard('All')" class="report-summary-company text-center px-3 py-3 border-b min-w-[110px] bg-blue-50/50">Total</th></tr>`;
+            const metrics=[['AL','Annual Leave (AL)'],['SL','Sick Leave (SL)'],['SP','Special Leave (SP)'],['UP','Unpaid Leave (UP)'],['late','Total Lateness'],['utilization','Paid Leave Utilization %']];
+            const stats=(c,recs)=>{const es=data.scopeEmployees.filter(e=>e.company===c),ids=new Set(es.map(e=>e.id));return calculateReportStats(recs.filter(r=>ids.has(r.staffId)),es);};const ta=calculateReportStats(data.aRecords,data.scopeEmployees),tb=data.period.mode==='year'?calculateReportStats(data.bRecords,data.scopeEmployees):null;
+            const fmt=(key,a,b=null)=>{const av=key==='utilization'?`${a.toFixed(1)}%`:mobileDashboardFormatNumber(a);if(b===null)return av;const bv=key==='utilization'?`${b.toFixed(1)}%`:mobileDashboardFormatNumber(b);return `<b>${av}</b><span class="text-slate-300 mx-1">/</span><span class="text-slate-500">${bv}</span>`;};
+            body.innerHTML=metrics.map(([k,l])=>{const rowClass=k==='AL'?'metric-al':k==='SL'?'metric-sl':k==='SP'?'metric-sp':k==='UP'?'metric-up':k==='late'?'metric-late':'metric-utilization';return`<tr class="report-metric-row ${rowClass}"><td class="report-metric-label px-3 py-3">${l}</td>${disp.map(c=>{if(c==='—')return'<td class="text-center px-3 py-3">—</td>';const a=stats(c,data.aRecords),b=data.period.mode==='year'?stats(c,data.bRecords):null;return`<td class="text-center px-3 py-3 font-semibold">${fmt(k,Number(a[k]||0),b?Number(b[k]||0):null)}</td>`;}).join('')}<td class="report-total-cell text-center px-3 py-3">${fmt(k,Number(ta[k]||0),tb?Number(tb[k]||0):null)}</td></tr>`;}).join('');
+            const h=document.getElementById('reportSummaryHint');if(h)h.textContent=data.period.mode==='year'?`${data.period.yearA} / ${data.period.yearB}`:data.period.label;
+        }
+
+        function renderReportWatchlist(data){
+            // Watchlist follows the currently selected report period.
+            const periodRecs=data.aRecords||[],map={};data.scopeEmployees.forEach(e=>map[e.id]={emp:e,leave:0,late:0});
+            periodRecs.forEach(r=>{const x=map[r.staffId];if(!x)return;const l=r.leaves||{};x.leave+=Number(l.AL||0)+Number(l.SL||0)+Number(l.SP||0)+Number(l.UP||0);x.late+=Number(l.Late5m||0)+Number(l.Late3m||0);});
+            const row=(x,t,i)=>{const v=t==='leave'?x.leave:x.late;const eid=String(x.emp.id||'').replace(/'/g,"\\'");return`<div class="report-watch-row px-4 py-3 flex items-center gap-3" onclick="openModalById('${eid}')"><div class="w-7 h-7 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-[10px] font-extrabold">${i}</div>${reportStaffAvatarHtml(x.emp,'w-9 h-9')}<div class="min-w-0 flex-1"><div class="text-xs font-bold text-slate-800 truncate">${reportEscapeHtml(x.emp.name)}</div><div class="text-[9px] text-slate-400 truncate">${reportEscapeHtml(x.emp.displayId)} • ${reportEscapeHtml(x.emp.company)} • ${reportEscapeHtml(x.emp.department||'')}</div></div><div class="text-sm font-extrabold ${t==='leave'?'text-blue-600':'text-orange-600'}">${mobileDashboardFormatNumber(v)}</div></div>`;};
+            const leave=Object.values(map).filter(x=>x.leave>0).sort((a,b)=>b.leave-a.leave).slice(0,8),late=Object.values(map).filter(x=>x.late>0).sort((a,b)=>b.late-a.late).slice(0,8),le=document.getElementById('reportLeaveWatchlist'),la=document.getElementById('reportLateWatchlist');
+            if(le)le.innerHTML=leave.length?leave.map((x,i)=>row(x,'leave',i+1)).join(''):'<div class="p-6 text-center text-xs text-slate-400">No leave usage in this period.</div>';if(la)la.innerHTML=late.length?late.map((x,i)=>row(x,'late',i+1)).join(''):'<div class="p-6 text-center text-xs text-slate-400">No lateness recorded in this period.</div>';
+        }
+
+        function getReportWarningsForEmployee(emp,period){return(warningNormalizeRecord(emp.id).history||[]).filter(h=>{if(!h.startAt)return period.mode==='year'?warningEntryYear(h)===period.yearA:true;return period.testA(new Date(h.startAt));});}
+
+        function renderReportWarnings(data){
+            let v=0,w=0,f=0,fic=0;const rows=[];data.scopeEmployees.forEach(emp=>{const hist=getReportWarningsForEmployee(emp,data.period),c={verbal:0,written:0,final:0,fic:0};hist.forEach(h=>{if(c[h.level]!==undefined)c[h.level]++;});v+=c.verbal;w+=c.written;f+=c.final;fic+=c.fic;if(c.verbal+c.written+c.final+c.fic)rows.push({emp,c,latest:hist.slice().sort((a,b)=>new Date(b.startAt||0)-new Date(a.startAt||0))[0]});});
+            const set=(id,x)=>{const e=document.getElementById(id);if(e)e.textContent=x;};set('reportWarnVerbal',v);set('reportWarnWritten',w);set('reportWarnFinal',f);set('reportWarnFic',fic);const body=document.getElementById('reportWarningsBody');if(!body)return;
+            rows.sort((a,b)=>(b.c.final*4+b.c.written*3+b.c.fic*2+b.c.verbal)-(a.c.final*4+a.c.written*3+a.c.fic*2+a.c.verbal));
+            body.innerHTML=rows.length?rows.map(x=>{const ll=x.latest?({verbal:'Verbal Warning',written:'Written Warning',final:'Final Warning',fic:'FIC'}[x.latest.level]||x.latest.level):'—';const eid=String(x.emp.id||'').replace(/'/g,"\\'");return`<tr class="report-drill-row" onclick="openModalById('${eid}')"><td class="px-3 py-2"><div class="flex items-center gap-2">${reportStaffAvatarHtml(x.emp,'w-8 h-8')}<div class="min-w-0"><b class="block truncate">${reportEscapeHtml(x.emp.name)}</b><div class="text-[9px] text-slate-400">${reportEscapeHtml(x.emp.displayId)}</div></div></div></td><td class="px-3 py-2">${reportEscapeHtml(x.emp.company)}</td><td class="px-3 py-2">${reportEscapeHtml(x.emp.department||'')}</td><td class="text-center px-3 py-2">${x.c.verbal||'-'}</td><td class="text-center px-3 py-2">${x.c.written||'-'}</td><td class="text-center px-3 py-2">${x.c.final||'-'}</td><td class="text-center px-3 py-2">${x.c.fic||'-'}</td><td class="px-3 py-2"><b>${reportEscapeHtml(ll)}</b>${x.latest?.startAt?`<div class="text-[9px] text-slate-400">${warningFormatDateTime(x.latest.startAt)}</div>`:''}</td></tr>`;}).join(''):'<tr><td colspan="8" class="p-8 text-center text-slate-400">No warning or FIC records in this report period.</td></tr>';
+        }
+
+        function renderReportPerformance(data){
+            const m={};data.scopeEmployees.forEach(e=>m[e.id]={emp:e,paid:0,up:0,late:0,a:0,warnings:0,fic:0});data.aRecords.forEach(r=>{const x=m[r.staffId];if(!x)return;const l=r.leaves||{};x.paid+=Number(l.AL||0)+Number(l.SL||0)+Number(l.SP||0);x.up+=Number(l.UP||0);x.late+=Number(l.Late5m||0)+Number(l.Late3m||0);x.a+=Number(l.A||0);});data.scopeEmployees.forEach(e=>{const h=getReportWarningsForEmployee(e,data.period),x=m[e.id];x.warnings=h.filter(a=>['verbal','written','final'].includes(a.level)).length;x.fic=h.filter(a=>a.level==='fic').length;});
+            const rows=Object.values(m).filter(x=>x.paid||x.up||x.late||x.a||x.warnings||x.fic).sort((a,b)=>(b.warnings*4+b.fic*3+b.late+b.up+b.a)-(a.warnings*4+a.fic*3+a.late+a.up+a.a)),body=document.getElementById('reportPerformanceBody');if(!body)return;
+            body.innerHTML=rows.length?rows.map(x=>{const s=[];if(x.late>=3)s.push('Frequent lateness');if(x.up>0)s.push('Unpaid leave');if(x.a>0)s.push('Absence');if(x.warnings)s.push(`${x.warnings} warning${x.warnings===1?'':'s'}`);if(x.fic)s.push(`${x.fic} FIC`);const eid=String(x.emp.id||'').replace(/'/g,"\\'");return`<tr class="report-drill-row" onclick="openModalById('${eid}')"><td class="px-3 py-2"><div class="flex items-center gap-2">${reportStaffAvatarHtml(x.emp,'w-8 h-8')}<div class="min-w-0"><b class="block truncate">${reportEscapeHtml(x.emp.name)}</b><div class="text-[9px] text-slate-400">${reportEscapeHtml(x.emp.displayId)}</div></div></div></td><td class="px-3 py-2">${reportEscapeHtml(x.emp.company)}<div class="text-[9px] text-slate-400">${reportEscapeHtml(x.emp.department||'')}</div></td><td class="text-center px-3 py-2">${mobileDashboardFormatNumber(x.paid)}</td><td class="text-center px-3 py-2">${mobileDashboardFormatNumber(x.up)}</td><td class="text-center px-3 py-2">${mobileDashboardFormatNumber(x.late)}</td><td class="text-center px-3 py-2">${mobileDashboardFormatNumber(x.a)}</td><td class="text-center px-3 py-2">${x.warnings||'-'}</td><td class="text-center px-3 py-2">${x.fic||'-'}</td><td class="px-3 py-2 text-[10px] text-slate-500">${s.length?s.join(' • '):'No elevated signal'}</td></tr>`;}).join(''):'<tr><td colspan="9" class="p-8 text-center text-slate-400">No attendance or performance signals in this report period.</td></tr>';
+        }
+
+        window.renderReport=function(){
+            initializeReportControls();
+            const data=getReportData(),lab=document.getElementById('reportPeriodLabel'),d=document.getElementById('reportDepartmentSelect')?.value||'All';
+            const list=Array.from(companies).filter(Boolean).sort();
+            const companyLabel=selectedReportCompanies.length===list.length?'All Companies':selectedReportCompanies.length===1?selectedReportCompanies[0]:selectedReportCompanies.length?`${selectedReportCompanies.length} Companies`:'No Companies';
+            if(lab)lab.textContent=`${data.period.label} • ${companyLabel} • ${d==='All'?'All Departments':d} • ${data.scopeEmployees.length} current staff`;
+            const leaveTitle=document.getElementById('reportLeaveWatchTitle'),lateTitle=document.getElementById('reportLateWatchTitle');
+            if(leaveTitle)leaveTitle.textContent=`Most Leave Used — ${data.period.label}`;
+            if(lateTitle)lateTitle.textContent=`Most Late — ${data.period.label}`;
+            renderReportCompanyKpis(data);renderReportSummary(data);renderReportWatchlist(data);renderReportWarnings(data);renderReportPerformance(data);setReportSubtab(reportSubtab);
+        };
+        window.resetReportFilters=function(){
+            reportMode='monthly';
+            const now=new Date(),a=document.getElementById('reportYearA'),b=document.getElementById('reportYearB'),m=document.getElementById('reportMonthSelect');
+            if(a)a.value=String(now.getFullYear());
+            if(b)b.value=String(now.getFullYear()-1);
+            if(m)m.value='All';
+            selectedReportCompanies=Array.from(companies).filter(Boolean).sort();
+            updateReportCompanyDropdownUI();
+            syncReportDepartments();
+            const d=document.getElementById('reportDepartmentSelect');if(d)d.value='All';
+            updateReportModeControls();renderReport();
+        };
+
+        function buildReportExportRows(){const data=getReportData(),cs=Array.from(new Set(data.scopeEmployees.map(e=>e.company).filter(Boolean))).sort(),rows=[];cs.forEach(c=>{const es=data.scopeEmployees.filter(e=>e.company===c),ids=new Set(es.map(e=>e.id)),a=calculateReportStats(data.aRecords.filter(r=>ids.has(r.staffId)),es),b=data.period.mode==='year'?calculateReportStats(data.bRecords.filter(r=>ids.has(r.staffId)),es):null;const row={Company:c,Period:data.period.label,AL:mobileDashboardFormatNumber(a.AL),SL:mobileDashboardFormatNumber(a.SL),SP:mobileDashboardFormatNumber(a.SP),UP:mobileDashboardFormatNumber(a.UP),Lateness:mobileDashboardFormatNumber(a.late),'Paid Leave Utilization %':Number(a.utilization.toFixed(1))};if(b){row[`AL ${data.period.yearB}`]=mobileDashboardFormatNumber(b.AL);row[`SL ${data.period.yearB}`]=mobileDashboardFormatNumber(b.SL);row[`SP ${data.period.yearB}`]=mobileDashboardFormatNumber(b.SP);row[`UP ${data.period.yearB}`]=mobileDashboardFormatNumber(b.UP);row[`Lateness ${data.period.yearB}`]=mobileDashboardFormatNumber(b.late);row[`Utilization ${data.period.yearB} %`]=Number(b.utilization.toFixed(1));}rows.push(row);});return{data,rows};}
+
+
+        function buildFullReportExportData(){
+            const data=getReportData();
+            const companyList=Array.from(companies).filter(Boolean).sort();
+            const company=selectedReportCompanies.length===companyList.length?'All Companies':selectedReportCompanies.length===1?selectedReportCompanies[0]:selectedReportCompanies.join(', ');
+            const department=document.getElementById('reportDepartmentSelect')?.value||'All';
+
+            const companySummary=buildReportExportRows().rows;
+
+            const staffMap={};
+            data.scopeEmployees.forEach(e=>{
+                staffMap[e.id]={
+                    emp:e,
+                    AL:0,SL:0,SP:0,UP:0,A:0,Late:0,
+                    warningCount:0,ficCount:0
+                };
+            });
+
+            data.aRecords.forEach(r=>{
+                const x=staffMap[r.staffId]; if(!x) return;
+                const l=r.leaves||{};
+                x.AL+=Number(l.AL||0);
+                x.SL+=Number(l.SL||0);
+                x.SP+=Number(l.SP||0);
+                x.UP+=Number(l.UP||0);
+                x.A+=Number(l.A||0);
+                x.Late+=Number(l.Late5m||0)+Number(l.Late3m||0);
+            });
+
+            const warningRows=[];
+            data.scopeEmployees.forEach(e=>{
+                const hist=getReportWarningsForEmployee(e,data.period);
+                hist.forEach(h=>{
+                    if(['verbal','written','final'].includes(h.level)) staffMap[e.id].warningCount++;
+                    if(h.level==='fic') staffMap[e.id].ficCount++;
+                    warningRows.push({
+                        Staff:e.name,
+                        ID:e.displayId,
+                        Company:e.company,
+                        Department:e.department||'',
+                        Type:({verbal:'Verbal Warning',written:'Written Warning',final:'Final Warning',fic:'FIC'}[h.level]||h.level),
+                        Start:h.startAt?warningFormatDateTime(h.startAt):'',
+                        End:h.endAt?warningFormatDateTime(h.endAt):'',
+                        Issuer:h.issuer||'',
+                        Note:h.note||''
+                    });
+                });
+            });
+
+            const staffRows=Object.values(staffMap).map(x=>({
+                Staff:x.emp.name,
+                ID:x.emp.displayId,
+                Company:x.emp.company,
+                Department:x.emp.department||'',
+                Position:x.emp.position||'',
+                AL:mobileDashboardFormatNumber(x.AL),
+                SL:mobileDashboardFormatNumber(x.SL),
+                SP:mobileDashboardFormatNumber(x.SP),
+                UP:mobileDashboardFormatNumber(x.UP),
+                'Paid Leave':mobileDashboardFormatNumber(x.AL+x.SL+x.SP),
+                Lateness:mobileDashboardFormatNumber(x.Late),
+                Absence:mobileDashboardFormatNumber(x.A),
+                Warnings:x.warningCount,
+                FIC:x.ficCount
+            }));
+
+            const leaveWatch=Object.values(staffMap)
+                .map(x=>({
+                    Staff:x.emp.name,
+                    ID:x.emp.displayId,
+                    Company:x.emp.company,
+                    Department:x.emp.department||'',
+                    'Leave Used':x.AL+x.SL+x.SP+x.UP,
+                    AL:x.AL,SL:x.SL,SP:x.SP,UP:x.UP
+                }))
+                .filter(x=>x['Leave Used']>0)
+                .sort((a,b)=>b['Leave Used']-a['Leave Used'])
+                .slice(0,8);
+
+            const lateWatch=Object.values(staffMap)
+                .map(x=>({
+                    Staff:x.emp.name,
+                    ID:x.emp.displayId,
+                    Company:x.emp.company,
+                    Department:x.emp.department||'',
+                    Lateness:x.Late
+                }))
+                .filter(x=>x.Lateness>0)
+                .sort((a,b)=>b.Lateness-a.Lateness)
+                .slice(0,8);
+
+            const performanceRows=Object.values(staffMap)
+                .map(x=>{
+                    const signals=[];
+                    if(x.Late>=3) signals.push('Frequent lateness');
+                    if(x.UP>0) signals.push('Unpaid leave');
+                    if(x.A>0) signals.push('Absence');
+                    if(x.warningCount>0) signals.push(`${x.warningCount} warning${x.warningCount===1?'':'s'}`);
+                    if(x.ficCount>0) signals.push(`${x.ficCount} FIC`);
+                    return {
+                        Staff:x.emp.name,
+                        ID:x.emp.displayId,
+                        Company:x.emp.company,
+                        Department:x.emp.department||'',
+                        'Paid Leave':x.AL+x.SL+x.SP,
+                        UP:x.UP,
+                        Late:x.Late,
+                        Absence:x.A,
+                        Warnings:x.warningCount,
+                        FIC:x.ficCount,
+                        Signal:signals.length?signals.join(' • '):'No elevated signal'
+                    };
+                })
+                .filter(x=>x['Paid Leave']||x.UP||x.Late||x.Absence||x.Warnings||x.FIC)
+                .sort((a,b)=>(b.Warnings*4+b.FIC*3+b.Late+b.UP+b.Absence)-(a.Warnings*4+a.FIC*3+a.Late+a.UP+a.Absence));
+
+            const overview=[
+                {Field:'Report Period',Value:data.period.label},
+                {Field:'Company Filter',Value:company},
+                {Field:'Department Filter',Value:department==='All'?'All Departments':department},
+                {Field:'Current Staff Included',Value:data.scopeEmployees.length},
+                {Field:'Employment Scope',Value:'Current staff only; former staff excluded after Last Working Day'},
+                {Field:'Paid Leave Utilization Formula',Value:'(AL + SL + SP used) / available AL + SL + SP x 100'}
+            ];
+
+            return {data,companySummary,staffRows,leaveWatch,lateWatch,warningRows,performanceRows,overview};
+        }
+
+        function reportExcelStyleSheet(ws, headerRow=1){
+            if(!ws||!ws['!ref']) return;
+            const range=XLSX.utils.decode_range(ws['!ref']);
+            for(let c=range.s.c;c<=range.e.c;c++){
+                const addr=XLSX.utils.encode_cell({r:headerRow-1,c});
+                if(ws[addr]){
+                    ws[addr].s={
+                        font:{bold:true,color:{rgb:'FFFFFF'}},
+                        fill:{fgColor:{rgb:'2563EB'}},
+                        alignment:{horizontal:'center',vertical:'center'}
+                    };
+                }
+            }
+            ws['!freeze']={xSplit:0,ySplit:headerRow};
+        }
+
+        function reportExcelAddSheet(wb,name,rows,widths=[]){
+            const safeRows=rows&&rows.length?rows:[{Info:'No data for this section'}];
+            const ws=XLSX.utils.json_to_sheet(safeRows);
+            if(widths.length) ws['!cols']=widths.map(w=>({wch:w}));
+            reportExcelStyleSheet(ws,1);
+            XLSX.utils.book_append_sheet(wb,ws,name);
+        }
+
+        window.exportReportExcel=function(){
+            try{
+                if(typeof XLSX==='undefined') throw new Error('Excel export library is not available.');
+                const full=buildFullReportExportData();
+                const wb=XLSX.utils.book_new();
+
+                reportExcelAddSheet(wb,'Overview',full.overview,[30,72]);
+                reportExcelAddSheet(wb,'Company Summary',full.companySummary,[18,18,12,12,12,12,12,20]);
+                reportExcelAddSheet(wb,'Staff Detail',full.staffRows,[24,14,12,20,22,9,9,9,9,12,12,10,10,8]);
+                reportExcelAddSheet(wb,'Most Leave Used',full.leaveWatch,[24,14,12,20,14,9,9,9,9]);
+                reportExcelAddSheet(wb,'Most Late',full.lateWatch,[24,14,12,20,12]);
+                reportExcelAddSheet(wb,'Warnings FIC',full.warningRows,[24,14,12,20,18,18,18,20,42]);
+                reportExcelAddSheet(wb,'Attendance Performance',full.performanceRows,[24,14,12,20,12,9,9,10,10,8,32]);
+
+                const safe=full.data.period.label.replace(/[^0-9A-Za-z_-]+/g,'_');
+                XLSX.writeFile(wb,`Attendance_Full_Report_${safe}.xlsx`);
+            }catch(e){
+                console.error(e);
+                showAppToast(String(e.message||e),'error');
+            }
+        };
+
+        function pdfSafe(v,max=42){
+            const s=String(v??'');
+            return s.length>max?s.slice(0,max-1)+'…':s;
+        }
+
+        function pdfSectionTitle(doc,title,y){
+            if(y>190){doc.addPage();y=16;}
+            doc.setFont(undefined,'bold');
+            doc.setFontSize(11);
+            doc.setTextColor(30,41,59);
+            doc.text(title,14,y);
+            doc.setTextColor(0);
+            return y+6;
+        }
+
+        function pdfSimpleTable(doc,headers,rows,widths,y){
+            const left=14;
+            const lineH=5.2;
+            const pageBottom=194;
+
+            const drawHeader=()=>{
+                let x=left;
+                doc.setFillColor(241,245,249);
+                doc.rect(left,y,widths.reduce((a,b)=>a+b,0),6,'F');
+                doc.setFont(undefined,'bold');
+                doc.setFontSize(7.2);
+                headers.forEach((h,i)=>{
+                    doc.text(pdfSafe(h,24),x+1.2,y+4.1);
+                    x+=widths[i];
+                });
+                doc.setFont(undefined,'normal');
+                y+=6;
+            };
+
+            drawHeader();
+
+            rows.forEach(row=>{
+                if(y>pageBottom){
+                    doc.addPage();
+                    y=16;
+                    drawHeader();
+                }
+                let x=left;
+                doc.setFontSize(7);
+                row.forEach((v,i)=>{
+                    const maxChars=Math.max(5,Math.floor(widths[i]*2.25));
+                    doc.text(pdfSafe(v,maxChars),x+1.2,y+3.7);
+                    x+=widths[i];
+                });
+                y+=lineH;
+            });
+            return y+3;
+        }
+
+        window.exportReportPdf=function(){
+            try{
+                if(!window.jspdf?.jsPDF) throw new Error('PDF export library is not available.');
+                const full=buildFullReportExportData();
+                const doc=new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+
+                const companyList=Array.from(companies).filter(Boolean).sort();
+                const company=selectedReportCompanies.length===companyList.length?'All Companies':selectedReportCompanies.length===1?selectedReportCompanies[0]:selectedReportCompanies.join(', ');
+                const department=document.getElementById('reportDepartmentSelect')?.value||'All';
+
+                doc.setFont(undefined,'bold');
+                doc.setFontSize(17);
+                doc.setTextColor(15,23,42);
+                doc.text('Attendance Full Report',14,15);
+
+                doc.setFont(undefined,'normal');
+                doc.setFontSize(8.5);
+                doc.setTextColor(100);
+                doc.text(`Period: ${full.data.period.label}`,14,21);
+                doc.text(`Company: ${pdfSafe(company,42)}`,80,21);
+                doc.text(`Department: ${department==='All'?'All Departments':department}`,150,21);
+                doc.text(`Current staff: ${full.data.scopeEmployees.length}`,242,21);
+                doc.setTextColor(0);
+
+                let y=30;
+
+                y=pdfSectionTitle(doc,'Company Summary',y);
+                y=pdfSimpleTable(
+                    doc,
+                    ['Company','AL','SL','SP','UP','Late','Paid Leave Util. %'],
+                    full.companySummary.map(r=>[
+                        r.Company,r.AL,r.SL,r.SP,r.UP,r.Lateness,`${r['Paid Leave Utilization %']}%`
+                    ]),
+                    [46,24,24,24,24,26,38],
+                    y
+                );
+
+                y=pdfSectionTitle(doc,`Most Leave Used — ${full.data.period.label}`,y);
+                y=pdfSimpleTable(
+                    doc,
+                    ['Staff','ID','Company','Dept','Leave','AL','SL','SP','UP'],
+                    full.leaveWatch.map(r=>[r.Staff,r.ID,r.Company,r.Department,r['Leave Used'],r.AL,r.SL,r.SP,r.UP]),
+                    [42,24,22,34,20,16,16,16,16],
+                    y
+                );
+
+                y=pdfSectionTitle(doc,`Most Late — ${full.data.period.label}`,y);
+                y=pdfSimpleTable(
+                    doc,
+                    ['Staff','ID','Company','Department','Lateness'],
+                    full.lateWatch.map(r=>[r.Staff,r.ID,r.Company,r.Department,r.Lateness]),
+                    [50,26,26,48,24],
+                    y
+                );
+
+                y=pdfSectionTitle(doc,'Warnings & FIC',y);
+                y=pdfSimpleTable(
+                    doc,
+                    ['Staff','ID','Company','Department','Type','Start','End','Issuer','Note'],
+                    full.warningRows.map(r=>[r.Staff,r.ID,r.Company,r.Department,r.Type,r.Start,r.End,r.Issuer,r.Note]),
+                    [34,20,20,29,25,27,27,28,48],
+                    y
+                );
+
+                y=pdfSectionTitle(doc,'Attendance & Performance',y);
+                y=pdfSimpleTable(
+                    doc,
+                    ['Staff','Company','Dept','Paid Leave','UP','Late','Absence','Warnings','FIC','Signal'],
+                    full.performanceRows.map(r=>[r.Staff,r.Company,r.Department,r['Paid Leave'],r.UP,r.Late,r.Absence,r.Warnings,r.FIC,r.Signal]),
+                    [35,20,31,23,15,15,19,21,14,57],
+                    y
+                );
+
+                y=pdfSectionTitle(doc,'Staff Detail',y);
+                y=pdfSimpleTable(
+                    doc,
+                    ['Staff','ID','Company','Dept','AL','SL','SP','UP','Paid','Late','Abs','Warn','FIC'],
+                    full.staffRows.map(r=>[r.Staff,r.ID,r.Company,r.Department,r.AL,r.SL,r.SP,r.UP,r['Paid Leave'],r.Lateness,r.Absence,r.Warnings,r.FIC]),
+                    [34,20,20,30,13,13,13,13,17,16,16,16,13],
+                    y
+                );
+
+                doc.setFontSize(7);
+                doc.setTextColor(100);
+                doc.text('Paid Leave Utilization = (AL + SL + SP used) / available AL + SL + SP x 100',14,203);
+
+                const safe=full.data.period.label.replace(/[^0-9A-Za-z_-]+/g,'_');
+                doc.save(`Attendance_Full_Report_${safe}.pdf`);
+            }catch(e){
+                console.error(e);
+                showAppToast(String(e.message||e),'error');
+            }
+        };
+
+
+        document.addEventListener('click',function(e){
+            const btn=document.getElementById('reportCompanyDropdownBtn');
+            const menu=document.getElementById('reportCompanyDropdownMenu');
+            if(!btn||!menu) return;
+            if(!btn.contains(e.target)&&!menu.contains(e.target)) menu.classList.add('hidden');
+        });
 
 
         window.changeMonth=function(o){currentCalendarDate.setMonth(currentCalendarDate.getMonth()+o); selectedCalendarDate=null; activeLeaveFilter=null; renderCalendar();};
@@ -9576,7 +10549,7 @@
    PWA SERVICE WORKER
    ========================================================== */
 
-console.log('Attendance build: 2026-09-17-probation-details-v1');
+console.log('Attendance build: 2026-09-17-report-multi-company-v1');
 
 if ('serviceWorker' in navigator) {
 
