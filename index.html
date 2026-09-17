@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Attendance Dashboard</title>
-    <meta name="app-build" content="2026-09-17-notice-filter-v1">
+    <meta name="app-build" content="2026-09-17-probation-details-v1">
     <!-- Photo mapping: Staff ID primary, Name/File Name fallback -->
         <!-- PWA -->
     <meta name="theme-color" content="#2563eb">
@@ -2589,6 +2589,7 @@
                         <div id="statusDropdownMenu" class="hidden absolute left-0 sm:left-auto sm:right-0 z-30 w-full sm:w-52 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg flex flex-col overflow-hidden">
                             <div class="p-2 flex flex-col space-y-1">
                                 <label class="flex items-center space-x-2 p-1.5 hover:bg-slate-50 rounded cursor-pointer"><input type="checkbox" value="Active" class="status-checkbox rounded text-blue-600" checked onchange="handleStatusCheck()"><span class="text-sm">Active</span></label>
+                                <label class="flex items-center space-x-2 p-1.5 hover:bg-slate-50 rounded cursor-pointer"><input type="checkbox" value="Probation" class="status-checkbox rounded text-violet-500" onchange="handleStatusCheck()"><span class="text-sm">Probation</span></label>
                                 <label class="flex items-center space-x-2 p-1.5 hover:bg-slate-50 rounded cursor-pointer"><input type="checkbox" value="Notice Period" class="status-checkbox rounded text-amber-500" onchange="handleStatusCheck()"><span class="text-sm">Notice Period</span></label>
                                 <label class="flex items-center space-x-2 p-1.5 hover:bg-slate-50 rounded cursor-pointer"><input type="checkbox" value="Resigned" class="status-checkbox rounded text-orange-500" onchange="handleStatusCheck()"><span class="text-sm">Resigned</span></label>
                                 <label class="flex items-center space-x-2 p-1.5 hover:bg-slate-50 rounded cursor-pointer"><input type="checkbox" value="Terminated" class="status-checkbox rounded text-red-500" onchange="handleStatusCheck()"><span class="text-sm">Terminated</span></label>
@@ -2725,6 +2726,7 @@
                             <span class="mobile-filter-label">Status</span>
                             <div class="mobile-filter-check-grid">
                                 <label class="mobile-filter-check"><input type="checkbox" value="Active" class="mobile-dashboard-status rounded" onchange="mobileDashboardSetStatuses()"><span>Active</span></label>
+                                <label class="mobile-filter-check"><input type="checkbox" value="Probation" class="mobile-dashboard-status rounded" onchange="mobileDashboardSetStatuses()"><span>Probation</span></label>
                                 <label class="mobile-filter-check"><input type="checkbox" value="Notice Period" class="mobile-dashboard-status rounded" onchange="mobileDashboardSetStatuses()"><span>Notice Period</span></label>
                                 <label class="mobile-filter-check"><input type="checkbox" value="Resigned" class="mobile-dashboard-status rounded" onchange="mobileDashboardSetStatuses()"><span>Resigned</span></label>
                                 <label class="mobile-filter-check"><input type="checkbox" value="Terminated" class="mobile-dashboard-status rounded" onchange="mobileDashboardSetStatuses()"><span>Terminated</span></label>
@@ -3172,6 +3174,32 @@
                 <div id="modalResignedSection" class="hidden bg-orange-50 rounded-xl p-3 border border-orange-200 shadow-sm mb-5">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3"><div class="sm:border-r border-orange-200"><p class="text-[10px] text-orange-600 font-bold mb-1">Inactive Date</p><p class="text-sm font-semibold text-orange-900" id="modalResignedDate">-</p></div><div><p class="text-[10px] text-orange-600 font-bold mb-1">Reason</p><p class="text-sm font-semibold text-orange-900" id="modalResignedReason">-</p></div></div>
                 </div>
+
+                <div id="modalProbationSection" class="hidden bg-indigo-50/70 rounded-xl p-3 border border-indigo-200 shadow-sm mb-5">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                        <div>
+                            <p class="text-[10px] text-indigo-500 font-bold uppercase tracking-wider">Probation</p>
+                            <p class="text-sm font-extrabold text-indigo-900" id="modalProbationEnd">-</p>
+                        </div>
+                        <span id="modalProbationDays" class="text-[10px] font-bold text-indigo-700 bg-white border border-indigo-200 rounded-full px-2 py-1">-</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="bg-white/80 rounded-lg border border-indigo-100 px-2 py-2 text-center">
+                            <div class="text-[9px] font-bold text-slate-400">AL AFTER 3M</div>
+                            <div id="modalProbationAL" class="text-sm font-extrabold text-blue-700">0</div>
+                        </div>
+                        <div class="bg-white/80 rounded-lg border border-indigo-100 px-2 py-2 text-center">
+                            <div class="text-[9px] font-bold text-slate-400">SL AFTER 3M</div>
+                            <div id="modalProbationSL" class="text-sm font-extrabold text-teal-700">0</div>
+                        </div>
+                        <div class="bg-white/80 rounded-lg border border-indigo-100 px-2 py-2 text-center">
+                            <div class="text-[9px] font-bold text-slate-400">SP AFTER 6M</div>
+                            <div id="modalProbationSP" class="text-sm font-extrabold text-purple-700">0</div>
+                        </div>
+                    </div>
+                    <p id="modalProbationSPDate" class="text-[9px] text-indigo-500 mt-2"></p>
+                </div>
+
                 <div id="modalWarningSection" class="hidden bg-white rounded-xl border shadow-sm mb-5 overflow-hidden">
                     <div id="modalWarningAccent" class="h-1 bg-emerald-500"></div>
 
@@ -3676,7 +3704,7 @@
             let arr = []; document.querySelectorAll('.status-checkbox').forEach(cb => { if(cb.checked) arr.push(cb.value); });
             selectedStatuses = arr;
             let lb = document.getElementById('statusDropdownLabel');
-            if (arr.length === 4) lb.innerText = 'All Statuses'; else if (arr.length === 0) lb.innerText = 'None'; else lb.innerText = arr.join(', ');
+            if (arr.length === 5) lb.innerText = 'All Statuses'; else if (arr.length === 0) lb.innerText = 'None'; else lb.innerText = arr.join(', ');
             applyFilters();
         };
 
@@ -4423,14 +4451,162 @@
             return lastDay >= ref;
         }
 
+        // Probation = first 3 calendar months from Join Date.
+        // Notice-period/resigned staff are not treated as probation.
+        function isProbationStaff(emp, referenceDate = new Date()) {
+            if (!emp || emp.status !== 'Active') return false;
+            if (isNoticePeriodStaff(emp, referenceDate)) return false;
+
+            const join = parseStaffDateValue(emp.joinDate);
+            if (!join) return false;
+
+            const ref = new Date(referenceDate);
+            ref.setHours(0,0,0,0);
+            join.setHours(0,0,0,0);
+
+            const probationEnd = new Date(join);
+            probationEnd.setMonth(probationEnd.getMonth() + 3);
+            probationEnd.setHours(0,0,0,0);
+
+            return ref >= join && ref < probationEnd;
+        }
+
+        function probationCustomRound(value) {
+            if (value === null || value === undefined || isNaN(value) || value <= 0) return 0;
+            const v = Math.round(Number(value) * 10000) / 10000;
+            const integerPart = Math.floor(v);
+            const fraction = Math.round((v - integerPart) * 100) / 100;
+            if (fraction < 0.5) return integerPart;
+            if (fraction <= 0.7) return integerPart + 0.5;
+            return integerPart + 1;
+        }
+
+        function probationLeaveEntitlement(joinDate, probationMonths, maxLeave, targetYear, today) {
+            if (maxLeave <= 0) return 0;
+            if (!(joinDate instanceof Date) || isNaN(joinDate.getTime())) return 0;
+            if (joinDate.getFullYear() > targetYear) return 0;
+
+            const probationEnd = new Date(joinDate.getTime());
+            probationEnd.setMonth(probationEnd.getMonth() + probationMonths);
+            const probationYear = probationEnd.getFullYear();
+
+            if (targetYear === today.getFullYear() && today < probationEnd) return 0;
+            if (probationYear > targetYear) return 0;
+            if (probationYear < targetYear) return maxLeave;
+
+            const remainingMonths = 12 - probationEnd.getMonth();
+            const rawEntitlement = maxLeave * (remainingMonths / 12);
+            return probationCustomRound(rawEntitlement);
+        }
+
+        function getProbationLeaveBases(emp, targetYear) {
+            const roleRaw = String(emp?.position || '').trim().toLowerCase();
+            const joinDate = parseStaffDateValue(emp?.joinDate);
+            if (!joinDate) return {AL:0,SL:0,SP:0};
+
+            const isNoLeaveRole =
+                roleRaw.includes('housekeeper') ||
+                roleRaw.includes('house keeper') ||
+                roleRaw.includes('security');
+
+            const isNoALRole =
+                isNoLeaveRole ||
+                roleRaw === 'delivery' ||
+                roleRaw === 'driver' ||
+                roleRaw === 'technician' ||
+                roleRaw === 'driver & technician';
+
+            const isPartTime = roleRaw.includes('part-time');
+
+            const evalDate = new Date(targetYear, 11, 31);
+            const diffYears = (evalDate - joinDate) / (365.25 * 24 * 60 * 60 * 1000);
+            const standardMaxAL = diffYears >= 3 ? 12 : 10;
+
+            let AL = 0, SL = 0, SP = 0;
+
+            if (!isNoLeaveRole) {
+                SL = isPartTime ? 2.5 : 5;
+                SP = isPartTime ? 2.5 : 5;
+
+                if (!isNoALRole) {
+                    if (roleRaw === 'general manager') AL = 14;
+                    else if (roleRaw === 'finance & tax manager') AL = 12;
+                    else if (isPartTime) AL = 5;
+                    else AL = standardMaxAL;
+                }
+            }
+
+            return {AL,SL,SP};
+        }
+
+        function getProbationProjection(emp, referenceDate = new Date()) {
+            const join = parseStaffDateValue(emp?.joinDate);
+            if (!join) return null;
+
+            join.setHours(0,0,0,0);
+
+            const probationEnd = new Date(join);
+            probationEnd.setMonth(probationEnd.getMonth() + 3);
+            probationEnd.setHours(0,0,0,0);
+
+            const spEligibleDate = new Date(join);
+            spEligibleDate.setMonth(spEligibleDate.getMonth() + 6);
+            spEligibleDate.setHours(0,0,0,0);
+
+            const ref = new Date(referenceDate);
+            ref.setHours(0,0,0,0);
+
+            const targetYear = ref.getFullYear();
+            const bases = getProbationLeaveBases(emp, targetYear);
+
+            // Project what will become available at each eligibility point using
+            // the same calculation rules as the Employee Info Apps Script.
+            const AL = probationLeaveEntitlement(join, 3, bases.AL, targetYear, probationEnd);
+            const SL = probationLeaveEntitlement(join, 3, bases.SL, targetYear, probationEnd);
+            const SP = probationLeaveEntitlement(join, 6, bases.SP, targetYear, spEligibleDate);
+
+            const msPerDay = 24 * 60 * 60 * 1000;
+            const daysRemaining = Math.max(0, Math.ceil((probationEnd - ref) / msPerDay));
+
+            const fmt = d => d.toLocaleDateString(undefined, {day:'2-digit', month:'short', year:'numeric'});
+
+            return {
+                joinDate: join,
+                probationEnd,
+                probationEndText: fmt(probationEnd),
+                spEligibleDate,
+                spEligibleText: fmt(spEligibleDate),
+                daysRemaining,
+                AL, SL, SP,
+                targetYear
+            };
+        }
+
+        function probationBadgeHtml(emp, compact=false, referenceDate=new Date()) {
+            if (!isProbationStaff(emp, referenceDate)) return '';
+            const p = getProbationProjection(emp, referenceDate);
+            if (!p) return '';
+            if (compact) {
+                return `<span class="bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded text-[9px] font-bold border border-indigo-200 shadow-sm"><i class="fa-solid fa-user-clock mr-1"></i>Probation · Ends ${p.probationEndText}</span>`;
+            }
+            return `<span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded-lg text-[10px] font-bold border border-indigo-200"><i class="fa-solid fa-user-clock mr-1"></i>Probation · Ends ${p.probationEndText}</span>`;
+        }
+
         function matchesDashboardStatusFilter(emp, referenceDate = new Date()) {
             if (!selectedStatuses.length) return true;
+
+            // Special subset filters.
+            if (selectedStatuses.includes('Probation') &&
+                isProbationStaff(emp, referenceDate)) {
+                return true;
+            }
 
             if (selectedStatuses.includes('Notice Period') &&
                 isResignedNoticePeriodStaff(emp, referenceDate)) {
                 return true;
             }
 
+            // Existing broad employment statuses.
             const effective = getEffectiveStaffStatus(emp, referenceDate);
             return selectedStatuses.includes(effective);
         }
@@ -4594,8 +4770,6 @@
             const refDate=getDashboardReferenceDate();
             allEmployees.forEach(e => { const ps=getDashboardPeriodStats(e); e.totalLate5m=ps.Late5m; e.totalLate3m=ps.Late3m; });
 
-            let ninetyDaysAgo = new Date(refDate); ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
-
             filteredEmployees = allEmployees.filter(e => {
                 if(selectedCompanies.length>0 && !selectedCompanies.includes(e.company)) return false;
                 if(Array.isArray(selectedDepartments) && selectedDepartments.length > 0 && !selectedDepartments.includes(e.department)) return false;
@@ -4620,7 +4794,7 @@
 
                 tot++; lSum+=sSum; aAl+=e.leaves.available.AL; aSl+=e.leaves.available.SL; aSp+=e.leaves.available.SP; rAl+=e.leaves.remaining.AL; rSl+=e.leaves.remaining.SL; rSp+=e.leaves.remaining.SP; tUp+=ps.UP; tL5+=ps.Late5m; tL3+=ps.Late3m;
                 if(getEffectiveStaffStatus(e, refDate)==='Active')act++; else inact++;
-                e.isProbation = getEffectiveStaffStatus(e, refDate) === 'Active' && !isNoticePeriodStaff(e, refDate) && e.sortableJoinDate > ninetyDaysAgo.getTime();
+                e.isProbation = isProbationStaff(e, refDate);
                 return true;
             });
 
@@ -4660,7 +4834,13 @@
                 if (isNoticePeriodStaff(e)) { rowColorClass = "bg-amber-50/40 hover:bg-amber-100/50"; nameBadge = `${noticePeriodBadgeHtml(e,true)} <span class="text-[9px] font-semibold text-amber-700 ml-1">Last Day: ${formatStaffLastDay(e)}</span>`; }
                 else if (e.status === 'Resigned') { rowColorClass = "bg-orange-50/50 hover:bg-orange-100/60"; nameBadge = `<span class="bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded text-[9px] font-bold border border-orange-200 shadow-sm ml-2">Resigned</span>`; }
                 else if (e.status === 'Terminated') { rowColorClass = "bg-red-50/50 hover:bg-red-100/60"; nameBadge = `<span class="bg-red-100 text-red-700 px-1.5 py-0.5 rounded text-[9px] font-bold border border-red-200 shadow-sm ml-2">Terminated</span>`; }
-                else if (e.isProbation) { rowColorClass = "bg-indigo-50/40 hover:bg-indigo-100/50"; nameBadge = `<span class="bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded text-[9px] font-bold border border-indigo-200 shadow-sm ml-2">Probation</span>`; }
+                else if (e.isProbation) {
+                    rowColorClass = "bg-indigo-50/40 hover:bg-indigo-100/50";
+                    const pp = getProbationProjection(e);
+                    nameBadge = pp
+                        ? `${probationBadgeHtml(e,true)} <span class="text-[9px] font-semibold text-indigo-600 ml-1">AL ${mobileDashboardFormatNumber(pp.AL)} · SL ${mobileDashboardFormatNumber(pp.SL)} · SP ${mobileDashboardFormatNumber(pp.SP)}</span>`
+                        : `<span class="bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded text-[9px] font-bold border border-indigo-200 shadow-sm ml-2">Probation</span>`;
+                }
                 
                 tr.className=`border-b cursor-pointer text-center ${rowColorClass}`; tr.onclick=()=>openModal(e);
                 tr.innerHTML=`<td class="px-4 py-3 text-left border-r">${e.displayId}</td><td class="px-4 py-3 font-semibold text-left border-r">${e.name} ${nameBadge}</td><td class="px-4 py-3 text-left border-r">${cB}</td><td class="px-4 py-3 text-xs border-r text-left">${e.position}</td><td class="px-4 py-3 text-xs border-r text-left">${e.joinDate}</td><td class="px-3 py-3 border-r bg-green-50/20">${e.leaves.available.AL}</td><td class="px-3 py-3 border-r bg-yellow-50/20">${e.leaves.available.SL}</td><td class="px-3 py-3 border-r bg-purple-50/20">${e.leaves.available.SP}</td><td class="px-3 py-3 border-r font-bold bg-green-50/20 ${rA}">${e.leaves.remaining.AL}</td><td class="px-3 py-3 border-r bg-yellow-50/20">${e.leaves.remaining.SL}</td><td class="px-3 py-3 border-r bg-purple-50/20">${e.leaves.remaining.SP}</td><td class="px-3 py-3 border-r font-bold ${uC}">${periodStats.UP>0?mobileDashboardFormatNumber(periodStats.UP):'-'}</td><td class="px-3 py-3 border-r font-bold ${l5C}">${e.totalLate5m>0?e.totalLate5m:'-'}</td><td class="px-3 py-3 font-bold ${l3C}">${e.totalLate3m>0?e.totalLate3m:'-'}</td>`; tb.appendChild(tr);
@@ -5199,7 +5379,7 @@
             const sf = document.getElementById('searchInput'); if (sf) sf.value = searchQuery;
             document.querySelectorAll('.status-checkbox').forEach(cb => cb.checked = selectedStatuses.includes(cb.value));
             const sl = document.getElementById('statusDropdownLabel');
-            if (sl) sl.innerText = selectedStatuses.length === 4 ? 'All Statuses' : (selectedStatuses.length === 0 ? 'None' : selectedStatuses.join(', '));
+            if (sl) sl.innerText = selectedStatuses.length === 5 ? 'All Statuses' : (selectedStatuses.length === 0 ? 'None' : selectedStatuses.join(', '));
         }
 
         function syncMobileDashboardFilterUI() {
@@ -6668,7 +6848,15 @@
                 if (ps.Late3m>0) flags.push(`<span class="mobile-staff-flag text-orange-700 bg-orange-50 border-orange-100">L30+ ${mobileDashboardFormatNumber(ps.Late3m)}</span>`);
                 if (isNoticePeriodStaff(e)) flags.push(`<span class="mobile-staff-flag text-amber-800 bg-amber-50 border-amber-200"><i class="fa-solid fa-hourglass-half mr-1"></i>Notice · Last Day ${formatStaffLastDay(e)}</span>`);
                 else if (!isEmploymentVisible(e)) flags.push(`<span class="mobile-staff-flag">${e.status}</span>`);
-                else if (e.isProbation) flags.push('<span class="mobile-staff-flag text-indigo-700 bg-indigo-50 border-indigo-100">Probation</span>');
+                else if (e.isProbation) {
+                    const pp = getProbationProjection(e);
+                    if (pp) {
+                        flags.push(`<span class="mobile-staff-flag text-indigo-700 bg-indigo-50 border-indigo-100"><i class="fa-solid fa-user-clock mr-1"></i>Probation · Ends ${pp.probationEndText}</span>`);
+                        flags.push(`<span class="mobile-staff-flag text-indigo-700 bg-indigo-50 border-indigo-100">After 3M: AL ${mobileDashboardFormatNumber(pp.AL)} · SL ${mobileDashboardFormatNumber(pp.SL)} · SP ${mobileDashboardFormatNumber(pp.SP)} @ 6M</span>`);
+                    } else {
+                        flags.push('<span class="mobile-staff-flag text-indigo-700 bg-indigo-50 border-indigo-100">Probation</span>');
+                    }
+                }
                 const cardWarningMeta = getStaffWarningHighestMeta(e.id, selectedDashboardYear);
                 const cardActionBreakdown = getStaffWarningBreakdown(e.id, selectedDashboardYear);
                 const cardWarningClass =
@@ -7324,10 +7512,30 @@
             window.currentModalEmployeeId = e?.id || window.currentModalEmployeeId || '';
             let avatarContent = staffPhotoImgHtml(e, 'w-full h-full object-cover', e.name || 'Avatar') || e.name[0];
             document.getElementById('modalAvatar').innerHTML = avatarContent;
-            document.getElementById('modalName').innerHTML=`${e.name} ${isNoticePeriodStaff(e) ? noticePeriodBadgeHtml(e,true) : ((e.status==='Resigned'||e.status==='Terminated')?`<span class="text-[9px] bg-red-100 text-red-700 px-1.5 rounded border">${e.status}</span>`:'')}`;
+            document.getElementById('modalName').innerHTML=`${e.name} ${
+                isNoticePeriodStaff(e) ? noticePeriodBadgeHtml(e,true) :
+                (isProbationStaff(e) ? probationBadgeHtml(e,true) :
+                ((e.status==='Resigned'||e.status==='Terminated')?`<span class="text-[9px] bg-red-100 text-red-700 px-1.5 rounded border">${e.status}</span>`:''))
+            }`;
             document.getElementById('modalId').innerText=e.displayId; document.getElementById('modalCompany').innerHTML=`${getCompanyLogo(e.company)} ${e.company}`;
             document.getElementById('modalPosition').innerText=e.position; document.getElementById('modalJoinDate').innerText=e.joinDate;
             const rS=document.getElementById('modalResignedSection'); if(e.status!=='Active'){rS.classList.remove('hidden'); document.getElementById('modalResignedDate').innerText=isNoticePeriodStaff(e)?`${formatStaffLastDay(e)} (Last Working Day)`: (e.resignedDate||'N/A'); document.getElementById('modalResignedReason').innerText=e.resignedReason||'N/A';} else rS.classList.add('hidden');
+
+            const probationSection = document.getElementById('modalProbationSection');
+            if (probationSection && isProbationStaff(e)) {
+                const pp = getProbationProjection(e);
+                if (pp) {
+                    probationSection.classList.remove('hidden');
+                    document.getElementById('modalProbationEnd').textContent = `Ends ${pp.probationEndText}`;
+                    document.getElementById('modalProbationDays').textContent = `${pp.daysRemaining} day${pp.daysRemaining===1?'':'s'} remaining`;
+                    document.getElementById('modalProbationAL').textContent = mobileDashboardFormatNumber(pp.AL);
+                    document.getElementById('modalProbationSL').textContent = mobileDashboardFormatNumber(pp.SL);
+                    document.getElementById('modalProbationSP').textContent = mobileDashboardFormatNumber(pp.SP);
+                    document.getElementById('modalProbationSPDate').textContent = `SP becomes eligible after 6 months: ${pp.spEligibleText}. Projected values use the same ${pp.targetYear} leave calculation rules.`;
+                }
+            } else if (probationSection) {
+                probationSection.classList.add('hidden');
+            }
 
             // Show the highest warning level recorded for the year inside the employee profile.
             const warningSection = document.getElementById('modalWarningSection');
@@ -9368,7 +9576,7 @@
    PWA SERVICE WORKER
    ========================================================== */
 
-console.log('Attendance build: 2026-09-17-notice-filter-v1');
+console.log('Attendance build: 2026-09-17-probation-details-v1');
 
 if ('serviceWorker' in navigator) {
 
