@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Attendance Dashboard</title>
-    <meta name="app-build" content="2026-09-17-report-watchlist-compact-font-v1">
+    <meta name="app-build" content="2026-09-17-report-bar-breakdown-no-twitch-v1">
     <!-- Photo mapping: Staff ID primary, Name/File Name fallback -->
         <!-- PWA -->
     <meta name="theme-color" content="#2563eb">
@@ -3308,6 +3308,223 @@
             background: #ffffff;
             overflow: hidden;
         }
+        #reportView .metric-leave-chart-controls {
+            display:flex;
+            flex-wrap:wrap;
+            align-items:center;
+            gap:6px;
+            padding:8px 12px;
+            border-bottom:1px solid #eef2f7;
+            background:#fff;
+        }
+        #reportView .metric-leave-type-btn {
+            display:inline-flex;
+            align-items:center;
+            gap:5px;
+            border:1px solid #e2e8f0;
+            background:#fff;
+            color:#64748b;
+            border-radius:999px;
+            padding:5px 8px;
+            font-size:8px;
+            font-weight:900;
+            cursor:pointer;
+        }
+        #reportView .metric-leave-type-btn.is-active {
+            background:#eff6ff;
+            color:#0f172a;
+            border-color:#93c5fd;
+            box-shadow: inset 0 0 0 1px rgba(59,130,246,.08);
+        }
+        #reportView .metric-leave-type-btn:not(.is-active) {
+            opacity:.45;
+            background:#f8fafc;
+        }
+        #reportView .metric-leave-type-btn:not(.is-active) .fa-check {
+            visibility:hidden;
+        }
+        #reportView .metric-leave-type-dot {
+            width:8px;
+            height:8px;
+            border-radius:2px;
+            flex:0 0 auto;
+        }
+        #reportView .metric-leave-type-dot.al { background:#3b82f6; }
+        #reportView .metric-leave-type-dot.sl { background:#14b8a6; }
+        #reportView .metric-leave-type-dot.sp { background:#a855f7; }
+        #reportView .metric-leave-type-dot.up { background:#fb7185; }
+
+        #reportView .metric-leave-total-strip {
+            display:grid;
+            grid-template-columns:repeat(4,minmax(0,1fr));
+            gap:8px;
+            padding:10px 12px;
+            border-bottom:1px solid #eef2f7;
+            background:#f8fafc;
+        }
+        #reportView .metric-leave-total-card {
+            border:1px solid #e2e8f0;
+            border-radius:9px;
+            background:#fff;
+            padding:8px 10px;
+        }
+        #reportView .metric-leave-total-card .k {
+            font-size:7px;
+            font-weight:900;
+            text-transform:uppercase;
+            color:#64748b;
+            letter-spacing:.3px;
+        }
+        #reportView .metric-leave-total-card .v {
+            margin-top:2px;
+            font-size:15px;
+            font-weight:900;
+            color:#0f172a;
+        }
+        #reportView .metric-leave-total-card.al { border-color:#bfdbfe; background:#f8fbff; }
+        #reportView .metric-leave-total-card.sl { border-color:#99f6e4; background:#f6fffd; }
+        #reportView .metric-leave-total-card.sp { border-color:#e9d5ff; background:#fcfaff; }
+        #reportView .metric-leave-total-card.up { border-color:#fecdd3; background:#fff9fa; }
+
+        #reportView .metric-month-cell .parts {
+            margin-top:4px;
+            display:flex;
+            justify-content:center;
+            gap:4px;
+            flex-wrap:wrap;
+            font-size:6px;
+            color:#94a3b8;
+            line-height:1.2;
+        }
+        #reportView .metric-month-cell .parts span {
+            white-space:nowrap;
+        }
+        @media(max-width:800px){
+            #reportView .metric-leave-total-strip { grid-template-columns:repeat(2,minmax(0,1fr)); }
+        }
+
+
+        #reportView .metric-stacked-track {
+            height:145px;
+            display:flex;
+            flex-direction:column-reverse;
+            justify-content:flex-start;
+            border-radius:6px 6px 3px 3px;
+            overflow:hidden;
+            background:
+                linear-gradient(to top, rgba(226,232,240,.5) 1px, transparent 1px);
+            background-size:100% 25%;
+        }
+        #reportView .metric-stacked-segment {
+            width:68%;
+            margin:0 auto;
+            min-height:0;
+        }
+        #reportView .metric-stacked-segment.al { background:#3b82f6; }
+        #reportView .metric-stacked-segment.sl { background:#14b8a6; }
+        #reportView .metric-stacked-segment.sp { background:#a855f7; }
+        #reportView .metric-stacked-segment.up { background:#fb7185; }
+
+        #reportView .metric-bar-wrap.breakdown-interactive {
+            cursor:pointer;
+            outline:none;
+        }
+        #reportView .metric-bar-wrap.breakdown-interactive:focus-visible {
+            border-radius:8px;
+            box-shadow:0 0 0 2px #93c5fd;
+        }
+        #reportView .metric-bar-wrap.breakdown-interactive.is-selected .metric-stacked-track {
+            box-shadow:0 0 0 2px #93c5fd;
+            border-radius:7px;
+        }
+
+        #reportView .metric-breakdown-panel {
+            margin:10px 12px 0;
+            min-height:84px;
+            border:1px solid #dbe3ec;
+            border-radius:10px;
+            background:#fff;
+            overflow:hidden;
+        }
+        #reportView .metric-breakdown-panel.hidden {
+            display:block !important;
+            visibility:visible !important;
+        }
+        #reportView .metric-breakdown-head {
+            padding:8px 10px;
+            background:#f8fafc;
+            border-bottom:1px solid #eef2f7;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:10px;
+        }
+        #reportView .metric-breakdown-title {
+            font-size:9px;
+            font-weight:900;
+            color:#0f172a;
+        }
+        #reportView .metric-breakdown-hint {
+            font-size:7px;
+            color:#94a3b8;
+            font-weight:700;
+        }
+        #reportView .metric-breakdown-grid {
+            display:grid;
+            grid-template-columns:repeat(5,minmax(0,1fr));
+        }
+        #reportView .metric-breakdown-cell {
+            padding:9px 10px;
+            border-right:1px solid #eef2f7;
+        }
+        #reportView .metric-breakdown-cell:last-child {
+            border-right:0;
+        }
+        #reportView .metric-breakdown-label {
+            display:flex;
+            align-items:center;
+            gap:5px;
+            font-size:7px;
+            font-weight:900;
+            color:#64748b;
+            text-transform:uppercase;
+            letter-spacing:.25px;
+        }
+        #reportView .metric-breakdown-dot {
+            width:8px;
+            height:8px;
+            border-radius:2px;
+            flex:0 0 auto;
+        }
+        #reportView .metric-breakdown-value {
+            margin-top:4px;
+            font-size:16px;
+            font-weight:900;
+            color:#0f172a;
+        }
+        #reportView .metric-breakdown-cell.total {
+            background:#f8fafc;
+        }
+        #reportView .metric-breakdown-placeholder {
+            min-height:52px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:10px;
+            font-size:9px;
+            color:#94a3b8;
+            font-weight:700;
+            text-align:center;
+        }
+        @media(max-width:800px){
+            #reportView .metric-breakdown-grid {
+                grid-template-columns:repeat(2,minmax(0,1fr));
+            }
+            #reportView .metric-breakdown-cell {
+                border-bottom:1px solid #eef2f7;
+            }
+        }
+
         #reportView .metric-chart-head {
             padding: 9px 11px;
             border-bottom: 1px solid #eef2f7;
@@ -3404,6 +3621,10 @@
             color: #2563eb;
             border-bottom-color: #2563eb;
         }
+        #reportView .metric-tab:first-child {
+            font-weight:900;
+        }
+
         #reportView .metric-kpi-grid {
             display: grid;
             grid-template-columns: repeat(4,minmax(0,1fr));
@@ -4244,8 +4465,45 @@
                 <div id="reportMetricKpis" class="metric-kpi-grid"></div>
                 <div class="metric-chart-card">
                     <div class="metric-chart-head">
-                        <span><i class="fa-solid fa-chart-column text-blue-500 mr-1.5"></i>Monthly Usage</span>
+                        <span><i class="fa-solid fa-chart-column text-blue-500 mr-1.5"></i><span id="reportMetricChartTitle">Monthly Usage</span></span>
                         <span id="reportMetricChartTotal" class="text-[8px] text-slate-400"></span>
+                    </div>
+                    <div id="reportMetricLeaveChartControls" class="metric-leave-chart-controls">
+                        <div class="w-full flex items-center justify-between gap-2 mb-1">
+                            <div>
+                                <div class="text-[9px] font-extrabold text-blue-700 uppercase tracking-wide">
+                                    <i class="fa-solid fa-layer-group mr-1"></i>Leave Type Chart Filter
+                                </div>
+                                <div class="text-[8px] text-slate-400 mt-0.5">Select one or multiple leave types. All are selected by default.</div>
+                            </div>
+                            <span class="inline-flex items-center rounded-full border border-emerald-100 bg-emerald-50 px-2 py-1 text-[7px] font-extrabold text-emerald-700">MULTI LEAVE v2</span>
+                        </div>
+
+                        <button type="button" class="metric-leave-type-btn is-active" data-leave-type="AL" onclick="toggleReportMetricLeaveType('AL')">
+                            <span class="metric-leave-type-dot al"></span><span>AL</span><i class="fa-solid fa-check text-[7px]"></i>
+                        </button>
+                        <button type="button" class="metric-leave-type-btn is-active" data-leave-type="SL" onclick="toggleReportMetricLeaveType('SL')">
+                            <span class="metric-leave-type-dot sl"></span><span>SL</span><i class="fa-solid fa-check text-[7px]"></i>
+                        </button>
+                        <button type="button" class="metric-leave-type-btn is-active" data-leave-type="SP" onclick="toggleReportMetricLeaveType('SP')">
+                            <span class="metric-leave-type-dot sp"></span><span>SP</span><i class="fa-solid fa-check text-[7px]"></i>
+                        </button>
+                        <button type="button" class="metric-leave-type-btn is-active" data-leave-type="UP" onclick="toggleReportMetricLeaveType('UP')">
+                            <span class="metric-leave-type-dot up"></span><span>UP</span><i class="fa-solid fa-check text-[7px]"></i>
+                        </button>
+
+                        <span id="reportMetricLeaveTypeCount" class="ml-auto text-[8px] font-bold text-slate-500">4 selected</span>
+                        <button type="button" class="metric-leave-type-btn" onclick="selectAllReportMetricLeaveTypes()">
+                            <i class="fa-solid fa-check-double"></i> Select All
+                        </button>
+                    </div>
+                    <div id="reportMetricLeaveTotals" class="metric-leave-total-strip"></div>
+                    <div id="reportMetricBarBreakdownPanel" class="metric-breakdown-panel">
+                        <div class="metric-breakdown-head">
+                            <div id="reportMetricBarBreakdownTitle" class="metric-breakdown-title">Month Breakdown</div>
+                            <div class="metric-breakdown-hint">Hover to preview • Click to pin</div>
+                        </div>
+                        <div id="reportMetricBarBreakdownGrid" class="metric-breakdown-placeholder">Hover or click a month bar to see AL, SL, SP, UP and Total.</div>
                     </div>
                     <div id="reportMetricChart" class="metric-bar-chart"></div>
                 </div>
@@ -4853,7 +5111,7 @@
         let selectedCompanies = []; let selectedCalendarCompanies = []; let selectedDailyCompanies = []; let selectedCalendarRowCompany = 'ITC'; let selectedCalendarRowDepartments = null; let selectedCalendarRowMonth = new Date().getMonth(); let selectedCalendarRowYear = new Date().getFullYear(); const attendanceDataYear = new Date().getFullYear();
         let selectedDepartments = null; // null = all departments; otherwise array of selected department names
         let selectedStatuses = ['Active']; let selectedDashboardYear = attendanceDataYear; let selectedDashboardMonth = 'All'; let selectedDashboardWarning = 'All'; let searchQuery = ''; let dailySearchQuery = '';
-        let reportMode='monthly'; let reportSubtab='warnings'; let reportInitialized=false; let selectedReportCompanies=[]; let reportMetricFocus=null; let reportDetailScrollBeforeEmployee=0; let employeeModalOriginalParent=null; let employeeModalOriginalNextSibling=null; let reportSearchQuery=''; let reportMetricSearchQuery=''; let reportMetricDepartment='All'; let reportMetricCompany='All'; let reportEmployeeMetricStandalone=false; let reportEmployeeMetricOriginalParent=null; let reportEmployeeMetricOriginalNextSibling=null;
+        let reportMode='monthly'; let reportSubtab='warnings'; let reportInitialized=false; let selectedReportCompanies=[]; let reportMetricFocus=null; let reportDetailScrollBeforeEmployee=0; let employeeModalOriginalParent=null; let employeeModalOriginalNextSibling=null; let reportSearchQuery=''; let reportMetricSearchQuery=''; let reportMetricDepartment='All'; let reportMetricCompany='All'; let reportMetricChartLeaveTypes=new Set(['AL','SL','SP','UP']); let reportEmployeeMetricStandalone=false; let reportEmployeeMetricOriginalParent=null; let reportEmployeeMetricOriginalNextSibling=null;
         let currentSortColumn = 'id'; let isSortAscending = true;
         let leaveHistoryByEmployee = {}; let dailyLeaveRecords = []; let currentDailyGroupedData = {}; 
         let currentCalendarDate = new Date(); let selectedCalendarDate = new Date().getDate();
@@ -8832,7 +9090,7 @@
             const totalUsed=monthData.reduce((n,m)=>n+m.total,0);
 
             let available=0,remaining=0;
-            if(key==='utilization'){
+            if(key==='utilization'||key==='allLeave'){
                 available=Number(emp.leaves?.available?.AL||0)+Number(emp.leaves?.available?.SL||0)+Number(emp.leaves?.available?.SP||0);
                 remaining=Number(emp.leaves?.remaining?.AL||0)+Number(emp.leaves?.remaining?.SL||0)+Number(emp.leaves?.remaining?.SP||0);
             }else if(['AL','SL','SP'].includes(key)){
@@ -8862,7 +9120,9 @@
             const selectedNote=document.getElementById('reportEmployeeSelectedMetricNote');
             if(selectedNote){
                 selectedNote.classList.remove('hidden');
-                if(meta.kind==='leave'){
+                if(meta.kind==='allLeave'){
+                    selectedNote.textContent=`Viewing All Leave Types: ${mobileDashboardFormatNumber(totalUsed)} used in ${data.period.label} (AL + SL + SP + UP).`;
+                }else if(meta.kind==='leave'){
                     selectedNote.textContent=`Viewing ${meta.label}: ${mobileDashboardFormatNumber(totalUsed)} used in ${data.period.label}.`;
                 }else if(meta.kind==='utilization'){
                     selectedNote.textContent=`Viewing Paid Leave Utilization: ${mobileDashboardFormatNumber(totalUsed)} paid leave used (AL + SL + SP) in ${data.period.label}.`;
@@ -9042,6 +9302,7 @@
         };
 
         const reportMetricMeta={
+            allLeave:{label:'All Leave Types',short:'All Types',kind:'allLeave'},
             AL:{label:'Annual Leave (AL)',short:'AL',kind:'leave',availableKey:'AL'},
             SL:{label:'Sick Leave (SL)',short:'SL',kind:'leave',availableKey:'SL'},
             SP:{label:'Special Leave (SP)',short:'SP',kind:'leave',availableKey:'SP'},
@@ -9053,6 +9314,7 @@
         function reportMetricValueFromRecord(r,key){
             const l=r?.leaves||{};
             if(key==='late') return Number(l.Late5m||0)+Number(l.Late3m||0);
+            if(key==='allLeave') return Number(l.AL||0)+Number(l.SL||0)+Number(l.SP||0)+Number(l.UP||0);
             if(key==='utilization') return Number(l.AL||0)+Number(l.SL||0)+Number(l.SP||0);
             return Number(l[key]||0);
         }
@@ -9060,10 +9322,10 @@
         function reportMetricEmployeeStats(data,key){
             const map={};
             data.scopeEmployees.forEach(emp=>{
-                const available=key==='utilization'
+                const available=(key==='utilization'||key==='allLeave')
                     ? Number(emp.leaves?.available?.AL||0)+Number(emp.leaves?.available?.SL||0)+Number(emp.leaves?.available?.SP||0)
                     : ['AL','SL','SP'].includes(key)?Number(emp.leaves?.available?.[key]||0):0;
-                const remaining=key==='utilization'
+                const remaining=(key==='utilization'||key==='allLeave')
                     ? Number(emp.leaves?.remaining?.AL||0)+Number(emp.leaves?.remaining?.SL||0)+Number(emp.leaves?.remaining?.SP||0)
                     : ['AL','SL','SP'].includes(key)?Number(emp.leaves?.remaining?.[key]||0):0;
                 map[emp.id]={emp,used:0,available,remaining,dates:[]};
@@ -9091,12 +9353,154 @@
             return vals;
         }
 
+
+
+
+        let reportMetricPinnedMonth=null;
+        let reportMetricCurrentStackedMonths=[];
+
+        function resetReportMetricBarBreakdownPanel(){
+            const panel=document.getElementById('reportMetricBarBreakdownPanel');
+            const title=document.getElementById('reportMetricBarBreakdownTitle');
+            const grid=document.getElementById('reportMetricBarBreakdownGrid');
+            if(!panel || !title || !grid) return;
+
+            panel.classList.remove('hidden');
+            title.textContent='Month Breakdown';
+            grid.className='metric-breakdown-placeholder';
+            grid.textContent='Hover or click a month bar to see AL, SL, SP, UP and Total.';
+
+            document.querySelectorAll('#reportMetricChart .metric-bar-wrap').forEach((el,i)=>{
+                el.classList.toggle('is-selected',reportMetricPinnedMonth===i);
+            });
+        }
+
+        function renderReportMetricBarBreakdown(monthIndex,pinned=false){
+            const panel=document.getElementById('reportMetricBarBreakdownPanel');
+            const title=document.getElementById('reportMetricBarBreakdownTitle');
+            const grid=document.getElementById('reportMetricBarBreakdownGrid');
+            const m=reportMetricCurrentStackedMonths?.[monthIndex];
+            if(!panel || !title || !grid || !m) return;
+
+            panel.classList.remove('hidden');
+            title.textContent=`${monthNames[monthIndex]} Leave Breakdown${pinned?' • Pinned':''}`;
+            grid.className='metric-breakdown-grid';
+
+            const rows=[
+                ['AL','Annual Leave','#3b82f6',m.AL],
+                ['SL','Sick Leave','#14b8a6',m.SL],
+                ['SP','Special Leave','#a855f7',m.SP],
+                ['UP','Unpaid Leave','#fb7185',m.UP],
+                ['Total','Selected Total','#64748b',m.total]
+            ];
+
+            grid.innerHTML=rows.map(([code,label,color,value],i)=>`<div class="metric-breakdown-cell ${i===4?'total':''}">
+                <div class="metric-breakdown-label">
+                    <span class="metric-breakdown-dot" style="background:${color}"></span>
+                    ${code} · ${label}
+                </div>
+                <div class="metric-breakdown-value">${mobileDashboardFormatNumber(value||0)}</div>
+            </div>`).join('');
+
+            document.querySelectorAll('#reportMetricChart .metric-bar-wrap').forEach((el,i)=>{
+                el.classList.toggle('is-selected',reportMetricPinnedMonth===i);
+            });
+        }
+
+        window.previewReportMetricBarBreakdown=function(monthIndex){
+            if(reportMetricPinnedMonth!==null) return;
+            renderReportMetricBarBreakdown(monthIndex,false);
+        };
+
+        window.clearReportMetricBarBreakdownPreview=function(){
+            if(reportMetricPinnedMonth!==null) return;
+            resetReportMetricBarBreakdownPanel();
+        };
+
+        window.pinReportMetricBarBreakdown=function(event,monthIndex){
+            event.stopPropagation();
+            reportMetricPinnedMonth=(reportMetricPinnedMonth===monthIndex)?null:monthIndex;
+
+            if(reportMetricPinnedMonth===null){
+                resetReportMetricBarBreakdownPanel();
+            }else{
+                renderReportMetricBarBreakdown(reportMetricPinnedMonth,true);
+            }
+        };
+
+        function reportMetricLeaveTypeTotals(data){
+            const totals={AL:0,SL:0,SP:0,UP:0};
+            (data.aRecords||[]).forEach(r=>{
+                const l=r.leaves||{};
+                totals.AL+=Number(l.AL||0);
+                totals.SL+=Number(l.SL||0);
+                totals.SP+=Number(l.SP||0);
+                totals.UP+=Number(l.UP||0);
+            });
+            return totals;
+        }
+
+        function reportMetricLeaveTypeMonthData(data){
+            const months=Array.from({length:12},(_,i)=>({month:i,AL:0,SL:0,SP:0,UP:0,total:0}));
+            (data.aRecords||[]).forEach(r=>{
+                const d=reportRecordDate(r);
+                if(!d) return;
+                const l=r.leaves||{};
+                const m=months[d.getMonth()];
+                m.AL+=Number(l.AL||0);
+                m.SL+=Number(l.SL||0);
+                m.SP+=Number(l.SP||0);
+                m.UP+=Number(l.UP||0);
+            });
+            months.forEach(m=>{
+                m.total=['AL','SL','SP','UP']
+                    .filter(k=>reportMetricChartLeaveTypes.has(k))
+                    .reduce((n,k)=>n+Number(m[k]||0),0);
+            });
+            return months;
+        }
+
+        window.toggleReportMetricLeaveType=function(type){
+            if(!['AL','SL','SP','UP'].includes(type)) return;
+            if(reportMetricChartLeaveTypes.has(type)){
+                if(reportMetricChartLeaveTypes.size===1) return; // always keep at least one selected
+                reportMetricChartLeaveTypes.delete(type);
+            }else{
+                reportMetricChartLeaveTypes.add(type);
+            }
+            const data=getReportData();
+            renderReportMetricDetail(data);
+        };
+
+        window.selectAllReportMetricLeaveTypes=function(){
+            reportMetricChartLeaveTypes=new Set(['AL','SL','SP','UP']);
+            const data=getReportData();
+            renderReportMetricDetail(data);
+        };
+
+        function syncReportMetricLeaveChartControls(){
+            document.querySelectorAll('#reportMetricLeaveChartControls [data-leave-type]').forEach(btn=>{
+                btn.classList.toggle('is-active',reportMetricChartLeaveTypes.has(btn.dataset.leaveType));
+            });
+            const count=document.getElementById('reportMetricLeaveTypeCount');
+            if(count) count.textContent=`${reportMetricChartLeaveTypes.size} selected`;
+        }
+
         window.setReportMetricFocus=function(key){
             if(!reportMetricMeta[key])return;
             reportMetricFocus=key;
             reportMetricSearchQuery='';
             reportMetricDepartment='All';
             reportMetricCompany='All';
+
+            // Top tabs now control the chart selection too.
+            // All Types = AL + SL + SP + UP.
+            // Individual leave tab = only that leave type.
+            // Paid Utilization = paid leave types only.
+            if(key==='allLeave') reportMetricChartLeaveTypes=new Set(['AL','SL','SP','UP']);
+            else if(['AL','SL','SP','UP'].includes(key)) reportMetricChartLeaveTypes=new Set([key]);
+            else if(key==='utilization') reportMetricChartLeaveTypes=new Set(['AL','SL','SP']);
+            else reportMetricChartLeaveTypes=new Set(['AL','SL','SP','UP']);
             const metricSearch=document.getElementById('reportMetricSearchInput'); if(metricSearch) metricSearch.value='';
             document.getElementById('reportMetricSearchClear')?.classList.add('hidden');
             const data=getReportData();
@@ -9136,7 +9540,7 @@
             const title=document.getElementById('reportMetricTitle');
             const subtitle=document.getElementById('reportMetricSubtitle');
             if(title)title.textContent=`${meta.label} Detail`;
-            if(subtitle)subtitle.textContent=`Focused analysis for ${data.period.label} using the selected companies and department.`;
+            if(subtitle)subtitle.textContent=`Focused analysis for ${data.period.label} using the selected companies and department.${key==='late'?'':' Top leave tabs change the chart selection; chart filter still supports multi-select.'}`;
 
             const tabs=document.getElementById('reportMetricTabs');
             if(tabs)tabs.innerHTML=Object.entries(reportMetricMeta).map(([k,m])=>`<button type="button" class="metric-tab ${k===key?'is-active':''}" onclick="setReportMetricFocus('${k}')">${m.short}</button>`).join('');
@@ -9158,7 +9562,14 @@
             const utilization=totalAvailable>0?totalUsed/totalAvailable*100:0;
 
             let kpis=[];
-            if(meta.kind==='leave'){
+            if(meta.kind==='allLeave'){
+                kpis=[
+                    ['All Leave Used',mobileDashboardFormatNumber(totalUsed),'AL + SL + SP + UP'],
+                    ['Employees Affected',employeeCount,`of ${stats.length} staff`],
+                    ['Average per User',mobileDashboardFormatNumber(avg),'among users'],
+                    ['Paid Leave Available',mobileDashboardFormatNumber(totalAvailable),`Paid remaining ${mobileDashboardFormatNumber(totalRemaining)}`]
+                ];
+            }else if(meta.kind==='leave'){
                 kpis=[
                     ['Used in Period',mobileDashboardFormatNumber(totalUsed),meta.short+' days'],
                     ['Employees Used',employeeCount,`of ${stats.length} staff`],
@@ -9185,23 +9596,111 @@
 
             const monthVals=reportMetricMonthTotals(data,key);
             const monthBox=document.getElementById('reportMetricMonths');
-            if(monthBox)monthBox.innerHTML=monthNames.map((m,i)=>`<div class="metric-month-cell"><div class="m">${m.slice(0,3)}</div><div class="v">${mobileDashboardFormatNumber(monthVals[i])}</div></div>`).join('');
 
             const chart=document.getElementById('reportMetricChart');
             const chartTotal=document.getElementById('reportMetricChartTotal');
-            const maxMonth=Math.max(...monthVals,0);
-            const monthTotal=monthVals.reduce((a,b)=>a+b,0);
-            if(chartTotal)chartTotal.textContent=`Total ${mobileDashboardFormatNumber(monthTotal)}`;
-            if(chart){
-                chart.innerHTML=monthNames.map((m,i)=>{
-                    const v=Number(monthVals[i]||0);
-                    const pct=maxMonth>0?Math.max(v>0?4:0,(v/maxMonth)*100):0;
-                    return `<div class="metric-bar-wrap" title="${reportEscapeHtml(m)}: ${mobileDashboardFormatNumber(v)}">
-                        <div class="metric-bar-value">${mobileDashboardFormatNumber(v)}</div>
-                        <div class="metric-bar-track"><div class="metric-bar" style="height:${pct}%"></div></div>
-                        <div class="metric-bar-label">${m.slice(0,3)}</div>
-                    </div>`;
-                }).join('');
+            const chartTitle=document.getElementById('reportMetricChartTitle');
+            const leaveControls=document.getElementById('reportMetricLeaveChartControls');
+
+            if(key==='late'){
+                if(leaveControls) leaveControls.classList.add('hidden');
+                const totalsBox=document.getElementById('reportMetricLeaveTotals');
+                if(totalsBox) totalsBox.classList.add('hidden');
+                reportMetricPinnedMonth=null;
+                const breakdownTitle=document.getElementById('reportMetricBarBreakdownTitle');
+                const breakdownGrid=document.getElementById('reportMetricBarBreakdownGrid');
+                if(breakdownTitle) breakdownTitle.textContent='Month Breakdown';
+                if(breakdownGrid){
+                    breakdownGrid.className='metric-breakdown-placeholder';
+                    breakdownGrid.textContent='Leave-type breakdown is available for All Types, AL, SL, SP, UP and Paid Utilization.';
+                }
+                if(chartTitle) chartTitle.textContent='Monthly Usage';
+                if(monthBox) monthBox.innerHTML=monthNames.map((m,i)=>`<div class="metric-month-cell"><div class="m">${m.slice(0,3)}</div><div class="v">${mobileDashboardFormatNumber(monthVals[i])}</div></div>`).join('');
+
+                const maxMonth=Math.max(...monthVals,0);
+                const monthTotal=monthVals.reduce((a,b)=>a+b,0);
+                if(chartTotal) chartTotal.textContent=`Total ${mobileDashboardFormatNumber(monthTotal)}`;
+
+                if(chart){
+                    chart.innerHTML=monthNames.map((m,i)=>{
+                        const v=Number(monthVals[i]||0);
+                        const pct=maxMonth>0?Math.max(v>0?4:0,(v/maxMonth)*100):0;
+                        return `<div class="metric-bar-wrap" title="${reportEscapeHtml(m)}: ${mobileDashboardFormatNumber(v)}">
+                            <div class="metric-bar-value">${mobileDashboardFormatNumber(v)}</div>
+                            <div class="metric-bar-track"><div class="metric-bar" style="height:${pct}%"></div></div>
+                            <div class="metric-bar-label">${m.slice(0,3)}</div>
+                        </div>`;
+                    }).join('');
+                }
+            }else{
+                if(leaveControls) leaveControls.classList.remove('hidden');
+                const totalsBox=document.getElementById('reportMetricLeaveTotals');
+                if(totalsBox) totalsBox.classList.remove('hidden');
+                syncReportMetricLeaveChartControls();
+
+                const stacked=reportMetricLeaveTypeMonthData(data);
+                reportMetricCurrentStackedMonths=stacked;
+                reportMetricPinnedMonth=null;
+                resetReportMetricBarBreakdownPanel();
+                const typeTotals=reportMetricLeaveTypeTotals(data);
+                const maxMonth=Math.max(...stacked.map(m=>m.total),0);
+                const allTotal=stacked.reduce((n,m)=>n+m.total,0);
+                const selected=Array.from(reportMetricChartLeaveTypes);
+
+                if(chartTitle) chartTitle.textContent='Monthly Leave Usage by Type';
+                if(chartTotal) chartTotal.textContent=`Selected ${selected.join(' + ')} • Total ${mobileDashboardFormatNumber(allTotal)}`;
+
+                if(totalsBox){
+                    const cards=[
+                        ['AL','Annual Leave','al'],
+                        ['SL','Sick Leave','sl'],
+                        ['SP','Special Leave','sp'],
+                        ['UP','Unpaid Leave','up']
+                    ];
+                    totalsBox.innerHTML=cards.map(([code,label,cls])=>`<div class="metric-leave-total-card ${cls}">
+                        <div class="k">${code} · ${label}</div>
+                        <div class="v">${mobileDashboardFormatNumber(typeTotals[code]||0)}</div>
+                    </div>`).join('');
+                }
+
+                if(monthBox){
+                    monthBox.innerHTML=monthNames.map((m,i)=>{
+                        const x=stacked[i];
+                        return `<div class="metric-month-cell">
+                            <div class="m">${m.slice(0,3)}</div>
+                            <div class="v">${mobileDashboardFormatNumber(x.total)}</div>
+                            <div class="parts">
+                                ${x.AL?`<span>AL ${mobileDashboardFormatNumber(x.AL)}</span>`:''}
+                                ${x.SL?`<span>SL ${mobileDashboardFormatNumber(x.SL)}</span>`:''}
+                                ${x.SP?`<span>SP ${mobileDashboardFormatNumber(x.SP)}</span>`:''}
+                                ${x.UP?`<span>UP ${mobileDashboardFormatNumber(x.UP)}</span>`:''}
+                            </div>
+                        </div>`;
+                    }).join('');
+                }
+
+                if(chart){
+                    chart.innerHTML=stacked.map(m=>{
+                        const totalPct=maxMonth>0?(m.total/maxMonth)*100:0;
+                        const segHeight=v=>m.total>0?(v/m.total)*totalPct:0;
+                        const title=`${monthNames[m.month]} — AL ${mobileDashboardFormatNumber(m.AL)}, SL ${mobileDashboardFormatNumber(m.SL)}, SP ${mobileDashboardFormatNumber(m.SP)}, UP ${mobileDashboardFormatNumber(m.UP)}`;
+                        return `<div class="metric-bar-wrap breakdown-interactive" tabindex="0" role="button" aria-label="${reportEscapeHtml(title)}"
+                            onmouseenter="previewReportMetricBarBreakdown(${m.month})"
+                            onmouseleave="clearReportMetricBarBreakdownPreview()"
+                            onfocus="previewReportMetricBarBreakdown(${m.month})"
+                            onblur="clearReportMetricBarBreakdownPreview()"
+                            onclick="pinReportMetricBarBreakdown(event,${m.month})">
+                            <div class="metric-bar-value">${mobileDashboardFormatNumber(m.total)}</div>
+                            <div class="metric-stacked-track">
+                                ${reportMetricChartLeaveTypes.has('AL')?`<div class="metric-stacked-segment al" style="height:${segHeight(m.AL)}%"></div>`:''}
+                                ${reportMetricChartLeaveTypes.has('SL')?`<div class="metric-stacked-segment sl" style="height:${segHeight(m.SL)}%"></div>`:''}
+                                ${reportMetricChartLeaveTypes.has('SP')?`<div class="metric-stacked-segment sp" style="height:${segHeight(m.SP)}%"></div>`:''}
+                                ${reportMetricChartLeaveTypes.has('UP')?`<div class="metric-stacked-segment up" style="height:${segHeight(m.UP)}%"></div>`:''}
+                            </div>
+                            <div class="metric-bar-label">${monthNames[m.month].slice(0,3)}</div>
+                        </div>`;
+                    }).join('');
+                }
             }
 
             const companyBox=document.getElementById('reportMetricCompanyBreakdown');
@@ -12516,7 +13015,7 @@
    PWA SERVICE WORKER
    ========================================================== */
 
-console.log('Attendance build: 2026-09-17-report-watchlist-compact-font-v1');
+console.log('Attendance build: 2026-09-17-report-bar-breakdown-no-twitch-v1');
 
 if ('serviceWorker' in navigator) {
 
