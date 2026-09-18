@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Attendance Dashboard</title>
-    <meta name="app-build" content="2026-09-17-report-bar-breakdown-no-twitch-v1">
+    <meta name="app-build" content="2026-09-18-scan-onleave-present-swapped-v1">
     <!-- Photo mapping: Staff ID primary, Name/File Name fallback -->
         <!-- PWA -->
     <meta name="theme-color" content="#2563eb">
@@ -611,6 +611,18 @@
         #scanView .icon-total { background: #eff6ff; color: #2563eb; }
         #scanView .icon-present { background: #dcfce7; color: #16a34a; }
         #scanView .icon-dayoff { background: #fef3c7; color: #b45309; }
+        #scanView .card-content .subline {
+            margin-top:4px;
+            font-size:8px;
+            line-height:1.25;
+            color:#94a3b8;
+            font-weight:600;
+            white-space:normal;
+        }
+        #scanView .card-content .subline strong {
+            color:#64748b;
+            font-weight:800;
+        }
         #scanView .icon-ontime { background: #f0fdf4; color: #15803d; }
         #scanView .icon-late5 { background: #ffedd5; color: #c2410c; }
         #scanView .icon-late30 { background: #fee2e2; color: #b91c1c; }
@@ -637,6 +649,52 @@
         #scanView .scan-summary-clickable:hover { transform:translateY(-2px); box-shadow:0 4px 12px rgba(15,23,42,.08); }
         #scanView .scan-status-profile { border:1px solid #e2e8f0; border-radius:14px; padding:12px; display:flex; gap:10px; align-items:center; cursor:pointer; background:#fff; }
         #scanView .scan-status-profile:hover { background:#f8fafc; }
+
+        /* Scan Activity KPI row: keep all summary cards on one desktop row. */
+        @media (min-width: 901px) {
+            #scanView .summary-bar {
+                grid-template-columns: repeat(9, minmax(0, 1fr)) !important;
+                gap: 8px !important;
+                align-items: stretch;
+            }
+            #scanView .scan-status-frame {
+                display: contents !important;
+            }
+            #scanView .summary-bar .card {
+                min-width: 0;
+                min-height: 74px;
+                padding: 10px 8px;
+                gap: 7px;
+            }
+            #scanView .summary-bar .card-icon {
+                width: 30px;
+                height: 30px;
+                flex-basis: 30px;
+                border-radius: 8px;
+            }
+            #scanView .summary-bar .card-icon::before {
+                font-size: 11px;
+            }
+            #scanView .summary-bar .card-content {
+                min-width: 0;
+            }
+            #scanView .summary-bar .card-content .title {
+                font-size: 9px;
+                line-height: 1.15;
+                letter-spacing: .15px;
+                white-space: normal;
+            }
+            #scanView .summary-bar .card-content .val {
+                font-size: 19px;
+                margin-top: 2px;
+            }
+            #scanView .summary-bar .card-content .subline,
+            #scanView .summary-bar .text-\[8px\] {
+                font-size: 7px !important;
+                line-height: 1.15;
+            }
+        }
+
         @media (max-width:700px) {
           #scanView .dashboard-header-card { border-radius:10px; padding:12px; }
           #scanView .header-title-group h1 { font-size:18px; }
@@ -3773,6 +3831,145 @@
         }
 
 </style>
+
+<style id="scan-kpi-one-row-v2">
+/* Final Scan Activity KPI layout override.
+   Desktop/tablet: 8 KPI cards in one continuous row. Narrow screens may scroll horizontally. */
+@media (min-width: 701px) {
+  #scanView .summary-bar {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: stretch !important;
+    gap: 7px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    padding-bottom: 2px !important;
+  }
+
+  #scanView .scan-status-frame {
+    display: contents !important;
+  }
+
+  #scanView .summary-bar > .card,
+  #scanView .scan-status-frame > .card {
+    flex: 1 1 0 !important;
+    min-width: 108px !important;
+    max-width: none !important;
+    min-height: 72px !important;
+    padding: 9px 7px !important;
+    gap: 6px !important;
+    box-sizing: border-box !important;
+  }
+
+  #scanView .summary-bar .card-icon {
+    width: 28px !important;
+    height: 28px !important;
+    flex: 0 0 28px !important;
+    border-radius: 7px !important;
+  }
+
+  #scanView .summary-bar .card-icon::before {
+    font-size: 10px !important;
+  }
+
+  #scanView .summary-bar .card-content {
+    min-width: 0 !important;
+  }
+
+  #scanView .summary-bar .card-content .title {
+    font-size: 8px !important;
+    line-height: 1.1 !important;
+    letter-spacing: 0 !important;
+    white-space: normal !important;
+  }
+
+  #scanView .summary-bar .card-content .val {
+    font-size: 18px !important;
+    line-height: 1 !important;
+    margin-top: 2px !important;
+  }
+
+  #scanView .summary-bar .card-content .subline,
+  #scanView .summary-bar .text-\[8px\] {
+    font-size: 6.5px !important;
+    line-height: 1.15 !important;
+  }
+}
+</style>
+
+
+<style id="scan-kpi-readability-v1">
+@media (min-width: 701px) {
+  #scanView .summary-bar > .card,
+  #scanView .scan-status-frame > .card {
+    min-height: 78px !important;
+    padding: 10px 9px !important;
+    gap: 7px !important;
+  }
+
+  #scanView .summary-bar .card-icon {
+    width: 31px !important;
+    height: 31px !important;
+    flex: 0 0 31px !important;
+  }
+
+  #scanView .summary-bar .card-icon::before {
+    font-size: 11px !important;
+  }
+
+  #scanView .summary-bar .card-content .title {
+    font-size: 9px !important;
+    line-height: 1.15 !important;
+    font-weight: 700 !important;
+    letter-spacing: .08px !important;
+  }
+
+  #scanView .summary-bar .card-content .val {
+    font-size: 21px !important;
+    line-height: 1 !important;
+    font-weight: 800 !important;
+    margin-top: 3px !important;
+  }
+
+  #scanView .summary-bar .card-content .subline,
+  #scanView .summary-bar .text-\[8px\] {
+    font-size: 7.5px !important;
+    line-height: 1.2 !important;
+    font-weight: 600 !important;
+  }
+}
+</style>
+
+
+<style id="scan-present-am-reference-v2">
+#scanView .scan-am-badge {
+  display:inline-flex;
+  align-items:center;
+  gap:3px;
+  margin-bottom:1px;
+  padding:3px 6px;
+  border:1px solid #bfdbfe;
+  border-radius:999px;
+  background:#eff6ff;
+  color:#1d4ed8;
+  white-space:nowrap;
+}
+#scanView .scan-am-badge.hidden {
+  display:none !important;
+}
+#scanView .scan-am-badge-label {
+  font-size:7px;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:.2px;
+}
+#scanView .scan-am-badge-value {
+  font-size:11px;
+  line-height:1;
+  font-weight:900;
+}
+</style>
+
 </head>
 <body class="text-slate-800 h-screen flex flex-col" data-active-tab="daily">
 <!-- Global Loading Screen -->
@@ -4670,6 +4867,7 @@
             </section>
         </div>
 
+<!-- SCAN PRESENT AM REFERENCE V2: afternoon Present Now + AM badge -->
 <div id="scanView" class="hidden">
 
 <div class="container">
@@ -4698,32 +4896,44 @@
     <div class="card">
       <div class="card-icon icon-total">👥</div>
       <div class="card-content">
-        <div class="title">Total Active Staff</div>
-        <div class="val" id="cntTotal">0</div>
+        <div class="title scan-kpi-title">Total Active Staff</div>
+        <div class="val scan-kpi-value" id="cntTotal">0</div>
+        <div class="subline scan-kpi-subline">All currently active staff</div>
       </div>
     </div>
 
     <div class="card scan-summary-clickable" onclick="openScanStatusPanel('dayOff')">
       <div class="card-icon icon-dayoff">🛏️</div>
       <div class="card-content">
-        <div class="title">Day Off</div>
-        <div class="val" id="cntDayOff">0</div>
+        <div class="title scan-kpi-title">Day Off</div>
+        <div class="val scan-kpi-value" id="cntDayOff">0</div>
+        <div class="subline scan-kpi-subline" id="cntDayOffDetail">0 Full • 0 Half</div>
+      </div>
+    </div>
+
+
+    <div class="card scan-summary-clickable" onclick="openScanStatusPanel('leave')">
+      <div class="card-icon icon-pending">🏖️</div>
+      <div class="card-content">
+        <div class="title scan-kpi-title">On Leave</div>
+        <div class="val scan-kpi-value" id="cntLeave">0</div>
+        <div class="subline scan-kpi-subline" id="cntLeaveDetail">0 Full • 0 Half</div>
+        <div class="subline scan-kpi-subline" id="cntLeaveNowDetail"><strong>Now: 0 staff</strong></div>
       </div>
     </div>
 
     <div class="card">
       <div class="card-icon icon-present">✅</div>
       <div class="card-content">
-        <div class="title">Present</div>
-        <div class="val" id="cntPresent">0</div>
-      </div>
-    </div>
-
-    <div class="card scan-summary-clickable" onclick="openScanStatusPanel('leave')">
-      <div class="card-icon icon-pending">🏖️</div>
-      <div class="card-content">
-        <div class="title">On Leave</div>
-        <div class="val" id="cntLeave">0</div>
+        <div class="title scan-kpi-title">Present Now</div>
+        <div class="flex items-end gap-2">
+          <div class="val scan-kpi-value" id="cntPresent">0</div>
+          <div id="cntMorningPresentBadge" class="scan-am-badge hidden">
+            <span class="scan-am-badge-label">AM</span>
+            <span class="scan-am-badge-value" id="cntMorningPresentValue">0</span>
+          </div>
+        </div>
+        <div class="subline scan-kpi-subline" id="cntPresentDetail">Current shift • adjusted for leave</div>
       </div>
     </div>
 
@@ -4731,33 +4941,34 @@
       <div class="card">
         <div class="card-icon icon-ontime">🕒</div>
         <div class="card-content">
-          <div class="title">On Time</div>
-          <div class="val" id="cntOnTime">0</div>
+          <div class="title scan-kpi-title">On Time</div>
+          <div class="val scan-kpi-value" id="cntOnTime">0</div>
+          <div class="subline scan-kpi-subline">Start-of-shift only • excludes Late</div>
         </div>
       </div>
 
       <div class="card scan-summary-clickable" onclick="openScanStatusPanel('notScanned')">
         <div class="card-icon icon-notscanned">👁️</div>
         <div class="card-content">
-          <div class="title">Not Scanned</div>
-          <div class="text-[8px] text-slate-400 mt-0.5">Overdue only</div>
-          <div class="val" id="cntNotScanned">0</div>
+          <div class="title scan-kpi-title">Not Scanned</div>
+          <div class="text-[8px] text-slate-400 mt-0.5 scan-kpi-subline">Overdue only</div>
+          <div class="val scan-kpi-value" id="cntNotScanned">0</div>
         </div>
       </div>
 
       <div class="card scan-summary-clickable" onclick="openScanStatusPanel('late')">
         <div class="card-icon icon-late5">⚠️</div>
         <div class="card-content">
-          <div class="title">Late</div>
-          <div class="val" id="cntLate5">0</div>
+          <div class="title scan-kpi-title">Late</div>
+          <div class="val scan-kpi-value" id="cntLate5">0</div>
         </div>
       </div>
 
       <div class="card scan-summary-clickable" onclick="openScanStatusPanel('late30')">
         <div class="card-icon icon-late30">🚨</div>
         <div class="card-content">
-          <div class="title">Late (&gt;30+)</div>
-          <div class="val" id="cntLate30">0</div>
+          <div class="title scan-kpi-title">Late (&gt;30+)</div>
+          <div class="val scan-kpi-value" id="cntLate30">0</div>
         </div>
       </div>
     </div>
@@ -5330,8 +5541,15 @@
             document.addEventListener('keydown', (e) => { if (e.ctrlKey && e.key === 'z' && document.getElementById('orgView').classList.contains('hidden') === false && isOrgEditMode) { e.preventDefault(); undoOrgChange(); } });
 
             fetchData().then(() => {
+                hasCompletedInitialDataLoad = true;
                 updateGlobalRefreshTimestamp();
                 startGlobalAutoRefresh();
+            }).catch(err => {
+                console.error('Initial attendance data load failed', err);
+                hasCompletedInitialDataLoad = true;
+                globalAutoRefreshPending = true;
+                startGlobalAutoRefresh();
+                scheduleNextGlobalAutoRefresh(GLOBAL_AUTO_REFRESH_RETRY_MS);
             });
         });
         
@@ -5387,10 +5605,15 @@
         let globalRefreshInProgress = false;
         let globalAutoRefreshTimer = null;
         let hasCompletedInitialDataLoad = false;
+        let globalAutoRefreshPending = false;
+        let globalLastSuccessfulRefreshAt = 0;
+        let globalNextAutoRefreshAt = 0;
         const GLOBAL_AUTO_REFRESH_MS = 5 * 60 * 1000;
+        const GLOBAL_AUTO_REFRESH_RETRY_MS = 15 * 1000;
 
         function updateGlobalRefreshTimestamp() {
-            const stamp = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            globalLastSuccessfulRefreshAt = Date.now();
+            const stamp = new Date(globalLastSuccessfulRefreshAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
             ['dashboardLastUpdated','mobileDashboardLastUpdated','globalLastUpdated'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.textContent = `Updated ${stamp}`;
@@ -5425,6 +5648,12 @@
 
             return false;
         }
+
+        window.kickPendingAutoRefresh = function() {
+            if (!globalAutoRefreshPending) return;
+            if (isUserInteractionOpen() || globalRefreshInProgress) return;
+            scheduleNextGlobalAutoRefresh(1000);
+        };
 
         function captureAllTabRefreshState() {
             return {
@@ -5607,45 +5836,51 @@
         }
 
         window.refreshAllTabs = async function(btn = null, silent = false) {
-            if (globalRefreshInProgress) return;
+            if (globalRefreshInProgress) {
+                globalAutoRefreshPending = true;
+                return false;
+            }
 
-            // Never interrupt a popup, editor, image preview, or open detail panel.
+            // Never interrupt a popup/editor, but remember that a refresh is owed.
             if (isUserInteractionOpen()) {
+                globalAutoRefreshPending = true;
                 if (!silent) showAppToast('Close the open popup before refreshing.', 'info');
-                return;
+                return false;
             }
 
             globalRefreshInProgress = true;
+            globalAutoRefreshPending = false;
 
             const keep = captureAllTabRefreshState();
             setGlobalRefreshButtonsLoading(true);
 
             try {
                 // Shared employee + attendance sources feed Dashboard, Calendar, Daily and Org.
-                // fetchData now refreshes data in the background without forcing Daily Attendance.
                 await fetchData();
                 restoreAllTabRefreshState(keep);
 
-                // Scan Activity has a separate live source, refresh it too,
-                // but only if the user has not opened an overlay while refresh was running.
+                // Scan Activity has a separate live source.
                 if (!isUserInteractionOpen() && typeof window.fetchLiveData === 'function') {
                     try { await window.fetchLiveData(); }
                     catch (scanErr) { console.warn('Scan Activity refresh failed', scanErr); }
                 }
 
-                // Normally the active tab never changes now. Only restore it if something external
-                // changed it, and never do so while the user is inside a popup/editor.
+                // Restore the active tab only when safe.
                 if (!isUserInteractionOpen() &&
                     (document.body.dataset.activeTab || 'daily') !== keep.activeTab) {
                     switchTab(keep.activeTab);
                 }
 
                 updateGlobalRefreshTimestamp();
+                globalNextAutoRefreshAt = Date.now() + GLOBAL_AUTO_REFRESH_MS;
 
                 if (!silent) showAppToast('All tabs refreshed with the latest data.', 'info');
+                return true;
             } catch (e) {
                 console.error('Global refresh failed', e);
+                globalAutoRefreshPending = true;
                 if (!silent) showAppToast('Could not refresh the latest data.', 'error');
+                return false;
             } finally {
                 setGlobalRefreshButtonsLoading(false);
                 globalRefreshInProgress = false;
@@ -5657,15 +5892,73 @@
         window.refreshCalendarView = function(btn) { return refreshAllTabs(btn, false); };
         window.refreshDailyAttendance = function(btn) { return refreshAllTabs(btn, false); };
 
-        function startGlobalAutoRefresh() {
-            if (globalAutoRefreshTimer) clearInterval(globalAutoRefreshTimer);
-            globalAutoRefreshTimer = setInterval(() => {
-                // Refresh every five minutes, but never interrupt active work.
-                // If a popup/editor is open, this cycle is skipped and the next cycle will try again.
-                if (isUserInteractionOpen()) return;
-                refreshAllTabs(null, true);
-            }, GLOBAL_AUTO_REFRESH_MS);
+        function scheduleNextGlobalAutoRefresh(delayMs) {
+            if (globalAutoRefreshTimer) clearTimeout(globalAutoRefreshTimer);
+            globalAutoRefreshTimer = setTimeout(runGlobalAutoRefreshCycle, Math.max(1000, delayMs));
         }
+
+        async function runGlobalAutoRefreshCycle() {
+            const now = Date.now();
+
+            // If user is interacting, do not lose the refresh cycle.
+            // Retry shortly after instead of waiting another full five minutes.
+            if (isUserInteractionOpen() || globalRefreshInProgress) {
+                globalAutoRefreshPending = true;
+                scheduleNextGlobalAutoRefresh(GLOBAL_AUTO_REFRESH_RETRY_MS);
+                return;
+            }
+
+            // If the browser woke from sleep/background throttling, refresh immediately when overdue.
+            if (globalAutoRefreshPending || !globalNextAutoRefreshAt || now >= globalNextAutoRefreshAt) {
+                const ok = await refreshAllTabs(null, true);
+                if (ok) {
+                    globalAutoRefreshPending = false;
+                    globalNextAutoRefreshAt = Date.now() + GLOBAL_AUTO_REFRESH_MS;
+                    scheduleNextGlobalAutoRefresh(GLOBAL_AUTO_REFRESH_MS);
+                } else {
+                    globalAutoRefreshPending = true;
+                    scheduleNextGlobalAutoRefresh(GLOBAL_AUTO_REFRESH_RETRY_MS);
+                }
+                return;
+            }
+
+            scheduleNextGlobalAutoRefresh(globalNextAutoRefreshAt - now);
+        }
+
+        function startGlobalAutoRefresh() {
+            if (globalAutoRefreshTimer) clearTimeout(globalAutoRefreshTimer);
+            globalAutoRefreshPending = false;
+            globalNextAutoRefreshAt = Date.now() + GLOBAL_AUTO_REFRESH_MS;
+            scheduleNextGlobalAutoRefresh(GLOBAL_AUTO_REFRESH_MS);
+        }
+
+        function catchUpGlobalAutoRefreshIfNeeded() {
+            if (!hasCompletedInitialDataLoad) return;
+            const overdue = !globalNextAutoRefreshAt || Date.now() >= globalNextAutoRefreshAt;
+            if (overdue || globalAutoRefreshPending) {
+                globalAutoRefreshPending = true;
+                if (!isUserInteractionOpen() && !globalRefreshInProgress) {
+                    scheduleNextGlobalAutoRefresh(1000);
+                } else {
+                    scheduleNextGlobalAutoRefresh(GLOBAL_AUTO_REFRESH_RETRY_MS);
+                }
+            }
+        }
+
+        // Browsers may throttle timers while the app is in the background.
+        // Catch up as soon as the tab/app becomes active again.
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) catchUpGlobalAutoRefreshIfNeeded();
+        });
+        window.addEventListener('focus', catchUpGlobalAutoRefreshIfNeeded);
+        window.addEventListener('pageshow', catchUpGlobalAutoRefreshIfNeeded);
+
+
+        setInterval(() => {
+            if (!hasCompletedInitialDataLoad) return;
+            if (document.hidden) return;
+            catchUpGlobalAutoRefreshIfNeeded();
+        }, 30000);
 
         window.setDailyDateRange = function() {
             if(!window.fpFrom || !window.fpTo) return;
@@ -8210,7 +8503,67 @@
             <div class="section"><div class="section-title">Employment Information</div><div class="info-grid"><div class="info"><span>Staff ID</span><b>${pdfPrintEscape(e.displayId)}</b></div><div class="info"><span>Company / Entity</span><b>${pdfPrintEscape(`${pdfFormatValue(e.company)}${e.entity && e.entity !== e.company ? ' / ' + e.entity : ''}`)}</b></div><div class="info"><span>Department</span><b>${pdfPrintEscape(e.department || 'Unspecified')}</b></div><div class="info"><span>Position</span><b>${pdfPrintEscape(e.position)}</b></div><div class="info"><span>Join Date</span><b>${pdfPrintEscape(e.joinDate)}</b></div><div class="info"><span>Service Length</span><b>${pdfPrintEscape(pdfServiceLength(e))}</b></div><div class="info"><span>Employment Status</span><b>${pdfPrintEscape(e.status)}</b></div><div class="info"><span>Last Working Day</span><b>${pdfPrintEscape(e.status === 'Active' ? '-' : (e.resignedDate || '-'))}</b></div>${exitReason}</div></div>
             <div class="section"><div class="section-title">Leave Balances</div><table class="leave"><thead><tr><th>Leave Type</th><th>Available</th><th>Used</th><th>Remaining</th></tr></thead><tbody>${leaveRows}</tbody></table></div>
             <div class="section"><div class="section-title">Attendance & Other Leave Usage — ${pdfPrintEscape(exportYear)}</div><div class="metrics">${metrics}</div></div>
-            <div class="section"><div class="section-title">Warning History</div>${warningHistoryHtml}</div><div class="foot">Generated ${pdfPrintEscape(new Date().toLocaleString())}</div></div></body></html>`;
+            <div class="section"><div class="section-title">Warning History</div>${warningHistoryHtml}</div><div class="foot">Generated ${pdfPrintEscape(new Date().toLocaleString())}</div></div>
+<style id="scan-kpi-readability-v2-final">
+@media (min-width: 701px) {
+  #scanView .summary-bar {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    overflow-x: auto !important;
+  }
+
+  #scanView .scan-status-frame {
+    display: contents !important;
+  }
+
+  #scanView .summary-bar > .card,
+  #scanView .scan-status-frame > .card {
+    flex: 1 1 0 !important;
+    min-width: 118px !important;
+    min-height: 82px !important;
+    padding: 11px 10px !important;
+    gap: 8px !important;
+  }
+
+  #scanView .summary-bar .card-icon {
+    width: 33px !important;
+    height: 33px !important;
+    flex: 0 0 33px !important;
+  }
+
+  #scanView .summary-bar .card-icon::before {
+    font-size: 12px !important;
+  }
+
+  #scanView .scan-kpi-title {
+    font-size: 10px !important;
+    line-height: 1.15 !important;
+    font-weight: 800 !important;
+    letter-spacing: .1px !important;
+  }
+
+  #scanView .scan-kpi-value {
+    font-size: 23px !important;
+    line-height: 1 !important;
+    font-weight: 900 !important;
+    margin-top: 3px !important;
+  }
+
+  #scanView .scan-kpi-subline {
+    font-size: 8px !important;
+    line-height: 1.2 !important;
+    font-weight: 650 !important;
+  }
+  #scanView #cntMorningPresentRef {
+    margin-top: 2px !important;
+    color: #2563eb !important;
+    font-weight: 800 !important;
+  }
+}
+</style>
+
+</body></html>`;
 
             // Google Sites often blocks window.open(), so use a same-page off-screen iframe.
             // The browser can render the remote employee photo in the print document even when
@@ -12768,6 +13121,25 @@
         : (useAfternoonPrimary
           ? (() => { const h = Math.floor(startMins / 60); const m = startMins % 60; const period = h >= 12 ? 'PM' : 'AM'; const h12 = (h % 12) || 12; return `${h12}:${String(m).padStart(2, '0')} ${period}`; })()
           : tr.dataset.morningTarget);
+      // Dedicated KPI status: do not let lunch-out / normal lunch-in affect
+      // On Time / Late summary cards. Only the real shift-start scan counts.
+      tr.dataset.shiftStartSummaryStatus = useAfternoonPrimary
+        ? (lInStatus || missingScanStatusForTarget(startMins, 6))
+        : (mStatus || missingScanStatusForTarget(startMins, 6));
+
+      // Present Now metadata.
+      // For half-day leave:
+      // - a morning scan means the employee works morning / leaves afternoon.
+      // - an afternoon first scan means the employee leaves morning / works afternoon.
+      // - when still unknown, default to afternoon leave until scan pattern clarifies it.
+      tr.dataset.shiftStartMins = String(startMins);
+      tr.dataset.shiftEndMins = String(Number(staff.targetEveningMins || 1020));
+      tr.dataset.isPartTime = isPartTime ? '1' : '0';
+      tr.dataset.halfDayWorkPart = forceMorningHalfDay
+        ? 'morning'
+        : (forceAfternoonFirstScan ? 'afternoon' : (isHalfDayLeave ? 'morning' : ''));
+      tr.dataset.hasHalfDayLeave = isHalfDayLeave ? '1' : '0';
+
       if (rowColors) {
         tr.classList.add('scan-row-colored');
         tr.style.setProperty('--scan-row-bg', rowColors[0]);
@@ -12856,9 +13228,19 @@
     const tbody = document.getElementById('attendanceTable');
     const rows = tbody.getElementsByTagName('tr');
 
-    let cntTotal = 0, cntDayOff = 0, cntPresent = 0, cntLeave = 0, cntOnTime = 0, cntNotScanned = 0, cntLate5 = 0, cntLate30 = 0;
-    const leaveCodes = new Set(['AL','H-AL','SL','H-SL','SP','H-SP','UP','H-UP']);
-    const dayOffCodes = new Set(['D','H-D','Off','H-Off']);
+    let cntTotal = 0, cntDayOff = 0, cntPresent = 0, cntMorningPresent = 0, cntLeave = 0, cntOnTime = 0, cntNotScanned = 0, cntLate5 = 0, cntLate30 = 0;
+    let cntLeaveFull = 0, cntLeaveHalf = 0, cntLeaveNow = 0, cntDayOffFull = 0, cntDayOffHalf = 0;
+    const nowForPresent = new Date();
+    const currentMinsForPresent = nowForPresent.getHours() * 60 + nowForPresent.getMinutes();
+    const selectedScanDate = document.getElementById('dateSelect')?.value || '';
+    const todayScanDate = `${nowForPresent.getFullYear()}-${String(nowForPresent.getMonth()+1).padStart(2,'0')}-${String(nowForPresent.getDate()).padStart(2,'0')}`;
+    const isTodayForPresent = selectedScanDate === todayScanDate;
+    const fullLeaveCodes = new Set(['AL','SL','SP','UP']);
+    const halfLeaveCodes = new Set(['H-AL','H-SL','H-SP','H-UP']);
+    const leaveCodes = new Set([...fullLeaveCodes, ...halfLeaveCodes]);
+    const fullDayOffCodes = new Set(['D','Off']);
+    const halfDayOffCodes = new Set(['H-D','H-Off']);
+    const dayOffCodes = new Set([...fullDayOffCodes, ...halfDayOffCodes]);
 
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
@@ -12902,32 +13284,151 @@
         const dailyCodes = cells[1] ? Array.from(cells[1].querySelectorAll('.code-badge')).map(b => b.textContent.trim()) : [];
         const primaryCode = dailyCodes[0] || '';
 
-        // Count as Present when the Daily Code is P OR when the staff has
-        // scanned at least once, even if their Daily Code is another code.
         const hasAnyScan = [2, 3, 4, 5].some(idx => {
           const cell = cells[idx];
           return !!(cell && cell.querySelector('.scan-time-val'));
         });
-        if (primaryCode === 'P' || hasAnyScan) cntPresent++;
 
-        if (dailyCodes.some(code => leaveCodes.has(code))) cntLeave++;
-        if (dailyCodes.some(code => dayOffCodes.has(code))) cntDayOff++;
+        const hasFullLeave = dailyCodes.some(code => fullLeaveCodes.has(code));
+        const hasHalfLeave = !hasFullLeave && dailyCodes.some(code => halfLeaveCodes.has(code));
+        const hasFullDayOff = dailyCodes.some(code => fullDayOffCodes.has(code));
+        const hasHalfDayOff = !hasFullDayOff && dailyCodes.some(code => halfDayOffCodes.has(code));
 
-        if (primaryStatus.includes('ON TIME')) cntOnTime++;
-        else if (primaryCode === 'P' && primaryStatus.includes('NOT SCANNED')) cntNotScanned++;
-        else if (primaryStatus.includes('Late (30+)')) cntLate30++;
-        else if (primaryStatus.includes('Late')) cntLate5++;
+        if (hasFullLeave || hasHalfLeave) {
+          cntLeave++;
+          if (hasFullLeave) cntLeaveFull++;
+          else cntLeaveHalf++;
+        }
+
+        if (hasFullDayOff || hasHalfDayOff) {
+          cntDayOff++;
+          if (hasFullDayOff) cntDayOffFull++;
+          else cntDayOffHalf++;
+        }
+
+        // PRESENT NOW:
+        // Today -> current workforce based on shift + full/half-day leave.
+        // Other dates -> fall back to actual scan presence so historical views remain meaningful.
+        if (isTodayForPresent) {
+          const shiftStart = Number(row.dataset.shiftStartMins || 480);
+          const shiftEnd = Number(row.dataset.shiftEndMins || 1020);
+          const inShiftNow = currentMinsForPresent >= shiftStart && currentMinsForPresent <= shiftEnd;
+
+          // MORNING REFERENCE:
+          // Count staff who were expected to be working during the morning half.
+          // Full-day leave/off are excluded. An afternoon-only worker (including
+          // a half-day morning leave) is not part of the morning present baseline.
+          const worksMorningShift = shiftStart < 720;
+          const halfDayWorkPart = row.dataset.halfDayWorkPart || '';
+          const morningBlockedByHalfDay =
+            (hasHalfLeave || hasHalfDayOff) && halfDayWorkPart === 'afternoon';
+
+          if (worksMorningShift && !hasFullLeave && !hasFullDayOff && !morningBlockedByHalfDay) {
+            cntMorningPresent++;
+          }
+
+          let onLeaveNow = hasFullLeave || hasFullDayOff;
+          if (!onLeaveNow && (hasHalfLeave || hasHalfDayOff)) {
+            const workPart = row.dataset.halfDayWorkPart || 'morning';
+            // Morning half: works before 12:00, on leave from 12:00 onward.
+            // Afternoon half: on leave before 12:00, works from 12:00 onward.
+            onLeaveNow = workPart === 'afternoon'
+              ? currentMinsForPresent < 720
+              : currentMinsForPresent >= 720;
+          }
+
+          if (hasFullLeave || hasHalfLeave) {
+            if (onLeaveNow) cntLeaveNow++;
+          }
+
+          if (inShiftNow && !onLeaveNow) cntPresent++;
+        } else {
+          const shiftStart = Number(row.dataset.shiftStartMins || 480);
+          const halfDayWorkPart = row.dataset.halfDayWorkPart || '';
+          const morningBlockedByHalfDay =
+            (hasHalfLeave || hasHalfDayOff) && halfDayWorkPart === 'afternoon';
+
+          if (shiftStart < 720 && !hasFullLeave && !hasFullDayOff && !morningBlockedByHalfDay) {
+            cntMorningPresent++;
+          }
+
+          if (!hasFullLeave && !hasFullDayOff && (primaryCode === 'P' || hasAnyScan || hasHalfLeave || hasHalfDayOff)) {
+            cntPresent++;
+          }
+        }
+
+        // Summary attendance status is START-OF-SHIFT ONLY.
+        // Normal staff: use Morning In status only.
+        // Staff whose actual shift starts in the afternoon (part-time / late-start /
+        // afternoon half-day return) may use their afternoon first-scan as the shift start.
+        // Lunch Out / normal Lunch In lateness is intentionally NOT counted here.
+        const shiftStartStatus = row.dataset.shiftStartSummaryStatus || primaryStatus;
+
+        if (shiftStartStatus.includes('ON TIME')) cntOnTime++;
+        else if (primaryCode === 'P' && shiftStartStatus.includes('NOT SCANNED')) cntNotScanned++;
+        else if (shiftStartStatus.includes('Late (30+)')) cntLate30++;
+        else if (shiftStartStatus.includes('Late')) cntLate5++;
       } else {
         row.style.display = 'none';
       }
     }
 
     document.getElementById('cntTotal').innerText = cntTotal;
+
     const dayOffEl = document.getElementById('cntDayOff');
     if (dayOffEl) dayOffEl.innerText = cntDayOff;
+
+    const dayOffEquivalent = cntDayOffFull + (cntDayOffHalf * 0.5);
+    const dayOffDetail = document.getElementById('cntDayOffDetail');
+    if (dayOffDetail) dayOffDetail.textContent = `${cntDayOffFull} Full • ${cntDayOffHalf} Half`;
+
     document.getElementById('cntPresent').innerText = cntPresent;
+    const presentDetail = document.getElementById('cntPresentDetail');
+    const morningBadge = document.getElementById('cntMorningPresentBadge');
+    const morningValue = document.getElementById('cntMorningPresentValue');
+
+    if (presentDetail) {
+      if (isTodayForPresent) {
+        presentDetail.textContent = currentMinsForPresent < 720
+          ? `Morning shift • ${cntLeaveNow} on leave now`
+          : `Afternoon shift • ${cntLeaveNow} on leave now`;
+      } else {
+        presentDetail.textContent = 'Historical view • based on recorded scans';
+      }
+    }
+
+    // After noon, keep the current Present Now number as the main KPI,
+    // and show the morning workforce beside it as a compact AM reference.
+    if (morningBadge && morningValue) {
+      if (isTodayForPresent && currentMinsForPresent >= 720) {
+        morningValue.textContent = cntMorningPresent;
+        morningBadge.classList.remove('hidden');
+        morningBadge.title = `Morning present: ${cntMorningPresent}`;
+      } else {
+        morningBadge.classList.add('hidden');
+      }
+    }
+
     document.getElementById('cntLeave').innerText = cntLeave;
-    document.getElementById('cntOnTime').innerText = cntOnTime;
+
+    const leaveDetail = document.getElementById('cntLeaveDetail');
+    if (leaveDetail) leaveDetail.textContent = `${cntLeaveFull} Full • ${cntLeaveHalf} Half`;
+
+    const leaveNowDetail = document.getElementById('cntLeaveNowDetail');
+    if (leaveNowDetail) {
+      leaveNowDetail.innerHTML = isTodayForPresent
+        ? `<strong>Now: ${cntLeaveNow} staff</strong>`
+        : `<strong>${cntLeave} staff on selected date</strong>`;
+    }
+
+    // On Time is reconciled to the CURRENT present workforce and only deducts
+    // start-of-shift exceptions. Lunch Out / Lunch In never reduce this KPI.
+    // Example: Present Now 79 and 2 start-shift Late => On Time 77.
+    const reconciledOnTime = isTodayForPresent
+      ? Math.max(0, cntPresent - cntLate5 - cntLate30 - cntNotScanned)
+      : cntOnTime;
+
+    document.getElementById('cntOnTime').innerText = reconciledOnTime;
     document.getElementById('cntNotScanned').innerText = cntNotScanned;
     document.getElementById('cntLate5').innerText = cntLate5;
     document.getElementById('cntLate30').innerText = cntLate30;
@@ -12940,6 +13441,7 @@
     const list = document.getElementById('scanStatusPanelList');
     const rows = Array.from(document.querySelectorAll('#attendanceTable tr')).filter(r => r.style.display !== 'none' && r.querySelectorAll('td').length);
     const leaveCodes = new Set(['AL','H-AL','SL','H-SL','SP','H-SP','UP','H-UP']);
+    const fullDayOffCodes = new Set(['D','Off']);
     const dayOffCodes = new Set(['D','H-D','Off','H-Off']);
     const matches = rows.filter(row => {
       const cells = row.querySelectorAll('td');
@@ -12956,7 +13458,27 @@
       return false;
     });
     document.getElementById('scanStatusPanelTitle').textContent = labels[status] + ' Staff';
-    document.getElementById('scanStatusPanelCount').textContent = matches.length + ' staff';
+
+    const panelCountEl = document.getElementById('scanStatusPanelCount');
+    if (status === 'leave') {
+      let full=0, half=0;
+      matches.forEach(row => {
+        const codes=Array.from(row.querySelectorAll('td')[1]?.querySelectorAll('.code-badge') || []).map(b=>b.textContent.trim());
+        if (codes.some(c => ['AL','SL','SP','UP'].includes(c))) full++;
+        else if (codes.some(c => ['H-AL','H-SL','H-SP','H-UP'].includes(c))) half++;
+      });
+      panelCountEl.textContent=`${matches.length} staff • ${full} Full • ${half} Half`;
+    } else if (status === 'dayOff') {
+      let full=0, half=0;
+      matches.forEach(row => {
+        const codes=Array.from(row.querySelectorAll('td')[1]?.querySelectorAll('.code-badge') || []).map(b=>b.textContent.trim());
+        if (codes.some(c => ['D','Off'].includes(c))) full++;
+        else if (codes.some(c => ['H-D','H-Off'].includes(c))) half++;
+      });
+      panelCountEl.textContent=`${matches.length} staff • ${full} Full • ${half} Half`;
+    } else {
+      panelCountEl.textContent = matches.length + ' staff';
+    }
     list.innerHTML = matches.length ? matches.map(row => {
       const cells = row.querySelectorAll('td');
       const staff = cells[0];
@@ -13015,7 +13537,7 @@
    PWA SERVICE WORKER
    ========================================================== */
 
-console.log('Attendance build: 2026-09-17-report-bar-breakdown-no-twitch-v1');
+console.log('Attendance build: 2026-09-18-scan-onleave-present-swapped-v1');
 
 if ('serviceWorker' in navigator) {
 
