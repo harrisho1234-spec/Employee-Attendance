@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Attendance Dashboard</title>
-    <meta name="app-build" content="2026-09-18-scan-onleave-present-swapped-v1">
+    <meta name="app-build" content="2026-09-18-scan-company-filter-v2-visible">
     <!-- Photo mapping: Staff ID primary, Name/File Name fallback -->
         <!-- PWA -->
     <meta name="theme-color" content="#2563eb">
@@ -538,6 +538,50 @@
             border-color: #2563eb;
             box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.10);
         }
+
+        #scanView .scan-company-control {
+            display:inline-flex;
+            align-items:center;
+            gap:5px;
+            padding:0;
+        }
+        #scanView .scan-company-text-label {
+            display:inline-flex;
+            align-items:center;
+            gap:4px;
+            color:#475569;
+            font-size:10px;
+            font-weight:800;
+            white-space:nowrap;
+        }
+        #scanView .scan-company-text-label i {
+            color:#2563eb;
+            font-size:10px;
+        }
+        #scanView .scan-company-filter {
+            width:112px;
+            min-width:112px;
+            height:32px;
+            padding:0 24px 0 8px;
+            font-size:11px;
+            font-weight:800;
+            border-color:#bfdbfe;
+            background:#f8fbff;
+            color:#0f172a;
+            cursor:pointer;
+        }
+        #scanView .scan-company-filter:focus {
+            background:#fff;
+            border-color:#2563eb;
+        }
+        @media (max-width:700px) {
+            #scanView .scan-company-text-label span { display:none; }
+            #scanView .scan-company-filter {
+                width:108px;
+                min-width:108px;
+            }
+        }
+
 
         #scanView .refresh-btn {
             height: 28px;
@@ -4868,6 +4912,7 @@
         </div>
 
 <!-- SCAN PRESENT AM REFERENCE V2: afternoon Present Now + AM badge -->
+<!-- SCAN COMPANY FILTER V2 ACTIVE: compact Company dropdown filters table + KPI cards -->
 <div id="scanView" class="hidden">
 
 <div class="container">
@@ -4882,6 +4927,18 @@
         <label for="dateSelect">Select Date:</label>
         <input type="date" id="dateSelect" class="input-style">
       </div>
+
+      <!-- SCAN COMPANY FILTER V2 -->
+      <div class="control-item scan-company-control" title="Filter Scan Activity by company">
+        <label for="scanCompanyFilter" class="scan-company-text-label">
+          <i class="fa-solid fa-building"></i>
+          <span>Company</span>
+        </label>
+        <select id="scanCompanyFilter" class="input-style scan-company-filter" onchange="handleScanCompanyFilterChange(this.value)">
+          <option value="">All Companies</option>
+        </select>
+      </div>
+
       <button id="scanShowAllBtn" class="refresh-btn scan-toggle-btn" onclick="toggleScanStaffView()">
         <i class="fa-solid fa-users"></i> Show All
       </button>
@@ -5689,7 +5746,8 @@
                 dailyYear: document.getElementById('dailyYearFilter')?.value || '',
 
                 orgCompany: (typeof currentOrgCompany !== 'undefined' && currentOrgCompany) ? currentOrgCompany : null,
-                scanDate: document.getElementById('dateSelect')?.value || ''
+                scanDate: document.getElementById('dateSelect')?.value || '',
+                scanCompany: document.getElementById('scanCompanyFilter')?.value || ''
             };
         }
 
@@ -5794,6 +5852,12 @@
             // Scan date
             const scanDate = document.getElementById('dateSelect');
             if (scanDate && keep.scanDate) scanDate.value = keep.scanDate;
+
+            const scanCompany = document.getElementById('scanCompanyFilter');
+            if (scanCompany && keep.scanCompany &&
+                Array.from(scanCompany.options).some(o => o.value === keep.scanCompany)) {
+                scanCompany.value = keep.scanCompany;
+            }
 
             // Re-render all data-driven tabs immediately.
             applyFilters();
@@ -13101,6 +13165,7 @@
       // Store Scan Activity details on the row so the status popup can show
       // the relevant leave type, missed scheduled time, or actual scan time.
       tr.dataset.leaveType = dailyCode || '';
+      tr.dataset.company = String(staff.company || '').trim();
       const h = Math.floor(startMins / 60);
       const m = startMins % 60;
       const period = h >= 12 ? 'PM' : 'AM';
@@ -13181,8 +13246,62 @@
       tbody.appendChild(tr);
     });
 
+    populateScanCompanyFilter();
     populateFilterOptions();
     filterTable();
+  }
+
+  window.handleScanCompanyFilterChange = function(value) {
+    const select = document.getElementById('scanCompanyFilter');
+    if (select && select.value !== value) select.value = value;
+
+    filterTable();
+
+    // Keep a visible indication in the control itself.
+    if (select) {
+      select.title = value ? `Showing ${value} only` : 'Showing all companies';
+    }
+  };
+
+  function populateScanCompanyFilter() {
+    const select = document.getElementById('scanCompanyFilter');
+    const tbody = document.getElementById('attendanceTable');
+    if (!select || !tbody) return;
+
+    const previous = select.value;
+    const companySet = new Set();
+
+    Array.from(tbody.querySelectorAll('tr')).forEach(row => {
+      const company = String(row.dataset.company || '').trim();
+      if (company) companySet.add(company);
+    });
+
+    // Also include companies from the current employee master data.
+    if (Array.isArray(allEmployees)) {
+      allEmployees.forEach(emp => {
+        const company = String(emp?.company || '').trim();
+        if (company) companySet.add(company);
+      });
+    }
+
+    const ordered = typeof companyDisplayOrder === 'function'
+      ? companyDisplayOrder(companySet)
+      : Array.from(companySet).sort((a,b) => a.localeCompare(b));
+
+    select.innerHTML = '<option value="">All Companies</option>';
+
+    ordered.forEach(company => {
+      const opt = document.createElement('option');
+      opt.value = company;
+      opt.textContent = company;
+      select.appendChild(opt);
+    });
+
+    if (previous && ordered.includes(previous)) {
+      select.value = previous;
+    } else {
+      select.value = '';
+    }
   }
 
   function populateFilterOptions() {
@@ -13235,6 +13354,7 @@
     const selectedScanDate = document.getElementById('dateSelect')?.value || '';
     const todayScanDate = `${nowForPresent.getFullYear()}-${String(nowForPresent.getMonth()+1).padStart(2,'0')}-${String(nowForPresent.getDate()).padStart(2,'0')}`;
     const isTodayForPresent = selectedScanDate === todayScanDate;
+    const scanCompanyValue = String(document.getElementById('scanCompanyFilter')?.value || '').trim().toLowerCase();
     const fullLeaveCodes = new Set(['AL','SL','SP','UP']);
     const halfLeaveCodes = new Set(['H-AL','H-SL','H-SP','H-UP']);
     const leaveCodes = new Set([...fullLeaveCodes, ...halfLeaveCodes]);
@@ -13248,7 +13368,14 @@
       if (cells.length === 0) continue;
 
       let isMatch = true;
-      for (let j = 0; j < filterInputs.length; j++) {
+
+      // Compact Company filter in the Scan Activity header.
+      if (scanCompanyValue) {
+        const rowCompany = String(row.dataset.company || '').trim().toLowerCase();
+        if (rowCompany !== scanCompanyValue) isMatch = false;
+      }
+
+      for (let j = 0; j < filterInputs.length && isMatch; j++) {
         const filterVal = filterInputs[j].value.toLowerCase().trim();
         if (!filterVal) continue;
 
@@ -13537,7 +13664,7 @@
    PWA SERVICE WORKER
    ========================================================== */
 
-console.log('Attendance build: 2026-09-18-scan-onleave-present-swapped-v1');
+console.log('Attendance build: 2026-09-18-scan-company-filter-v2-visible');
 
 if ('serviceWorker' in navigator) {
 
