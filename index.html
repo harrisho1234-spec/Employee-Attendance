@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Attendance Dashboard</title>
-    <meta name="app-build" content="2026-09-18-scan-company-filter-v2-visible">
+    <meta name="app-build" content="2026-09-19-report-employee-late-line-v1">
     <!-- Photo mapping: Staff ID primary, Name/File Name fallback -->
         <!-- PWA -->
     <meta name="theme-color" content="#2563eb">
@@ -574,6 +574,66 @@
             background:#fff;
             border-color:#2563eb;
         }
+
+        #scanView .scan-staff-search-wrap {
+            position:relative;
+            width:100%;
+            min-width:170px;
+        }
+        #scanView .scan-staff-search-wrap > .fa-magnifying-glass {
+            position:absolute;
+            left:9px;
+            top:50%;
+            transform:translateY(-50%);
+            color:#94a3b8;
+            font-size:10px;
+            pointer-events:none;
+        }
+        #scanView .scan-staff-search {
+            width:100%;
+            height:29px;
+            border:1px solid #dbe3ec;
+            border-radius:7px;
+            background:#fff;
+            color:#0f172a;
+            font-size:11px;
+            font-weight:600;
+            padding:0 29px 0 27px;
+            outline:none;
+            box-sizing:border-box;
+        }
+        #scanView .scan-staff-search::placeholder {
+            color:#94a3b8;
+            font-weight:500;
+        }
+        #scanView .scan-staff-search:focus {
+            border-color:#2563eb;
+            box-shadow:0 0 0 2px rgba(37,99,235,.08);
+        }
+        #scanView .scan-staff-search-clear {
+            position:absolute;
+            right:4px;
+            top:50%;
+            transform:translateY(-50%);
+            width:22px;
+            height:22px;
+            border:0;
+            border-radius:5px;
+            background:transparent;
+            color:#94a3b8;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            cursor:pointer;
+        }
+        #scanView .scan-staff-search-clear:hover {
+            background:#f1f5f9;
+            color:#475569;
+        }
+        #scanView .scan-staff-search-clear i {
+            font-size:9px;
+        }
+
         @media (max-width:700px) {
             #scanView .scan-company-text-label span { display:none; }
             #scanView .scan-company-filter {
@@ -3327,6 +3387,117 @@
             border-radius:2px;
             flex:0 0 auto;
         }
+
+        #reportEmployeeMetricModal .employee-late-line-toggle {
+            display:inline-flex;
+            align-items:center;
+            gap:5px;
+            height:24px;
+            padding:0 8px;
+            border:1px solid #fed7aa;
+            border-radius:999px;
+            background:#fff7ed;
+            color:#9a3412;
+            font-size:8px;
+            font-weight:900;
+            cursor:pointer;
+            transition:all .15s ease;
+        }
+        #reportEmployeeMetricModal .employee-late-line-toggle:hover {
+            border-color:#fb923c;
+            background:#ffedd5;
+        }
+        #reportEmployeeMetricModal .employee-late-line-toggle:not(.is-active) {
+            background:#f8fafc;
+            border-color:#e2e8f0;
+            color:#94a3b8;
+            opacity:.7;
+        }
+        #reportEmployeeMetricModal .employee-late-line-sample {
+            position:relative;
+            width:16px;
+            height:8px;
+            display:inline-block;
+        }
+        #reportEmployeeMetricModal .employee-late-line-sample::before {
+            content:"";
+            position:absolute;
+            left:0;
+            right:0;
+            top:3px;
+            height:2px;
+            background:#f97316;
+            border-radius:2px;
+        }
+        #reportEmployeeMetricModal .employee-late-line-sample::after {
+            content:"";
+            position:absolute;
+            left:6px;
+            top:0;
+            width:7px;
+            height:7px;
+            border-radius:50%;
+            background:#fff;
+            border:2px solid #f97316;
+        }
+        #reportEmployeeMetricModal .employee-report-chart {
+            position:relative;
+        }
+        #reportEmployeeMetricModal .employee-late-line-layer {
+            position:absolute;
+            left:14px;
+            right:14px;
+            top:34px;
+            bottom:28px;
+            z-index:8;
+            pointer-events:none;
+            overflow:visible;
+        }
+        #reportEmployeeMetricModal .employee-late-line-layer svg {
+            width:100%;
+            height:100%;
+            overflow:visible;
+            display:block;
+        }
+        #reportEmployeeMetricModal .employee-late-line-path {
+            fill:none;
+            stroke:#f97316;
+            stroke-width:2.6;
+            vector-effect:non-scaling-stroke;
+            stroke-linecap:round;
+            stroke-linejoin:round;
+            filter:drop-shadow(0 1px 1px rgba(154,52,18,.12));
+        }
+        #reportEmployeeMetricModal .employee-late-line-point {
+            fill:#fff;
+            stroke:#f97316;
+            stroke-width:2.2;
+            vector-effect:non-scaling-stroke;
+        }
+        #reportEmployeeMetricModal .employee-late-line-label {
+            fill:#c2410c;
+            font-size:8px;
+            font-weight:900;
+            text-anchor:middle;
+            paint-order:stroke;
+            stroke:#fff;
+            stroke-width:3px;
+            stroke-linejoin:round;
+        }
+        #reportEmployeeMetricModal .employee-late-line-scale-note {
+            position:absolute;
+            right:4px;
+            top:2px;
+            padding:2px 5px;
+            border-radius:999px;
+            background:rgba(255,247,237,.92);
+            border:1px solid #fed7aa;
+            color:#c2410c;
+            font-size:7px;
+            font-weight:800;
+            white-space:nowrap;
+        }
+
         #reportEmployeeMetricModal .employee-stacked-track {
             height:145px;
             display:flex;
@@ -4834,7 +5005,15 @@
                                     <span class="employee-chart-legend-item"><span class="employee-chart-dot" style="background:#14b8a6"></span>SL</span>
                                     <span class="employee-chart-legend-item"><span class="employee-chart-dot" style="background:#a855f7"></span>SP</span>
                                     <span class="employee-chart-legend-item"><span class="employee-chart-dot" style="background:#fb7185"></span>UP</span>
-                                    <span class="ml-auto text-[8px] text-slate-400">Stacked monthly total</span>
+                                    <button id="reportEmployeeLateLineToggle" type="button"
+                                            class="employee-late-line-toggle is-active"
+                                            onclick="toggleReportEmployeeLateLine()"
+                                            title="Show or hide monthly lateness on top of the leave chart">
+                                        <span class="employee-late-line-sample"></span>
+                                        <span>Late Line</span>
+                                        <span id="reportEmployeeLateLineToggleState">ON</span>
+                                    </button>
+                                    <span class="ml-auto text-[8px] text-slate-400">Bars = leave • Line = late occurrences</span>
                                 </div>
                                 <div id="reportEmployeeMetricChart" class="employee-report-chart"></div>
                             </div>
@@ -4913,6 +5092,8 @@
 
 <!-- SCAN PRESENT AM REFERENCE V2: afternoon Present Now + AM badge -->
 <!-- SCAN COMPANY FILTER V2 ACTIVE: compact Company dropdown filters table + KPI cards -->
+<!-- SCAN STAFF SEARCH V1 ACTIVE: Not Scanned KPI removed; Staff Info is live-searchable -->
+<!-- REPORT EMPLOYEE LATE LINE V1 ACTIVE: leave bars + toggleable monthly late line -->
 <div id="scanView" class="hidden">
 
 <div class="container">
@@ -5004,15 +5185,6 @@
         </div>
       </div>
 
-      <div class="card scan-summary-clickable" onclick="openScanStatusPanel('notScanned')">
-        <div class="card-icon icon-notscanned">👁️</div>
-        <div class="card-content">
-          <div class="title scan-kpi-title">Not Scanned</div>
-          <div class="text-[8px] text-slate-400 mt-0.5 scan-kpi-subline">Overdue only</div>
-          <div class="val scan-kpi-value" id="cntNotScanned">0</div>
-        </div>
-      </div>
-
       <div class="card scan-summary-clickable" onclick="openScanStatusPanel('late')">
         <div class="card-icon icon-late5">⚠️</div>
         <div class="card-content">
@@ -5043,12 +5215,23 @@
           <th>Evening Out</th>
         </tr>
         <tr class="filter-row">
-          <th><select class="column-filter" onchange="filterTable()"><option value="">All Staff</option></select></th>
-          <th><select class="column-filter" onchange="filterTable()"><option value="">All Status</option></select></th>
-          <th><select class="column-filter" onchange="filterTable()"><option value="">All Morning Status</option></select></th>
-          <th><select class="column-filter" onchange="filterTable()"><option value="">All Lunch Out Status</option></select></th>
-          <th><select class="column-filter" onchange="filterTable()"><option value="">All Lunch In Status</option></select></th>
-          <th><select class="column-filter" onchange="filterTable()"><option value="">All Evening Status</option></select></th>
+          <th>
+            <div class="scan-staff-search-wrap">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input id="scanStaffSearch" type="text" class="scan-staff-search"
+                     placeholder="Search name or Staff ID..."
+                     autocomplete="off" oninput="filterTable()">
+              <button type="button" class="scan-staff-search-clear" title="Clear search"
+                      onclick="clearScanStaffSearch()" aria-label="Clear staff search">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+          </th>
+          <th><select class="column-filter" data-col="1" onchange="filterTable()"><option value="">All Status</option></select></th>
+          <th><select class="column-filter" data-col="2" onchange="filterTable()"><option value="">All Morning Status</option></select></th>
+          <th><select class="column-filter" data-col="3" onchange="filterTable()"><option value="">All Lunch Out Status</option></select></th>
+          <th><select class="column-filter" data-col="4" onchange="filterTable()"><option value="">All Lunch In Status</option></select></th>
+          <th><select class="column-filter" data-col="5" onchange="filterTable()"><option value="">All Evening Status</option></select></th>
         </tr>
       </thead>
       <tbody id="attendanceTable">
@@ -5747,7 +5930,8 @@
 
                 orgCompany: (typeof currentOrgCompany !== 'undefined' && currentOrgCompany) ? currentOrgCompany : null,
                 scanDate: document.getElementById('dateSelect')?.value || '',
-                scanCompany: document.getElementById('scanCompanyFilter')?.value || ''
+                scanCompany: document.getElementById('scanCompanyFilter')?.value || '',
+                scanStaffSearch: document.getElementById('scanStaffSearch')?.value || ''
             };
         }
 
@@ -5858,6 +6042,9 @@
                 Array.from(scanCompany.options).some(o => o.value === keep.scanCompany)) {
                 scanCompany.value = keep.scanCompany;
             }
+
+            const scanStaffSearch = document.getElementById('scanStaffSearch');
+            if (scanStaffSearch) scanStaffSearch.value = keep.scanStaffSearch || '';
 
             // Re-render all data-driven tabs immediately.
             applyFilters();
@@ -9423,6 +9610,22 @@
             return totals;
         }
 
+        function reportEmployeeLateMonthData(empId,period){
+            const months=Array.from({length:12},(_,i)=>({month:i,late5:0,late30:0,total:0}));
+            dailyLeaveRecords.forEach(r=>{
+                if(r.staffId!==empId) return;
+                const d=reportRecordDate(r);
+                if(!d || !period.testA(d)) return;
+                const l=r.leaves||{};
+                const m=months[d.getMonth()];
+                m.late5+=Number(l.Late5m||0);
+                m.late30+=Number(l.Late3m||0);
+                m.total=m.late5+m.late30;
+            });
+            return months;
+        }
+
+
         function reportEmployeeMonthDailyData(empId,monthIndex,period){
             const rows=[];
             dailyLeaveRecords.forEach(r=>{
@@ -9489,6 +9692,58 @@
             return months;
         }
 
+
+        let reportEmployeeLateLineVisible=true;
+        let reportEmployeeLateLineMonths=[];
+
+        function renderReportEmployeeLateLine(){
+            const chart=document.getElementById('reportEmployeeMetricChart');
+            if(!chart) return;
+
+            chart.querySelector('.employee-late-line-layer')?.remove();
+
+            const toggle=document.getElementById('reportEmployeeLateLineToggle');
+            const state=document.getElementById('reportEmployeeLateLineToggleState');
+            if(toggle) toggle.classList.toggle('is-active',reportEmployeeLateLineVisible);
+            if(state) state.textContent=reportEmployeeLateLineVisible?'ON':'OFF';
+
+            if(!reportEmployeeLateLineVisible || !Array.isArray(reportEmployeeLateLineMonths) || reportEmployeeLateLineMonths.length!==12) return;
+
+            const vals=reportEmployeeLateLineMonths.map(m=>Number(m.total||0));
+            const maxLate=Math.max(...vals,0);
+            const W=1200, H=150;
+            const padTop=17, padBottom=12;
+            const usableH=H-padTop-padBottom;
+
+            const x=i=>((i+0.5)/12)*W;
+            const y=v=>{
+                if(maxLate<=0) return H-padBottom;
+                return padTop + (1-(Number(v||0)/maxLate))*usableH;
+            };
+
+            const points=vals.map((v,i)=>`${x(i)},${y(v)}`).join(' ');
+            const pointSvg=vals.map((v,i)=>{
+                const px=x(i), py=y(v);
+                const labelY=Math.max(9,py-8);
+                return `<circle class="employee-late-line-point" cx="${px}" cy="${py}" r="4.2"></circle>
+                        <text class="employee-late-line-label" x="${px}" y="${labelY}">${mobileDashboardFormatNumber(v)}</text>`;
+            }).join('');
+
+            const layer=document.createElement('div');
+            layer.className='employee-late-line-layer';
+            layer.innerHTML=`<div class="employee-late-line-scale-note">Late scale: 0–${mobileDashboardFormatNumber(maxLate)}</div>
+                <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">
+                    <polyline class="employee-late-line-path" points="${points}"></polyline>
+                    ${pointSvg}
+                </svg>`;
+            chart.appendChild(layer);
+        }
+
+        window.toggleReportEmployeeLateLine=function(){
+            reportEmployeeLateLineVisible=!reportEmployeeLateLineVisible;
+            renderReportEmployeeLateLine();
+        };
+
         window.openReportEmployeeMetricDetail=function(empId){
             if(!reportMetricFocus || !reportMetricMeta[reportMetricFocus]) return;
             const emp=allEmployees.find(e=>e.id===empId);
@@ -9503,6 +9758,9 @@
             const leaveTypeTotals=reportEmployeeLeaveTypeTotals(emp.id,data.period);
             const lateTotals=reportEmployeeLateTotals(emp.id,data.period);
             const leaveTypeMonthData=reportEmployeeLeaveTypeMonthData(emp.id,data.period);
+            const lateMonthData=reportEmployeeLateMonthData(emp.id,data.period);
+            reportEmployeeLateLineMonths=lateMonthData;
+            reportEmployeeLateLineVisible=true;
             const monthData=reportEmployeeMetricMonthData(emp.id,key,data.period);
             const totalUsed=monthData.reduce((n,m)=>n+m.total,0);
 
@@ -9623,6 +9881,7 @@
                         <div class="metric-bar-label">${monthNames[m.month].slice(0,3)}</div>
                     </div>`;
                 }).join('');
+                renderReportEmployeeLateLine();
             }
 
             const monthsBox=document.getElementById('reportEmployeeMetricMonths');
@@ -13305,11 +13564,12 @@
   }
 
   function populateFilterOptions() {
-    const filterSelects = document.querySelectorAll('.column-filter');
+    const filterSelects = document.querySelectorAll('#scanView .column-filter');
     const tbody = document.getElementById('attendanceTable');
     const rows = tbody.getElementsByTagName('tr');
 
-    filterSelects.forEach((select, colIdx) => {
+    filterSelects.forEach(select => {
+      const colIdx = Number(select.dataset.col);
       const previousSelection = select.value;
       const uniqueValues = new Set();
 
@@ -13319,12 +13579,14 @@
           if ([2, 3, 4, 5].includes(colIdx)) {
             const badge = cell.querySelector('.status-badge');
             if (badge) {
-              const text = badge.textContent.trim();
-              if (text) uniqueValues.add(text);
+              const value = badge.textContent.trim();
+              if (value) uniqueValues.add(value);
             }
-          } else {
-            const text = cell.textContent.trim();
-            if (text && text !== '-') uniqueValues.add(text);
+          } else if (colIdx === 1) {
+            Array.from(cell.querySelectorAll('.code-badge')).forEach(badge => {
+              const value = badge.textContent.trim();
+              if (value) uniqueValues.add(value);
+            });
           }
         }
       }
@@ -13342,8 +13604,17 @@
     });
   }
 
+  window.clearScanStaffSearch = function() {
+    const input = document.getElementById('scanStaffSearch');
+    if (!input) return;
+    input.value = '';
+    input.focus();
+    filterTable();
+  };
+
   function filterTable() {
-    const filterInputs = document.querySelectorAll('.column-filter');
+    const filterInputs = document.querySelectorAll('#scanView .column-filter');
+    const staffSearchValue = String(document.getElementById('scanStaffSearch')?.value || '').toLowerCase().trim();
     const tbody = document.getElementById('attendanceTable');
     const rows = tbody.getElementsByTagName('tr');
 
@@ -13375,27 +13646,30 @@
         if (rowCompany !== scanCompanyValue) isMatch = false;
       }
 
+      // Search Staff Info by name, Staff ID, or company text.
+      if (isMatch && staffSearchValue) {
+        const staffText = (cells[0] ? cells[0].textContent || cells[0].innerText : '').toLowerCase();
+        if (!staffText.includes(staffSearchValue)) isMatch = false;
+      }
+
       for (let j = 0; j < filterInputs.length && isMatch; j++) {
-        const filterVal = filterInputs[j].value.toLowerCase().trim();
+        const select = filterInputs[j];
+        const colIdx = Number(select.dataset.col);
+        const filterVal = select.value.toLowerCase().trim();
         if (!filterVal) continue;
 
-        if ([2, 3, 4, 5].includes(j)) {
-          const badge = cells[j] ? cells[j].querySelector('.status-badge') : null;
+        if ([2, 3, 4, 5].includes(colIdx)) {
+          const badge = cells[colIdx] ? cells[colIdx].querySelector('.status-badge') : null;
           const statusText = badge ? badge.textContent.toLowerCase().trim() : '';
           if (statusText !== filterVal) {
             isMatch = false;
             break;
           }
-        } else if (j === 1) {
-          const codeBadges = cells[1] ? Array.from(cells[1].querySelectorAll('.code-badge')).map(b => b.textContent.trim().toLowerCase()) : [];
-          // Daily Code filtering is exact: selecting P must not include SP/UP/etc.
+        } else if (colIdx === 1) {
+          const codeBadges = cells[1]
+            ? Array.from(cells[1].querySelectorAll('.code-badge')).map(b => b.textContent.trim().toLowerCase())
+            : [];
           if (!codeBadges.includes(filterVal)) {
-            isMatch = false;
-            break;
-          }
-        } else {
-          const cellText = (cells[j] ? cells[j].textContent || cells[j].innerText : '').toLowerCase().trim();
-          if (cellText !== filterVal && !cellText.includes(filterVal)) {
             isMatch = false;
             break;
           }
@@ -13556,7 +13830,6 @@
       : cntOnTime;
 
     document.getElementById('cntOnTime').innerText = reconciledOnTime;
-    document.getElementById('cntNotScanned').innerText = cntNotScanned;
     document.getElementById('cntLate5').innerText = cntLate5;
     document.getElementById('cntLate30').innerText = cntLate30;
   }
@@ -13664,7 +13937,7 @@
    PWA SERVICE WORKER
    ========================================================== */
 
-console.log('Attendance build: 2026-09-18-scan-company-filter-v2-visible');
+console.log('Attendance build: 2026-09-19-report-employee-late-line-v1');
 
 if ('serviceWorker' in navigator) {
 
