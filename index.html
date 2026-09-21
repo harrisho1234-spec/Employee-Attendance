@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Attendance Dashboard</title>
-    <meta name="app-build" content="2026-09-19-report-employee-late-line-v1">
+    <meta name="app-build" content="2026-09-21-auto-refresh-wake-recovery-v1">
     <!-- Photo mapping: Staff ID primary, Name/File Name fallback -->
         <!-- PWA -->
     <meta name="theme-color" content="#2563eb">
@@ -5094,6 +5094,7 @@
 <!-- SCAN COMPANY FILTER V2 ACTIVE: compact Company dropdown filters table + KPI cards -->
 <!-- SCAN STAFF SEARCH V1 ACTIVE: Not Scanned KPI removed; Staff Info is live-searchable -->
 <!-- REPORT EMPLOYEE LATE LINE V1 ACTIVE: leave bars + toggleable monthly late line -->
+<!-- AUTO REFRESH WAKE RECOVERY V1 ACTIVE: stale lock reset + wake refresh -->
 <div id="scanView" class="hidden">
 
 <div class="container">
@@ -5780,10 +5781,16 @@
 
             document.addEventListener('keydown', (e) => { if (e.ctrlKey && e.key === 'z' && document.getElementById('orgView').classList.contains('hidden') === false && isOrgEditMode) { e.preventDefault(); undoOrgChange(); } });
 
-            fetchData().then(() => {
+            fetchData().then(ok => {
                 hasCompletedInitialDataLoad = true;
-                updateGlobalRefreshTimestamp();
-                startGlobalAutoRefresh();
+                if (ok !== false) {
+                    updateGlobalRefreshTimestamp();
+                    startGlobalAutoRefresh();
+                } else {
+                    globalAutoRefreshPending = true;
+                    startGlobalAutoRefresh();
+                    scheduleNextGlobalAutoRefresh(GLOBAL_AUTO_REFRESH_RETRY_MS);
+                }
             }).catch(err => {
                 console.error('Initial attendance data load failed', err);
                 hasCompletedInitialDataLoad = true;
@@ -5848,8 +5855,40 @@
         let globalAutoRefreshPending = false;
         let globalLastSuccessfulRefreshAt = 0;
         let globalNextAutoRefreshAt = 0;
+        let globalRefreshStartedAt = 0;
+        let globalRefreshRunId = 0;
+        let globalHiddenAt = 0;
         const GLOBAL_AUTO_REFRESH_MS = 5 * 60 * 1000;
         const GLOBAL_AUTO_REFRESH_RETRY_MS = 15 * 1000;
+        const GLOBAL_REFRESH_HARD_TIMEOUT_MS = 35 * 1000;
+        const GLOBAL_REFRESH_STALE_MS = 45 * 1000;
+
+        function withRefreshTimeout(promise, timeoutMs, label='Refresh timed out') {
+            let timer = null;
+            return Promise.race([
+                Promise.resolve(promise),
+                new Promise((_, reject) => {
+                    timer = setTimeout(() => reject(new Error(label)), timeoutMs);
+                })
+            ]).finally(() => {
+                if (timer) clearTimeout(timer);
+            });
+        }
+
+        function forceReleaseStuckRefresh(reason='stale refresh') {
+            if (!globalRefreshInProgress) return false;
+
+            const age = globalRefreshStartedAt ? (Date.now() - globalRefreshStartedAt) : Infinity;
+            if (age < GLOBAL_REFRESH_STALE_MS && reason !== 'wake-from-background') return false;
+
+            globalRefreshRunId++;
+            globalRefreshInProgress = false;
+            globalRefreshStartedAt = 0;
+            globalAutoRefreshPending = true;
+            setGlobalRefreshButtonsLoading(false);
+            console.warn(`Recovered from ${reason}. Starting a fresh refresh.`);
+            return true;
+        }
 
         function updateGlobalRefreshTimestamp() {
             globalLastSuccessfulRefreshAt = Date.now();
@@ -6088,35 +6127,62 @@
 
         window.refreshAllTabs = async function(btn = null, silent = false) {
             if (globalRefreshInProgress) {
+                const age = globalRefreshStartedAt ? Date.now() - globalRefreshStartedAt : Infinity;
+                if (age >= GLOBAL_REFRESH_STALE_MS) {
+                    forceReleaseStuckRefresh('stale refresh');
+                } else {
+                    globalAutoRefreshPending = true;
+                    return false;
+                }
+            }
+
+            if (document.hidden) {
                 globalAutoRefreshPending = true;
                 return false;
             }
 
-            // Never interrupt a popup/editor, but remember that a refresh is owed.
             if (isUserInteractionOpen()) {
                 globalAutoRefreshPending = true;
                 if (!silent) showAppToast('Close the open popup before refreshing.', 'info');
                 return false;
             }
 
+            const runId = ++globalRefreshRunId;
             globalRefreshInProgress = true;
+            globalRefreshStartedAt = Date.now();
             globalAutoRefreshPending = false;
 
             const keep = captureAllTabRefreshState();
-            setGlobalRefreshButtonsLoading(true);
+
+            // Background auto-refresh stays visually silent. Manual refresh keeps the spinner.
+            if (!silent) setGlobalRefreshButtonsLoading(true);
 
             try {
-                // Shared employee + attendance sources feed Dashboard, Calendar, Daily and Org.
-                await fetchData();
+                const mainOk = await withRefreshTimeout(
+                    fetchData(runId),
+                    GLOBAL_REFRESH_HARD_TIMEOUT_MS,
+                    'Main attendance refresh timed out'
+                );
+
+                if (runId !== globalRefreshRunId) return false;
+                if (mainOk === false) throw new Error('Main attendance refresh failed');
+
                 restoreAllTabRefreshState(keep);
 
-                // Scan Activity has a separate live source.
                 if (!isUserInteractionOpen() && typeof window.fetchLiveData === 'function') {
-                    try { await window.fetchLiveData(); }
-                    catch (scanErr) { console.warn('Scan Activity refresh failed', scanErr); }
+                    try {
+                        await withRefreshTimeout(
+                            window.fetchLiveData(),
+                            15 * 1000,
+                            'Scan Activity refresh timed out'
+                        );
+                    } catch (scanErr) {
+                        console.warn('Scan Activity refresh failed', scanErr);
+                    }
                 }
 
-                // Restore the active tab only when safe.
+                if (runId !== globalRefreshRunId) return false;
+
                 if (!isUserInteractionOpen() &&
                     (document.body.dataset.activeTab || 'daily') !== keep.activeTab) {
                     switchTab(keep.activeTab);
@@ -6124,17 +6190,22 @@
 
                 updateGlobalRefreshTimestamp();
                 globalNextAutoRefreshAt = Date.now() + GLOBAL_AUTO_REFRESH_MS;
+                globalAutoRefreshPending = false;
 
                 if (!silent) showAppToast('All tabs refreshed with the latest data.', 'info');
                 return true;
             } catch (e) {
+                if (runId !== globalRefreshRunId) return false;
                 console.error('Global refresh failed', e);
                 globalAutoRefreshPending = true;
-                if (!silent) showAppToast('Could not refresh the latest data.', 'error');
+                if (!silent) showAppToast('Could not refresh the latest data. Retrying shortly.', 'error');
                 return false;
             } finally {
-                setGlobalRefreshButtonsLoading(false);
-                globalRefreshInProgress = false;
+                if (runId === globalRefreshRunId) {
+                    if (!silent) setGlobalRefreshButtonsLoading(false);
+                    globalRefreshInProgress = false;
+                    globalRefreshStartedAt = 0;
+                }
             }
         };
 
@@ -6151,8 +6222,19 @@
         async function runGlobalAutoRefreshCycle() {
             const now = Date.now();
 
-            // If user is interacting, do not lose the refresh cycle.
-            // Retry shortly after instead of waiting another full five minutes.
+            // Never start network work while the app is backgrounded.
+            if (document.hidden) {
+                globalAutoRefreshPending = true;
+                scheduleNextGlobalAutoRefresh(GLOBAL_AUTO_REFRESH_RETRY_MS);
+                return;
+            }
+
+            // Recover a suspended refresh instead of staying locked forever.
+            if (globalRefreshInProgress && globalRefreshStartedAt &&
+                (now - globalRefreshStartedAt) >= GLOBAL_REFRESH_STALE_MS) {
+                forceReleaseStuckRefresh('scheduler watchdog');
+            }
+
             if (isUserInteractionOpen() || globalRefreshInProgress) {
                 globalAutoRefreshPending = true;
                 scheduleNextGlobalAutoRefresh(GLOBAL_AUTO_REFRESH_RETRY_MS);
@@ -6196,20 +6278,53 @@
             }
         }
 
-        // Browsers may throttle timers while the app is in the background.
-        // Catch up as soon as the tab/app becomes active again.
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) catchUpGlobalAutoRefreshIfNeeded();
-        });
-        window.addEventListener('focus', catchUpGlobalAutoRefreshIfNeeded);
-        window.addEventListener('pageshow', catchUpGlobalAutoRefreshIfNeeded);
-
-
-        setInterval(() => {
+        function handleAppReturnedToForeground(source='foreground') {
             if (!hasCompletedInitialDataLoad) return;
-            if (document.hidden) return;
+
+            const hiddenFor = globalHiddenAt ? (Date.now() - globalHiddenAt) : 0;
+            globalHiddenAt = 0;
+
+            // If a refresh was suspended while hidden, invalidate it immediately.
+            if (globalRefreshInProgress &&
+                (hiddenFor >= 20 * 1000 ||
+                 !globalRefreshStartedAt ||
+                 (Date.now() - globalRefreshStartedAt) >= GLOBAL_REFRESH_STALE_MS)) {
+                forceReleaseStuckRefresh('wake-from-background');
+            }
+
+            const overdue = !globalNextAutoRefreshAt || Date.now() >= globalNextAutoRefreshAt;
+            if (hiddenFor >= GLOBAL_AUTO_REFRESH_MS || overdue || globalAutoRefreshPending) {
+                globalAutoRefreshPending = true;
+                setGlobalRefreshButtonsLoading(false);
+                scheduleNextGlobalAutoRefresh(500);
+            }
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                globalHiddenAt = Date.now();
+                return;
+            }
+            handleAppReturnedToForeground('visibility');
+        });
+
+        window.addEventListener('focus', () => handleAppReturnedToForeground('focus'));
+        window.addEventListener('pageshow', () => handleAppReturnedToForeground('pageshow'));
+
+        // Visible watchdog: release any stale refresh lock and retry quickly.
+        setInterval(() => {
+            if (!hasCompletedInitialDataLoad || document.hidden) return;
+
+            if (globalRefreshInProgress && globalRefreshStartedAt &&
+                (Date.now() - globalRefreshStartedAt) >= GLOBAL_REFRESH_STALE_MS) {
+                forceReleaseStuckRefresh('visible watchdog');
+                scheduleNextGlobalAutoRefresh(500);
+                return;
+            }
+
             catchUpGlobalAutoRefreshIfNeeded();
-        }, 30000);
+        }, 15000);
+
 
         window.setDailyDateRange = function() {
             if(!window.fpFrom || !window.fpTo) return;
@@ -6243,24 +6358,87 @@
             renderDailyAttendance();
         };
 
-        async function fetchData() {
+        async function fetchData(refreshRunId = null) {
             try {
                 await loadCustomNotes();
-                let completed = 0; const updateProgress = () => { completed++; document.getElementById('loaderPct').innerText = Math.floor((completed / 40) * 100) + '%'; };
-                const safeFetch = async (url) => { for(let i=0;i<3;i++) { try { const c = new AbortController(); const t = setTimeout(()=>c.abort(), 6000); const r = await fetch(url, {cache:'no-store', signal:c.signal}); clearTimeout(t); updateProgress(); return r.ok ? await r.text() : ""; } catch(e) { if(i===2) { updateProgress(); return ""; } } } };
-                
-                const [infoTxt, pullTxt, resigTxt, photoTxt, gridRes] = await Promise.all([ safeFetch(csvInfoUrl), safeFetch(csvDataPullUrl), safeFetch(csvResignedUrl), safeFetch(csvPhotoUrl), Promise.all(gridSources.map(s => Promise.all(s.urls.map(u => safeFetch(u))).then(tx => ({month:s.month, data: tx.flatMap(t => t ? Papa.parse(t).data : [])})) )) ]);
-                
-                document.getElementById('loaderSubText').innerHTML = `Processing Data... <i class="fa-solid fa-cog fa-spin ml-1.5"></i>`;
+
+                if (refreshRunId !== null && refreshRunId !== globalRefreshRunId) return false;
+
+                let completed = 0;
+                const updateProgress = () => {
+                    completed++;
+                    const pct = document.getElementById('loaderPct');
+                    if (pct) pct.innerText = Math.floor((completed / 40) * 100) + '%';
+                };
+
+                const safeFetch = async (url) => {
+                    for (let i = 0; i < 3; i++) {
+                        try {
+                            const c = new AbortController();
+                            const t = setTimeout(() => c.abort(), 6000);
+                            const r = await fetch(url, {cache:'no-store', signal:c.signal});
+                            clearTimeout(t);
+                            updateProgress();
+                            return r.ok ? await r.text() : "";
+                        } catch(e) {
+                            if (i === 2) {
+                                updateProgress();
+                                return "";
+                            }
+                        }
+                    }
+                    return "";
+                };
+
+                const [infoTxt, pullTxt, resigTxt, photoTxt, gridRes] = await Promise.all([
+                    safeFetch(csvInfoUrl),
+                    safeFetch(csvDataPullUrl),
+                    safeFetch(csvResignedUrl),
+                    safeFetch(csvPhotoUrl),
+                    Promise.all(
+                        gridSources.map(s =>
+                            Promise.all(s.urls.map(u => safeFetch(u)))
+                                .then(tx => ({
+                                    month:s.month,
+                                    data: tx.flatMap(t => t ? Papa.parse(t).data : [])
+                                }))
+                        )
+                    )
+                ]);
+
+                if (refreshRunId !== null && refreshRunId !== globalRefreshRunId) return false;
+
+                const loaderSub = document.getElementById('loaderSubText');
+                if (loaderSub) loaderSub.innerHTML = `Processing Data... <i class="fa-solid fa-cog fa-spin ml-1.5"></i>`;
                 await new Promise(r => setTimeout(r, 100));
 
                 const parseCSV = str => new Promise(r => Papa.parse(str, {complete:r}));
-                processData((await parseCSV(infoTxt)).data, (await parseCSV(pullTxt)).data, gridRes, (await parseCSV(resigTxt)).data, (await parseCSV(photoTxt)).data);
-                
+
+                const infoData = (await parseCSV(infoTxt)).data;
+                const pullData = (await parseCSV(pullTxt)).data;
+                const resigData = (await parseCSV(resigTxt)).data;
+                const photoData = (await parseCSV(photoTxt)).data;
+
+                if (refreshRunId !== null && refreshRunId !== globalRefreshRunId) return false;
+
+                processData(infoData, pullData, gridRes, resigData, photoData);
+
+                if (refreshRunId !== null && refreshRunId !== globalRefreshRunId) return false;
+
                 const loader = document.getElementById('globalLoader');
-                if(loader) { loader.style.opacity = '0'; setTimeout(()=>loader.style.display='none', 500); }
-            } catch(e) { console.error(e); showAppToast("Error loading data: " + e.message, "error"); }
+                if(loader) {
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.style.display='none', 500);
+                }
+
+                return true;
+            } catch(e) {
+                console.error(e);
+                if (refreshRunId === null) showAppToast("Error loading data: " + e.message, "error");
+                return false;
+            }
         }
+
 
         function normalizeHeaderName(v) {
             return String(v || '').trim().toLowerCase().replace(/[_\-]+/g, ' ').replace(/\s+/g, ' ');
@@ -12563,11 +12741,21 @@
   }
 
   async function fetchLiveData() {
+    const fetchWithTimeout = async (url, timeoutMs = 10000) => {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        return await fetch(url, { cache: 'no-store', signal: controller.signal });
+      } finally {
+        clearTimeout(timer);
+      }
+    };
+
     try {
       const [logRes, masterRes, photoRes] = await Promise.all([
-        fetch(GVIZ_LOG_URL),
-        fetch(GVIZ_MASTER_URL),
-        fetch(SCAN_PHOTO_CSV_URL)
+        fetchWithTimeout(GVIZ_LOG_URL),
+        fetchWithTimeout(GVIZ_MASTER_URL),
+        fetchWithTimeout(SCAN_PHOTO_CSV_URL)
       ]);
 
       const logCsv = await logRes.text();
@@ -12580,8 +12768,10 @@
 
       const masterData = parseMasterEmployee(masterRows, photoRows);
       processAttendanceData(logRows, masterData);
+      return true;
     } catch (err) {
       console.error('Data fetch failed:', err);
+      return false;
     }
   }
 
@@ -13937,7 +14127,7 @@
    PWA SERVICE WORKER
    ========================================================== */
 
-console.log('Attendance build: 2026-09-19-report-employee-late-line-v1');
+console.log('Attendance build: 2026-09-21-auto-refresh-wake-recovery-v1');
 
 if ('serviceWorker' in navigator) {
 
