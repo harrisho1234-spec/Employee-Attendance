@@ -4608,6 +4608,17 @@
                             <div id="dailyCompanyCheckboxList" class="p-2 flex flex-col space-y-1 overflow-y-auto"></div>
                         </div>
                     </div>
+
+                    <!-- Multi-Select Daily Department Filter -->
+                    <div class="relative filter-dropdown w-full sm:w-auto">
+                        <button id="dailyDepartmentDropdownBtn" type="button" class="w-full sm:w-auto bg-white border border-slate-200 text-slate-700 text-sm rounded-lg p-2 min-w-[160px] flex justify-between items-center cursor-pointer shadow-sm font-semibold">
+                            <span id="dailyDepartmentDropdownLabel" class="truncate max-w-[130px]">All Departments</span><i class="fa-solid fa-chevron-down text-xs ml-2 text-slate-400"></i>
+                        </button>
+                        <div id="dailyDepartmentDropdownMenu" class="hidden absolute left-0 sm:left-auto sm:right-auto z-30 w-full sm:w-56 mt-1 bg-white border border-slate-200 rounded-lg shadow-xl max-h-60 flex flex-col overflow-hidden">
+                            <div class="p-2 border-b border-slate-100 shrink-0 bg-slate-50"><label class="flex items-center space-x-2 cursor-pointer p-1"><input type="checkbox" id="dailySelectAllDepartments" class="rounded text-blue-600" checked><span class="text-sm font-bold text-slate-700">All Departments</span></label></div>
+                            <div id="dailyDepartmentCheckboxList" class="p-2 flex flex-col space-y-1 overflow-y-auto"></div>
+                        </div>
+                    </div>
                     
                     <!-- Multi-Select Daily Leave Filter -->
                     <div class="relative filter-dropdown w-full sm:w-auto">
@@ -5552,6 +5563,10 @@
         const csvDataPullUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR8o8p12U_gWwt-uSmSRBgm1mq1Ouks6qP_38xv5szrDpiPmDTotqrL88nop0l-kbV14aPMpHWv6sH3/pub?gid=1932519603&single=true&output=csv';
         const csvResignedUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR8o8p12U_gWwt-uSmSRBgm1mq1Ouks6qP_38xv5szrDpiPmDTotqrL88nop0l-kbV14aPMpHWv6sH3/pub?gid=1222934&single=true&output=csv'; 
         const csvPhotoUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTMLb32UtkgIEdeDvC980pnJ0cZJJRyVVfGNLy6QBkSOWxJF7bY7CP0PSxRbvmlrY13fiTZtDAsehNF/pub?output=csv';
+
+        // Payroll AJ bridge: deploy the small Apps Script bridge provided with this update, then paste its /exec URL here.
+        // This is required because the Backend spreadsheet itself is Restricted.
+        const PAYROLL_AJ_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzqXBIxrUx4XUeSzD4n03SpJNTbM1-Rct3RSK-FeSAV1phIpy_GKUYu_ah3cVPV258F7g/exec';
         
         const gridGids = { 'January': '2006891031', 'February': '1349409947', 'March': '1401062813', 'April': '1577313383', 'May': '411061239', 'June': '533249454', 'July': '565478401', 'August': '1279774546', 'September': '946959903', 'October': '1363713547', 'November': '967879953', 'December': '1958319263' };
         const roots = ['https://docs.google.com/spreadsheets/d/e/2PACX-1vR6t0Y4tyj0_mfECLqLcLs5fkb_1_bfmPw_goauS2Rnzo5IjG-ifmF6rXCYVPP-KHX0GJTcr5VMgnEp/pub?single=true&output=csv&gid=', 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTlBLiAerrgDSPv7x8ENRLV-CFWDQ5dGLInrqiiadmtZ0xSOXdX6inlnPO1X0M1ew5xXLWwUlkH_YVp/pub?single=true&output=csv&gid=', 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSSQh8yswBgWnt3tToX-Xr0eH6o11ZSMby2qq2iXx_Woym6YVbWE5QDgjkSRarUPNmp-PFFsIW_XE_O/pub?single=true&output=csv&gid='];
@@ -5560,7 +5575,7 @@
         // Global State
         let allEmployees = []; let filteredEmployees = []; 
         let companies = new Set(); let departments = new Set();
-        let selectedCompanies = []; let selectedCalendarCompanies = []; let selectedDailyCompanies = []; let selectedCalendarRowCompany = 'ITC'; let selectedCalendarRowDepartments = null; let selectedCalendarRowMonth = new Date().getMonth(); let selectedCalendarRowYear = new Date().getFullYear(); const attendanceDataYear = new Date().getFullYear();
+        let selectedCompanies = []; let selectedCalendarCompanies = []; let selectedDailyCompanies = []; let selectedDailyDepartments = null; let selectedCalendarRowCompany = 'ITC'; let selectedCalendarRowDepartments = null; let selectedCalendarRowMonth = new Date().getMonth(); let selectedCalendarRowYear = new Date().getFullYear(); const attendanceDataYear = new Date().getFullYear();
         let selectedDepartments = null; // null = all departments; otherwise array of selected department names
         let selectedStatuses = ['Active']; let selectedDashboardYear = attendanceDataYear; let selectedDashboardMonth = 'All'; let selectedDashboardWarning = 'All'; let searchQuery = ''; let dailySearchQuery = '';
         let reportMode='monthly'; let reportSubtab='warnings'; let reportInitialized=false; let selectedReportCompanies=[]; let reportMetricFocus=null; let reportDetailScrollBeforeEmployee=0; let employeeModalOriginalParent=null; let employeeModalOriginalNextSibling=null; let reportSearchQuery=''; let reportMetricSearchQuery=''; let reportMetricDepartment='All'; let reportMetricCompany='All'; let reportMetricChartLeaveTypes=new Set(['AL','SL','SP','UP']); let reportEmployeeMetricStandalone=false; let reportEmployeeMetricOriginalParent=null; let reportEmployeeMetricOriginalNextSibling=null;
@@ -5709,6 +5724,7 @@
             const calRowBtn = document.getElementById('calRowCompanyDropdownBtn'); const calRowMenu = document.getElementById('calRowCompanyDropdownMenu');
             const calRowDeptBtn = document.getElementById('calRowDepartmentDropdownBtn'); const calRowDeptMenu = document.getElementById('calRowDepartmentDropdownMenu');
             const dailyBtn = document.getElementById('dailyCompanyDropdownBtn'); const dailyMenu = document.getElementById('dailyCompanyDropdownMenu');
+            const dailyDeptBtn = document.getElementById('dailyDepartmentDropdownBtn'); const dailyDeptMenu = document.getElementById('dailyDepartmentDropdownMenu');
             const monthBtn = document.getElementById('monthDropdownBtn'); const monthMenu = document.getElementById('monthDropdownMenu');
             const dailyTabExportBtn = document.getElementById('dailyTabExportBtn'); const dailyTabExportMenu = document.getElementById('dailyTabExportMenu');
             const statusBtn = document.getElementById('statusDropdownBtn'); const statusMenu = document.getElementById('statusDropdownMenu');
@@ -5717,24 +5733,30 @@
             orgLabel = document.getElementById('orgCompanyDropdownLabel'); orgList = document.getElementById('orgCompanyList');
 
             const setupDropdown = (btn, menu, others) => { if(btn) btn.addEventListener('click', (e) => { e.stopPropagation(); menu.classList.toggle('hidden'); others.forEach(m => { if(m) m.classList.add('hidden'); }); }); };
-            setupDropdown(mainBtn, mainMenu, [calMenu, calRowMenu, calRowDeptMenu, dailyMenu, monthMenu, dailyTabExportMenu, orgMenu, statusMenu, dailyLeaveMenu]);
-            setupDropdown(calBtn, calMenu, [mainMenu, calRowMenu, calRowDeptMenu, dailyMenu, monthMenu, dailyTabExportMenu, orgMenu, statusMenu, dailyLeaveMenu]);
-            setupDropdown(calRowBtn, calRowMenu, [mainMenu, calMenu, calRowDeptMenu, dailyMenu, monthMenu, dailyTabExportMenu, orgMenu, statusMenu, dailyLeaveMenu]);
-            setupDropdown(calRowDeptBtn, calRowDeptMenu, [mainMenu, calMenu, calRowMenu, dailyMenu, monthMenu, dailyTabExportMenu, orgMenu, statusMenu, dailyLeaveMenu]);
-            setupDropdown(dailyBtn, dailyMenu, [mainMenu, calMenu, calRowMenu, calRowDeptMenu, monthMenu, dailyTabExportMenu, orgMenu, statusMenu, dailyLeaveMenu]);
-            setupDropdown(monthBtn, monthMenu, [mainMenu, calMenu, calRowMenu, calRowDeptMenu, dailyMenu, dailyTabExportMenu, orgMenu, statusMenu, dailyLeaveMenu]);
-            setupDropdown(dailyTabExportBtn, dailyTabExportMenu, [mainMenu, calMenu, calRowMenu, calRowDeptMenu, dailyMenu, monthMenu, orgMenu, statusMenu, dailyLeaveMenu]);
-            setupDropdown(orgBtn, orgMenu, [mainMenu, calMenu, calRowMenu, calRowDeptMenu, dailyMenu, monthMenu, dailyTabExportMenu, statusMenu, dailyLeaveMenu]);
-            setupDropdown(statusBtn, statusMenu, [mainMenu, calMenu, calRowMenu, calRowDeptMenu, dailyMenu, monthMenu, dailyTabExportMenu, orgMenu, dailyLeaveMenu]);
-            setupDropdown(dailyLeaveBtn, dailyLeaveMenu, [mainMenu, calMenu, calRowMenu, calRowDeptMenu, dailyMenu, monthMenu, dailyTabExportMenu, orgMenu, statusMenu]);
+            setupDropdown(mainBtn, mainMenu, [calMenu, calRowMenu, calRowDeptMenu, dailyMenu, monthMenu, dailyTabExportMenu, orgMenu, statusMenu, dailyLeaveMenu, dailyDeptMenu]);
+            setupDropdown(calBtn, calMenu, [mainMenu, calRowMenu, calRowDeptMenu, dailyMenu, monthMenu, dailyTabExportMenu, orgMenu, statusMenu, dailyLeaveMenu, dailyDeptMenu]);
+            setupDropdown(calRowBtn, calRowMenu, [mainMenu, calMenu, calRowDeptMenu, dailyMenu, monthMenu, dailyTabExportMenu, orgMenu, statusMenu, dailyLeaveMenu, dailyDeptMenu]);
+            setupDropdown(calRowDeptBtn, calRowDeptMenu, [mainMenu, calMenu, calRowMenu, dailyMenu, monthMenu, dailyTabExportMenu, orgMenu, statusMenu, dailyLeaveMenu, dailyDeptMenu]);
+            setupDropdown(dailyBtn, dailyMenu, [mainMenu, calMenu, calRowMenu, calRowDeptMenu, monthMenu, dailyTabExportMenu, orgMenu, statusMenu, dailyLeaveMenu, dailyDeptMenu]);
+            setupDropdown(dailyDeptBtn, dailyDeptMenu, [mainMenu, calMenu, calRowMenu, calRowDeptMenu, dailyMenu, monthMenu, dailyTabExportMenu, orgMenu, statusMenu, dailyLeaveMenu]);
+            setupDropdown(monthBtn, monthMenu, [mainMenu, calMenu, calRowMenu, calRowDeptMenu, dailyMenu, dailyTabExportMenu, orgMenu, statusMenu, dailyLeaveMenu, dailyDeptMenu]);
+            setupDropdown(dailyTabExportBtn, dailyTabExportMenu, [mainMenu, calMenu, calRowMenu, calRowDeptMenu, dailyMenu, monthMenu, orgMenu, statusMenu, dailyLeaveMenu, dailyDeptMenu]);
+            setupDropdown(orgBtn, orgMenu, [mainMenu, calMenu, calRowMenu, calRowDeptMenu, dailyMenu, monthMenu, dailyTabExportMenu, statusMenu, dailyLeaveMenu, dailyDeptMenu]);
+            setupDropdown(statusBtn, statusMenu, [mainMenu, calMenu, calRowMenu, calRowDeptMenu, dailyMenu, monthMenu, dailyTabExportMenu, orgMenu, dailyLeaveMenu, dailyDeptMenu]);
+            setupDropdown(dailyLeaveBtn, dailyLeaveMenu, [mainMenu, calMenu, calRowMenu, calRowDeptMenu, dailyMenu, monthMenu, dailyTabExportMenu, orgMenu, statusMenu, dailyDeptMenu]);
 
             document.addEventListener('click', (e) => {
-                if (!e.target.closest('.filter-dropdown')) { [mainMenu, calMenu, calRowMenu, calRowDeptMenu, dailyMenu, monthMenu, dailyTabExportMenu, orgMenu, statusMenu, dailyLeaveMenu].forEach(m => { if(m) m.classList.add('hidden'); }); }
+                if (!e.target.closest('.filter-dropdown')) { [mainMenu, calMenu, calRowMenu, calRowDeptMenu, dailyMenu, dailyDeptMenu, monthMenu, dailyTabExportMenu, orgMenu, statusMenu, dailyLeaveMenu].forEach(m => { if(m) m.classList.add('hidden'); }); }
             });
             document.querySelectorAll('.filter-dropdown').forEach(d => d.addEventListener('click', e => { if(e.target.closest('[id$="Menu"]')) e.stopPropagation(); }));
 
             ['main', 'cal', 'daily'].forEach(t => { const el = document.getElementById(t==='main'?'selectAllCompanies':t==='cal'?'calSelectAllCompanies':'dailySelectAllCompanies'); if(el) el.addEventListener('change', e => handleSelectAll(e.target.checked, t)); });
             
+            const dailySelectAllDepartments = document.getElementById('dailySelectAllDepartments');
+            if (dailySelectAllDepartments) {
+                dailySelectAllDepartments.addEventListener('change', (e) => handleDailyDepartmentSelectAll(e.target.checked));
+            }
+
             const dailySelectAllLeaves = document.getElementById('dailySelectAllLeaves');
             if (dailySelectAllLeaves) {
                 dailySelectAllLeaves.addEventListener('change', (e) => {
@@ -5960,6 +5982,7 @@
                 calLeaveFilter: activeLeaveFilter,
 
                 dailyCompanies: [...selectedDailyCompanies],
+                dailyDepartments: selectedDailyDepartments === null ? null : [...selectedDailyDepartments],
                 dailyLeaveTypes: [...(window.selectedDailyLeaveTypes || window.allLeaveTypeKeys || [])],
                 dailySearch: dailySearchQuery,
                 dailyFrom: document.getElementById('dailyFilterFrom')?.value || '',
@@ -6043,6 +6066,9 @@
             // Daily Attendance
             const dailyCompanies = keep.dailyCompanies.filter(c => availableCompanies.includes(c));
             selectedDailyCompanies = dailyCompanies.length || keep.dailyCompanies.length === 0 ? dailyCompanies : [...availableCompanies];
+            selectedDailyDepartments = keep.dailyDepartments === undefined || keep.dailyDepartments === null
+                ? null
+                : keep.dailyDepartments.filter(d => availableDepartments.includes(d));
             window.selectedDailyLeaveTypes = [...keep.dailyLeaveTypes];
             dailySearchQuery = keep.dailySearch;
 
@@ -6071,6 +6097,7 @@
             restoreCompanyCheckboxState('main', selectedCompanies);
             restoreCompanyCheckboxState('cal', selectedCalendarCompanies);
             restoreCompanyCheckboxState('daily', selectedDailyCompanies);
+            initializeDailyDepartmentFilter(false);
 
             // Scan date
             const scanDate = document.getElementById('dateSelect');
@@ -6481,6 +6508,10 @@
                 allEmployees.push({
                     id: id, displayId: rawId, name: row[2]||'', company: c, department: d, position: row[5]||'Unknown', entity: entity, joinDate: row[6]||'N/A', sortableJoinDate: isNaN(jd.getTime())?0:jd.getTime(), status: stat, totalLate5m: 0, totalLate3m: 0,
                     resignedDate: stat !== 'Active' ? detectedLastDay : null, resignedReason: null, photoUrl: null,
+                    // Backend column AJ = zero-based index 35. The app's existing published
+                    // Employee Info CSV already carries this column, so Payroll Export can
+                    // use it without opening the restricted source spreadsheet in the browser.
+                    payrollGroup: String(row[35] || '').trim(),
                     leaves: { available: {AL:parseFloat(row[8])||0, SL:parseFloat(row[9])||0, SP:parseFloat(row[10])||0}, used: {SL:parseFloat(row[16])||0, AL:parseFloat(row[17])||0, SP:parseFloat(row[19])||0}, remaining: {AL:parseFloat(row[20])||0, SL:parseFloat(row[21])||0, SP:parseFloat(row[22])||0}, unpaid: parseFloat(row[12])||0, absences: parseFloat(row[13])||0 }
                 });
             });
@@ -6716,11 +6747,13 @@
             selectedCompanies=[...cArr];
             selectedCalendarCompanies=cArr.includes('HQ')?['HQ']:[...cArr];
             selectedDailyCompanies=[...cArr];
+            selectedDailyDepartments = null;
             selectedCalendarRowCompany = cArr.includes('HQ') ? 'HQ' : (cArr[0] || '__ALL__');
             selectedCalendarRowMonth = new Date().getMonth();
             selectedCalendarRowYear = attendanceDataYear;
             initializeCalendarRowPeriodFilters();
             initializeCalendarRowDepartmentFilter(true);
+            initializeDailyDepartmentFilter(true);
             updateCalendarRowCompanyLabel();
             const calAll=document.getElementById('calSelectAllCompanies');
             if(calAll){
@@ -6790,7 +6823,7 @@
             if(arr.length===companies.size){sa.checked=true;sa.indeterminate=false;}else if(arr.length===0){sa.checked=false;sa.indeterminate=false;}else{sa.checked=false;sa.indeterminate=true;}
             let lb=document.getElementById(type==='main'?'companyDropdownLabel':(type==='cal'?'calCompanyDropdownLabel':'dailyCompanyDropdownLabel'));
             if(lb) lb.innerText = arr.length===companies.size?"All Companies":(arr.length===0?"Select Company":(arr.length===1?arr[0]:`${arr.length} Companies`));
-            if(type==='main') applyFilters(); else if(type==='cal') renderCalendar(); else renderDailyAttendance();
+            if(type==='main') applyFilters(); else if(type==='cal') renderCalendar(); else { initializeDailyDepartmentFilter(false); renderDailyAttendance(); }
         };
 
         window.handleSelectAll=function(chk,type) {
@@ -6804,7 +6837,96 @@
             let lb=document.getElementById(type==='main'?'companyDropdownLabel':(type==='cal'?'calCompanyDropdownLabel':'dailyCompanyDropdownLabel'));
             if(lb) lb.innerText = chk?"All Companies":"Select Company";
             
-            if(type==='main') applyFilters(); else if(type==='cal') renderCalendar(); else renderDailyAttendance();
+            if(type==='main') applyFilters(); else if(type==='cal') renderCalendar(); else { initializeDailyDepartmentFilter(false); renderDailyAttendance(); }
+        };
+
+        function getDailyAvailableDepartments() {
+            const selectedCompanies = Array.isArray(selectedDailyCompanies) ? selectedDailyCompanies : [];
+            const available = new Set();
+
+            // Match the Daily Attendance company filter exactly. When one company is selected,
+            // only departments belonging to that company are shown. With multiple companies,
+            // show the union of departments belonging to the selected companies.
+            if (selectedCompanies.length === 0) return [];
+
+            allEmployees.forEach(emp => {
+                const company = String(emp?.company || '').trim();
+                const dept = String(emp?.department || '').trim();
+                if (dept && selectedCompanies.includes(company)) available.add(dept);
+            });
+
+            return Array.from(available).sort((a,b) => a.localeCompare(b));
+        }
+
+        window.initializeDailyDepartmentFilter = function(resetToAll = false) {
+            const list = document.getElementById('dailyDepartmentCheckboxList');
+            const allBox = document.getElementById('dailySelectAllDepartments');
+            const available = getDailyAvailableDepartments();
+
+            if (resetToAll || selectedDailyDepartments === undefined) selectedDailyDepartments = null;
+            if (Array.isArray(selectedDailyDepartments)) {
+                selectedDailyDepartments = selectedDailyDepartments.filter(d => available.includes(d));
+            }
+
+            if (list) {
+                list.innerHTML = '';
+                available.forEach(dept => {
+                    const label = document.createElement('label');
+                    label.className = 'flex items-center gap-2 p-1.5 rounded hover:bg-slate-50 cursor-pointer';
+                    const input = document.createElement('input');
+                    input.type = 'checkbox';
+                    input.className = 'daily-department-checkbox rounded text-blue-600 focus:ring-blue-500';
+                    input.value = dept;
+                    input.checked = selectedDailyDepartments === null || selectedDailyDepartments.includes(dept);
+                    input.addEventListener('change', () => toggleDailyDepartment(dept, input.checked));
+                    const span = document.createElement('span');
+                    span.className = 'text-sm text-slate-700 truncate';
+                    span.textContent = dept;
+                    label.appendChild(input);
+                    label.appendChild(span);
+                    list.appendChild(label);
+                });
+                if (!available.length) list.innerHTML = '<div class="px-2 py-3 text-xs text-slate-400 text-center">No departments found</div>';
+            }
+
+            if (allBox) {
+                const selectedCount = selectedDailyDepartments === null ? available.length : selectedDailyDepartments.length;
+                allBox.checked = available.length > 0 && selectedCount === available.length;
+                allBox.indeterminate = selectedCount > 0 && selectedCount < available.length;
+                allBox.disabled = available.length === 0;
+            }
+            updateDailyDepartmentLabel();
+        };
+
+        window.updateDailyDepartmentLabel = function() {
+            const label = document.getElementById('dailyDepartmentDropdownLabel');
+            if (!label) return;
+            const available = getDailyAvailableDepartments();
+            const selected = selectedDailyDepartments;
+            if (!available.length) label.textContent = 'No Departments';
+            else if (selected === null || selected.length === available.length) label.textContent = 'All Departments';
+            else if (selected.length === 0) label.textContent = 'No Departments';
+            else if (selected.length === 1) label.textContent = selected[0];
+            else label.textContent = `${selected.length} Departments`;
+        };
+
+        window.handleDailyDepartmentSelectAll = function(checked) {
+            selectedDailyDepartments = checked ? null : [];
+            initializeDailyDepartmentFilter(false);
+            renderDailyAttendance();
+        };
+
+        window.toggleDailyDepartment = function(dept, checked) {
+            const available = getDailyAvailableDepartments();
+            let selected = selectedDailyDepartments === null ? [...available] : [...selectedDailyDepartments];
+            if (checked) {
+                if (!selected.includes(dept)) selected.push(dept);
+            } else {
+                selected = selected.filter(d => d !== dept);
+            }
+            selectedDailyDepartments = selected.length === available.length ? null : selected;
+            initializeDailyDepartmentFilter(false);
+            renderDailyAttendance();
         };
 
         window.toggleDeptDropdown = function(e, cId, dept) { e.stopPropagation(); document.querySelectorAll('[id^="dept-dropdown-"]').forEach(el=>el.classList.add('hidden')); openDeptModal(cId.replace(/-/g,' '), dept); };
@@ -7505,6 +7627,9 @@
         }
 
         const STAFF_PHOTO_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwoIQLIY1az5u9qL4TEKGkAq_lDBmfRRYffJN6TpkzSYVgJLCBQDBdZTuHvl4KnXpbrbQ/exec';
+        // Warning attachments are stored in the dedicated Google Drive folder through Apps Script.
+        // Set this to the deployed Warning_Attachment_Drive_Bridge Web App /exec URL.
+        const WARNING_ATTACHMENT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwz2uwx3IDZPD0SwCpxJT4clNmggS55iNF1LCek949smOwBM-CtazS0FIBaY_D3qGL7/exec';
 
         async function blobToDataUrl(blob) {
             return await new Promise((resolve, reject) => {
@@ -8121,28 +8246,77 @@
             }
             return files;
         }
+        function warningFileToDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(String(reader.result || ''));
+                reader.onerror = () => reject(new Error(`Could not read ${file?.name || 'the attachment'}.`));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function warningAttachmentDriveRequest(payload) {
+            const endpoint = String(WARNING_ATTACHMENT_WEB_APP_URL || '').trim();
+            if (!endpoint) {
+                throw new Error('Warning attachment storage is not configured. Deploy Warning_Attachment_Drive_Bridge and set WARNING_ATTACHMENT_WEB_APP_URL.');
+            }
+
+            const response = await withTimeout(fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload),
+                redirect: 'follow',
+                cache: 'no-store'
+            }), 45000, 'Warning attachment Drive service');
+
+            if (!response.ok) throw new Error(`Warning attachment service returned HTTP ${response.status}.`);
+
+            let result;
+            try {
+                result = await withTimeout(response.json(), 10000, 'Warning attachment service response');
+            } catch (e) {
+                throw new Error('The warning attachment service returned an unreadable response.');
+            }
+
+            if (!result || result.ok !== true) {
+                throw new Error(result?.error || result?.message || 'Google Drive upload failed.');
+            }
+            return result;
+        }
+
         async function uploadNewWarningAttachmentFiles(staffId, level, startAt, issuer, files) {
             if (!files.length) return [];
             if (!['written','final','fic'].includes(level)) return [];
-            if (!window.fbStorage || !window.fbStorageRef || !window.fbUploadBytes || !window.fbGetDownloadURL) {
-                throw new Error('Google Drive is not ready. Enable Storage for this Firebase project first.');
-            }
-            await window.authReady;
-            const safeStaff = warningNormalizeKey(staffId).replace(/[^A-Z0-9_-]/gi,'_');
-            const entryKey = String(startAt || Date.now()).replace(/[^0-9A-Za-z_-]/g,'_');
+
+            const emp = allEmployees.find(e => e.id === warningNormalizeKey(staffId) || normalizeId(e.displayId) === warningNormalizeKey(staffId));
+            const staffName = emp?.name || '';
+            const company = emp?.company || '';
+
             const attachments = [];
             for (const f of files) {
-                const safeName = f.name.replace(/[^0-9A-Za-z._-]+/g,'_').slice(-120);
-                const path = `warning-attachments/${safeStaff}/${entryKey}/${Date.now()}_${Math.random().toString(36).slice(2,8)}_${safeName}`;
-                const ref = window.fbStorageRef(window.fbStorage, path);
-                const snap = await window.fbUploadBytes(ref, f, {
-                    contentType:f.type,
-                    customMetadata:{ staffId:staffId, warningLevel:level }
+                const base64 = await warningFileToDataUrl(f);
+                const result = await warningAttachmentDriveRequest({
+                    action: 'uploadWarningAttachment',
+                    staffId: String(staffId || '').trim(),
+                    staffName: String(staffName || '').trim(),
+                    company: String(company || '').trim(),
+                    warningLevel: String(level || '').trim(),
+                    startAt: String(startAt || '').trim(),
+                    issuer: String(issuer || 'HR').trim(),
+                    fileName: String(f.name || 'attachment').trim(),
+                    mimeType: String(f.type || 'application/octet-stream'),
+                    base64
                 });
-                const url = await window.fbGetDownloadURL(snap.ref);
+
                 attachments.push({
-                    name:f.name, url, path, contentType:f.type, size:f.size,
-                    uploadedAt:new Date().toISOString(), uploadedBy:issuer || 'HR'
+                    name: result.name || f.name,
+                    url: result.url || '',
+                    fileId: result.fileId || '',
+                    path: '',
+                    contentType: f.type,
+                    size: f.size,
+                    uploadedAt: new Date().toISOString(),
+                    uploadedBy: issuer || 'HR'
                 });
             }
             return attachments;
@@ -8509,47 +8683,72 @@
             if (!ctx) { showAppToast('Save the warning entry first, then attach the signed form.', 'error'); return; }
             const level = document.getElementById('warningHistoryEditLevel')?.value || ctx.entry.level;
             if (!['written','final','fic'].includes(level)) { showAppToast('Attachments can be uploaded to Written Warning, Final Warning or FIC entries.', 'error'); return; }
-            if (!window.fbStorage || !window.fbStorageRef || !window.fbUploadBytes || !window.fbGetDownloadURL) { showAppToast('Google Drive is not ready. Enable Storage for this Firebase project first.', 'error'); return; }
+
             const input = document.getElementById('warningAttachmentInput');
             const files = Array.from(input?.files || []);
             if (!files.length) { showAppToast('Choose a PDF, JPG or PNG file first.', 'error'); return; }
+
             const allowed = new Set(['application/pdf','image/jpeg','image/png']);
             for (const f of files) {
                 if (!allowed.has(f.type)) { showAppToast(`${f.name}: only PDF, JPG and PNG are allowed.`, 'error'); return; }
                 if (f.size > 10*1024*1024) { showAppToast(`${f.name}: maximum file size is 10 MB.`, 'error'); return; }
             }
+
             const btn = event?.currentTarget || null;
             if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i>Uploading'; }
+
             try {
-                await window.authReady;
-                const safeStaff = warningNormalizeKey(ctx.id).replace(/[^A-Z0-9_-]/gi,'_');
-                const entryKey = String(ctx.entry.startAt || Date.now()).replace(/[^0-9A-Za-z_-]/g,'_');
                 const record = warningNormalizeRecord(ctx.id);
                 const history = record.history.map(h=>({...h,attachments:Array.isArray(h.attachments)?[...h.attachments]:[]}));
                 const target = history[ctx.index];
                 if (!target) throw new Error('Warning entry changed. Reopen it and try again.');
+
+                const emp = allEmployees.find(e => e.id === ctx.id || normalizeId(e.displayId) === ctx.id);
                 const uploader = document.getElementById('warningHistoryEditIssuer')?.value.trim() || target.issuer || 'HR';
+
                 for (const f of files) {
-                    const safeName = f.name.replace(/[^0-9A-Za-z._-]+/g,'_').slice(-120);
-                    const path = `warning-attachments/${safeStaff}/${entryKey}/${Date.now()}_${Math.random().toString(36).slice(2,8)}_${safeName}`;
-                    const ref = window.fbStorageRef(window.fbStorage, path);
-                    const snap = await window.fbUploadBytes(ref, f, { contentType:f.type, customMetadata:{ staffId:ctx.id, warningLevel:level } });
-                    const url = await window.fbGetDownloadURL(snap.ref);
-                    target.attachments.push({ name:f.name, url, path, contentType:f.type, size:f.size, uploadedAt:new Date().toISOString(), uploadedBy:uploader });
+                    const base64 = await warningFileToDataUrl(f);
+                    const result = await warningAttachmentDriveRequest({
+                        action: 'uploadWarningAttachment',
+                        staffId: String(ctx.id || '').trim(),
+                        staffName: String(emp?.name || '').trim(),
+                        company: String(emp?.company || '').trim(),
+                        warningLevel: String(level || '').trim(),
+                        startAt: String(target.startAt || '').trim(),
+                        issuer: String(uploader || 'HR').trim(),
+                        fileName: String(f.name || 'attachment').trim(),
+                        mimeType: String(f.type || 'application/octet-stream'),
+                        base64
+                    });
+
+                    target.attachments.push({
+                        name: result.name || f.name,
+                        url: result.url || '',
+                        fileId: result.fileId || '',
+                        path: '',
+                        contentType: f.type,
+                        size: f.size,
+                        uploadedAt: new Date().toISOString(),
+                        uploadedBy: uploader
+                    });
                 }
-                staffWarnings[ctx.id] = { level:getStaffWarningLevelFromHistory(history, new Date().getFullYear()), history };
+
+                staffWarnings[ctx.id] = {
+                    level:getStaffWarningLevelFromHistory(history, new Date().getFullYear()),
+                    history
+                };
                 await window.saveCustomNotes();
                 if (input) input.value = '';
                 renderWarningAttachments(); updateWarningAttachmentVisibility(); renderWarningHistory(ctx.id); renderMobileDashboardUI();
                 showAppToast(`${files.length} attachment${files.length===1?'':'s'} uploaded.`, 'info');
             } catch(e) {
                 console.error('Warning attachment upload failed', e);
-                const msg = String(e?.message || e || 'Upload failed');
-                showAppToast(msg.includes('storage') ? 'Upload failed. Check Google Drive is enabled and its rules allow authenticated uploads.' : msg, 'error');
+                showAppToast(e?.message || 'Upload failed.', 'error');
             } finally {
                 if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up mr-1.5"></i>Upload'; }
             }
         };
+
         window.downloadWarningAttachment = async function(index) {
             const ctx = getCurrentWarningAttachmentContext();
             const a = ctx?.entry?.attachments?.[index];
@@ -8568,7 +8767,8 @@
             const ctx = getCurrentWarningAttachmentContext();
             const a = ctx?.entry?.attachments?.[index];
             if (!ctx || !a) return;
-            const key = `${ctx.id}::${ctx.index}::${index}::${a.path||a.url||a.name}`;
+
+            const key = `${ctx.id}::${ctx.index}::${index}::${a.fileId||a.path||a.url||a.name}`;
             if (warningAttachmentRemoveKey !== key) {
                 warningAttachmentRemoveKey = key;
                 if (warningAttachmentRemoveTimer) clearTimeout(warningAttachmentRemoveTimer);
@@ -8577,18 +8777,41 @@
                 warningAttachmentRemoveTimer = setTimeout(()=>{warningAttachmentRemoveKey=''; renderWarningAttachments();},5000);
                 return;
             }
-            warningAttachmentRemoveKey=''; if(warningAttachmentRemoveTimer) clearTimeout(warningAttachmentRemoveTimer);
+
+            warningAttachmentRemoveKey='';
+            if (warningAttachmentRemoveTimer) clearTimeout(warningAttachmentRemoveTimer);
             if (button) { button.disabled=true; button.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i>'; }
+
             try {
-                if (a.path && window.fbStorage && window.fbDeleteObject && window.fbStorageRef) {
-                    try { await window.fbDeleteObject(window.fbStorageRef(window.fbStorage,a.path)); } catch(e) { console.warn('Storage delete warning',e); }
+                if (a.fileId) {
+                    await warningAttachmentDriveRequest({
+                        action: 'deleteWarningAttachment',
+                        fileId: String(a.fileId)
+                    });
+                } else if (a.path && window.fbStorage && window.fbDeleteObject && window.fbStorageRef) {
+                    // Backward compatibility for attachments created before Drive-folder storage.
+                    try { await window.fbDeleteObject(window.fbStorageRef(window.fbStorage,a.path)); } catch(e) { console.warn('Legacy Storage delete warning',e); }
                 }
-                const record=warningNormalizeRecord(ctx.id); const history=record.history.map(h=>({...h,attachments:Array.isArray(h.attachments)?[...h.attachments]:[]}));
+
+                const record=warningNormalizeRecord(ctx.id);
+                const history=record.history.map(h=>({...h,attachments:Array.isArray(h.attachments)?[...h.attachments]:[]}));
                 if (!history[ctx.index]) throw new Error('Warning entry not found.');
                 history[ctx.index].attachments.splice(index,1);
-                staffWarnings[ctx.id]={level:getStaffWarningLevelFromHistory(history,new Date().getFullYear()),history};
-                await window.saveCustomNotes(); renderWarningAttachments(); updateWarningAttachmentVisibility(); renderWarningHistory(ctx.id); renderMobileDashboardUI(); showAppToast('Attachment removed.','info');
-            } catch(e) { showAppToast(e?.message||'Could not remove attachment.','error'); renderWarningAttachments(); }
+
+                staffWarnings[ctx.id]={
+                    level:getStaffWarningLevelFromHistory(history,new Date().getFullYear()),
+                    history
+                };
+                await window.saveCustomNotes();
+                renderWarningAttachments();
+                updateWarningAttachmentVisibility();
+                renderWarningHistory(ctx.id);
+                renderMobileDashboardUI();
+                showAppToast('Attachment removed.','info');
+            } catch(e) {
+                showAppToast(e?.message||'Could not remove attachment.','error');
+                renderWarningAttachments();
+            }
         };
 
         window.exportWarningEmployeeFromEditor = function() {
@@ -11494,6 +11717,10 @@
             }).join('');
         }
 
+        function isDailyDepartmentSelected(e) {
+            return selectedDailyDepartments === null || (Array.isArray(selectedDailyDepartments) && selectedDailyDepartments.includes(String(e?.department || '').trim()));
+        }
+
         function renderDailyAttendance() {
             const tb=document.getElementById('dailyTableBody'), mc=document.getElementById('dailyMobileCards'), nd=document.getElementById('dailyNoDataMessage'), fI=document.getElementById('dailyFilterFrom'), tI=document.getElementById('dailyFilterTo');
             if(!tb||!nd||!fI||!tI||!fI.value||!tI.value)return; tb.innerHTML=''; if(mc)mc.innerHTML='';
@@ -11503,7 +11730,7 @@
             dailyLeaveRecords.forEach(r=>{
                 let d=new Date(`${r.month} ${r.day}, ${yr}`); d.setHours(12,0,0,0);
                 if(d>=fD && d<=tD) {
-                    let e=allEmployees.find(x=>x.id===r.staffId); if(!e||!isEmploymentVisible(e)||!selectedDailyCompanies.includes(e.company))return;
+                    let e=allEmployees.find(x=>x.id===r.staffId); if(!e||!isEmploymentVisible(e)||!selectedDailyCompanies.includes(e.company)||!isDailyDepartmentSelected(e))return;
                     if(dailySearchQuery && !e.name.toLowerCase().includes(dailySearchQuery) && !e.displayId.toLowerCase().includes(dailySearchQuery)) return;
                     if(r.isPresent&&r.leaves.AL===0&&r.leaves.SL===0&&r.leaves.SP===0&&r.leaves.UP===0&&r.leaves.A===0&&r.leaves.Late5m===0&&r.leaves.Late3m===0&&r.leaves.D===0&&r.leaves.OT===0&&r.leaves.H===0&&!r.isRawD&&!r.isRawH)return;
                     
@@ -11551,7 +11778,7 @@
                 let dC=selectedDailyCompanies.length>0?selectedDailyCompanies:Array.from(companies);
                 
                 let allTot=0, allL=0, allO=0, allLa=0, allG=0, allH=0;
-                dC.forEach(c => { let tot=allEmployees.filter(e=>e.company===c&&isEmploymentVisible(e)).length; allTot+=tot; let g=grp[c]||[]; allG+=g.length; g.forEach(i=>{allL+=(i.leaves.AL+i.leaves.SL+i.leaves.SP+i.leaves.UP+i.leaves.A); allO+=i.leaves.D; allLa+=(i.leaves.Late5m+i.leaves.Late3m); allH+=i.leaves.H;}); });
+                dC.forEach(c => { let tot=allEmployees.filter(e=>e.company===c&&isEmploymentVisible(e)&&isDailyDepartmentSelected(e)).length; allTot+=tot; let g=grp[c]||[]; allG+=g.length; g.forEach(i=>{allL+=(i.leaves.AL+i.leaves.SL+i.leaves.SP+i.leaves.UP+i.leaves.A); allO+=i.leaves.D; allLa+=(i.leaves.Late5m+i.leaves.Late3m); allH+=i.leaves.H;}); });
                 let aSp=[]; if(allL>0)aSp.push(`<span class="bg-red-50 text-red-700 px-2 py-1 rounded border border-red-100">${allL} Leave</span>`); if(allO>0)aSp.push(`<span class="bg-slate-700 text-white px-2 py-1 rounded border border-slate-800">${allO} Off</span>`); if(allLa>0)aSp.push(`<span class="bg-orange-50 text-orange-700 px-2 py-1 rounded border">${allLa} Late</span>`); if(allH>0)aSp.push(`<span class="bg-rose-50 text-rose-700 px-2 py-1 rounded border">${allH} Hol</span>`);
                 sH+=`<div class="flex items-center text-xs border border-blue-200 bg-blue-50/50 shadow-sm rounded-lg p-3 pr-4 mr-2"><div class="flex items-center gap-2 border-r border-blue-200 pr-4"><span class="font-bold text-blue-800">All Selected</span><span class="text-blue-500 text-[10px]">${allG}/${allTot} Staff</span></div><div class="pl-4 flex gap-1.5">${aSp.length>0?aSp.join(''):'<span class="bg-emerald-50 text-emerald-700 px-2 py-1 rounded border border-emerald-200 shadow-sm">All Present</span>'}</div></div>`;
 
@@ -11565,7 +11792,7 @@
 
             if(Object.keys(grp).length===0) { nd.classList.remove('hidden'); return; } nd.classList.add('hidden');
             Object.keys(grp).sort().forEach(c => {
-                let tot=allEmployees.filter(e=>e.company===c&&isEmploymentVisible(e)).length;
+                let tot=allEmployees.filter(e=>e.company===c&&isEmploymentVisible(e)&&isDailyDepartmentSelected(e)).length;
                 let hdr=document.createElement('tr'); hdr.className="bg-slate-100/80 border-y"; hdr.innerHTML=`<td colspan="6" class="px-5 py-2.5"><div class="text-sm font-bold flex items-center gap-2">${getCompanyLogo(c)} ${c} <span class="bg-white border text-[10px] px-2 rounded-full ml-2">${grp[c].length}/${tot} Staff</span></div></td>`; tb.appendChild(hdr);
                 grp[c].forEach(i=>{
                     let e=i.emp, t=[], h=i.leaves;
@@ -12179,29 +12406,29 @@
             let fD=new Date(fV); fD.setHours(0,0,0,0); let tD=new Date(tV); tD.setHours(23,59,59,999); if(fD>tD){let t=fD;fD=tD;tD=t;}
             let dA=getDates(fD,tD); if(dA.length>31){showAppToast("Max 31 Days allowed.","error");return;}
             let cS=selectedDailyCompanies.length>0&&selectedDailyCompanies.length<companies.size?selectedDailyCompanies.join(', '):'All Companies', dLb=fV===tV?fV:`${fV} to ${tV}`;
-            let rS=allEmployees.filter(e=>isEmploymentVisible(e)&&(selectedDailyCompanies.length===0||selectedDailyCompanies.includes(e.company))&&!window.isExcludedPosition(e.position)).sort((a,b)=>{if(a.company!==b.company)return a.company.localeCompare(b.company); return a.name.localeCompare(b.name);}); if(rS.length===0)return;
-            let sD=0,sUP=0,sA=0,sL=0,sLp=0,sSL=0,sAL=0,sSP=0, bR=[], cnt=1;
+            let rS=allEmployees.filter(e=>isEmploymentVisible(e)&&(selectedDailyCompanies.length===0||selectedDailyCompanies.includes(e.company))&&isDailyDepartmentSelected(e)&&!window.isExcludedPosition(e.position)).sort((a,b)=>{if(a.company!==b.company)return a.company.localeCompare(b.company); return a.name.localeCompare(b.name);}); if(rS.length===0)return;
+            let sD=0,sUP=0,sA=0,sL=0,sLp=0,sSL=0,sAL=0,sOT=0,sSP=0, bR=[], cnt=1;
             rS.forEach(e=>{
-                let rO={no:cnt++,id:e.displayId,name:e.name,dys:[],t:{D:0,UP:0,A:0,L5:0,L3:0,SL:0,AL:0,SP:0}};
+                let rO={no:cnt++,id:e.displayId,name:e.name,dys:[],t:{D:0,UP:0,A:0,L5:0,L3:0,SL:0,AL:0,OT:0,SP:0}};
                 dA.forEach(dt=>{
                     let ms=monthNames[dt.getMonth()].substring(0,3).toLowerCase(), dN=dt.getDate(), rec=dailyLeaveRecords.find(r=>r.staffId===e.id&&r.month.toLowerCase().startsWith(ms)&&r.day===dN), cV=isBeforeEmployeeJoinDate(e,dt)?'':'P';
                     if(rec){
                         let l=rec.leaves, t=[], iM=(l.AL>0?1:0)+(l.SL>0?1:0)+(l.SP>0?1:0)+(l.UP>0?1:0)+(l.A>0?1:0)>1;
-                        if(l.AL===0.5)t.push(iM?'AL':'H-AL');else if(l.AL>0)t.push('AL'); if(l.SL===0.5)t.push(iM?'SL':'H-SL');else if(l.SL>0)t.push('SL'); if(l.SP===0.5)t.push(iM?'SP':'H-SP');else if(l.SP>0)t.push('SP'); if(l.UP===0.5)t.push(iM?'UP':'H-UP');else if(l.UP>0)t.push('UP'); if(l.A===0.5)t.push(iM?'A':'H-A');else if(l.A>0)t.push('A'); if(l.Late5m>0)t.push('L'); if(l.Late3m>0)t.push("L'"); if(l.D===0.5)t.push(iM?'D':'H-D');else if(l.H===0.5)t.push(iM?'H':'H-H');else if(l.H>0)t.push('H');
+                        if(l.AL===0.5)t.push(iM?'AL':'H-AL');else if(l.AL>0)t.push('AL'); if(l.SL===0.5)t.push(iM?'SL':'H-SL');else if(l.SL>0)t.push('SL'); if(l.SP===0.5)t.push(iM?'SP':'H-SP');else if(l.SP>0)t.push('SP'); if(l.UP===0.5)t.push(iM?'UP':'H-UP');else if(l.UP>0)t.push('UP'); if(l.A===0.5)t.push(iM?'A':'H-A');else if(l.A>0)t.push('A'); if(l.Late5m>0)t.push('L'); if(l.Late3m>0)t.push("L'"); if(l.OT===0.5)t.push('H-OT');else if(l.OT>0)t.push('OT'); if(l.D===0.5)t.push(iM?'D':'H-D');else if(l.H===0.5)t.push(iM?'H':'H-H');else if(l.H>0)t.push('H');
                         if(t.length>1)cV=[...new Set(t.map(x=>x.replace('H-','')))].join('/'); else if(t.length===1)cV=t[0]; else cV='P';
-                        rO.t.AL+=l.AL;rO.t.SL+=l.SL;rO.t.SP+=l.SP;rO.t.UP+=l.UP;rO.t.A+=l.A;rO.t.L5+=l.Late5m;rO.t.L3+=l.Late3m;rO.t.D+=l.D;
+                        rO.t.AL+=l.AL;rO.t.SL+=l.SL;rO.t.SP+=l.SP;rO.t.UP+=l.UP;rO.t.A+=l.A;rO.t.L5+=l.Late5m;rO.t.L3+=l.Late3m;rO.t.D+=l.D;rO.t.OT+=l.OT;
                     } rO.dys.push(cV);
-                }); sD+=rO.t.D;sUP+=rO.t.UP;sA+=rO.t.A;sL+=rO.t.L5;sLp+=rO.t.L3;sSL+=rO.t.SL;sAL+=rO.t.AL;sSP+=rO.t.SP; bR.push(rO);
+                }); sD+=rO.t.D;sUP+=rO.t.UP;sA+=rO.t.A;sL+=rO.t.L5;sLp+=rO.t.L3;sSL+=rO.t.SL;sAL+=rO.t.AL;sOT+=rO.t.OT;sSP+=rO.t.SP; bR.push(rO);
             });
             let dCStr=Array(dA.length).fill(4).join(',');
-            let h=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"><style>table{border-collapse:collapse;font-family:'Times New Roman';font-size:11pt;}th,td{border:1px solid #000;padding:5px;vertical-align:middle;}</style></head><body><table id="exTab" data-cols-width="5,12,25,${dCStr},5,5,5,5,5,5,5,5,15"><tr><td colspan="7" data-f-sz="14" data-f-bold="true" data-b-a-s="none">Attendant Report (${dLb})</td>${dL('P','Present','ffffff','000000')}${dL('UP','Unpaid Leave','00ffff','000000')}${dL('AL','Annual Leave','c5e0b4','000000')}${dL('SL','Sick Leave','ffff00','000000')}${dL('SP','Special Leave','ccc0da','000000')}${dL('SB','Stand By','b4c6e7','000000')}${dL('L','Late >8:05','bdd7ee','000000')}${dL('H','Holiday','fce4d6','ff0000')}</tr><tr><td colspan="7" data-f-sz="11" data-f-bold="true" data-b-a-s="none">Company: ${cS}</td>${dL('D','Day Off','fce4d6','ff0000')}${dL('H-UP','Half Unpaid','00ffff','000000')}${dL('H-AL','Half AL','c5e0b4','000000')}${dL('H-SL','Half SL','ffff00','000000')}${dL('A','Absent','ff0000','ffffff')}${dL("L'",'Late >8:30','c00000','ffffff')}</tr><tr><td colspan="${dA.length+14}" data-b-a-s="none"></td></tr><tr><th rowspan="2" data-f-bold="true" data-fill-color="d9d9d9" data-a-h="center" data-b-a-s="thin">No.</th><th rowspan="2" data-f-bold="true" data-fill-color="d9d9d9" data-a-h="center" data-b-a-s="thin">ID</th><th rowspan="2" data-f-bold="true" data-fill-color="d9d9d9" data-a-h="left" data-b-a-s="thin">Name</th>`;
+            let h=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"><style>table{border-collapse:collapse;font-family:'Times New Roman';font-size:11pt;}th,td{border:1px solid #000;padding:5px;vertical-align:middle;}</style></head><body><table id="exTab" data-cols-width="5,12,25,${dCStr},5,5,5,5,5,5,5,5,5,15"><tr><td colspan="7" data-f-sz="14" data-f-bold="true" data-b-a-s="none">Attendant Report (${dLb})</td>${dL('P','Present','ffffff','000000')}${dL('UP','Unpaid Leave','00ffff','000000')}${dL('AL','Annual Leave','c5e0b4','000000')}${dL('SL','Sick Leave','ffff00','000000')}${dL('SP','Special Leave','ccc0da','000000')}${dL('SB','Stand By','b4c6e7','000000')}${dL('L','Late >8:05','bdd7ee','000000')}${dL('OT','Overtime','f4cccc','c00000')}</tr><tr><td colspan="7" data-f-sz="11" data-f-bold="true" data-b-a-s="none">Company: ${cS}</td>${dL('D','Day Off','fce4d6','ff0000')}${dL('H-UP','Half Unpaid','00ffff','000000')}${dL('H-AL','Half AL','c5e0b4','000000')}${dL('H-SL','Half SL','ffff00','000000')}${dL('A','Absent','ff0000','ffffff')}${dL("L'",'Late >8:30','c00000','ffffff')}${dL('H','Holiday','fce4d6','ff0000')}</tr><tr><td colspan="${dA.length+15}" data-b-a-s="none"></td></tr><tr><th rowspan="2" data-f-bold="true" data-fill-color="d9d9d9" data-a-h="center" data-b-a-s="thin">No.</th><th rowspan="2" data-f-bold="true" data-fill-color="d9d9d9" data-a-h="center" data-b-a-s="thin">ID</th><th rowspan="2" data-f-bold="true" data-fill-color="d9d9d9" data-a-h="left" data-b-a-s="thin">Name</th>`;
             dA.forEach(d=>{h+=`<th data-fill-color="d9d9d9" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${d.getDate()}</th>`;});
-            h+=`<th data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${sD}</th><th data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${sUP}</th><th data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${sA}</th><th data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${sL}</th><th data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${sLp}</th><th data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${sSL}</th><th data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${sAL}</th><th data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${sSP}</th><th rowspan="2" data-fill-color="ffffff" data-f-bold="true" data-a-h="center" data-b-a-s="thin">Signature</th></tr><tr>`;
+            h+=`<th data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${sD}</th><th data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${sUP}</th><th data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${sA}</th><th data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${sL}</th><th data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${sLp}</th><th data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${sSL}</th><th data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${sAL}</th><th data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${sOT}</th><th data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${sSP}</th><th rowspan="2" data-fill-color="ffffff" data-f-bold="true" data-a-h="center" data-b-a-s="thin">Signature</th></tr><tr>`;
             dA.forEach(d=>{h+=`<th data-fill-color="d9d9d9" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${d.toLocaleDateString('en-US',{weekday:'short'}).substring(0,3)}</th>`;});
-            h+=`<th data-fill-color="fce4d6" data-f-color="ff0000" data-a-h="center" data-b-a-s="thin">D</th><th data-fill-color="00ffff" data-a-h="center" data-b-a-s="thin">UP</th><th data-fill-color="ff0000" data-f-color="ffffff" data-a-h="center" data-b-a-s="thin">A</th><th data-fill-color="bdd7ee" data-a-h="center" data-b-a-s="thin">L</th><th data-fill-color="c00000" data-f-color="ffffff" data-a-h="center" data-b-a-s="thin">L'</th><th data-fill-color="ffff00" data-a-h="center" data-b-a-s="thin">SL</th><th data-fill-color="c5e0b4" data-a-h="center" data-b-a-s="thin">AL</th><th data-fill-color="ccc0da" data-a-h="center" data-b-a-s="thin">SP</th></tr>`;
+            h+=`<th data-fill-color="fce4d6" data-f-color="ff0000" data-a-h="center" data-b-a-s="thin">D</th><th data-fill-color="00ffff" data-a-h="center" data-b-a-s="thin">UP</th><th data-fill-color="ff0000" data-f-color="ffffff" data-a-h="center" data-b-a-s="thin">A</th><th data-fill-color="bdd7ee" data-a-h="center" data-b-a-s="thin">L</th><th data-fill-color="c00000" data-f-color="ffffff" data-a-h="center" data-b-a-s="thin">L'</th><th data-fill-color="ffff00" data-a-h="center" data-b-a-s="thin">SL</th><th data-fill-color="c5e0b4" data-a-h="center" data-b-a-s="thin">AL</th><th data-fill-color="f4cccc" data-f-color="c00000" data-a-h="center" data-b-a-s="thin">OT</th><th data-fill-color="ccc0da" data-a-h="center" data-b-a-s="thin">SP</th></tr>`;
             const fT=(v,t)=>v===0?`<td data-t="n" data-a-h="center" data-b-a-s="thin">0</td>`:`<td data-t="n" ${gBg(t)} data-f-bold="true" data-a-h="center" data-b-a-s="thin">${v}</td>`;
-            bR.forEach(r=>{ h+=`<tr><td data-t="n" data-a-h="center" data-b-a-s="thin">${r.no}</td><td data-t="s" data-a-h="center" data-b-a-s="thin">${r.id}</td><td data-t="s" data-a-h="left" data-b-a-s="thin">${r.name}</td>`; r.dys.forEach(v=>{h+=`<td ${gBg(v)} data-f-bold="true" data-a-h="center" data-b-a-s="thin">${v}</td>`;}); h+=fT(r.t.D,'D')+fT(r.t.UP,'UP')+fT(r.t.A,'A')+fT(r.t.L5,'L')+fT(r.t.L3,"L'")+fT(r.t.SL,'SL')+fT(r.t.AL,'AL')+fT(r.t.SP,'SP')+`<td data-b-a-s="thin"></td></tr>`; });
-            h+=`<tr><td colspan="${dA.length+14}" data-b-a-s="none"></td></tr><tr><td colspan="${dA.length+14}" data-b-a-s="none"></td></tr><tr><td colspan="4" data-b-a-s="none" data-f-bold="true">Prepared By:</td><td colspan="${Math.max(1,Math.floor(dA.length/2))}" data-b-a-s="none" data-f-bold="true">Checked & Agreed:</td><td colspan="5" data-b-a-s="none" data-f-bold="true">Approved By:</td></tr></table></body></html>`;
+            bR.forEach(r=>{ h+=`<tr><td data-t="n" data-a-h="center" data-b-a-s="thin">${r.no}</td><td data-t="s" data-a-h="center" data-b-a-s="thin">${r.id}</td><td data-t="s" data-a-h="left" data-b-a-s="thin">${r.name}</td>`; r.dys.forEach(v=>{h+=`<td ${gBg(v)} data-f-bold="true" data-a-h="center" data-b-a-s="thin">${v}</td>`;}); h+=fT(r.t.D,'D')+fT(r.t.UP,'UP')+fT(r.t.A,'A')+fT(r.t.L5,'L')+fT(r.t.L3,"L'")+fT(r.t.SL,'SL')+fT(r.t.AL,'AL')+fT(r.t.OT,'OT')+fT(r.t.SP,'SP')+`<td data-b-a-s="thin"></td></tr>`; });
+            h+=`<tr><td colspan="${dA.length+15}" data-b-a-s="none"></td></tr><tr><td colspan="${dA.length+15}" data-b-a-s="none"></td></tr><tr><td colspan="4" data-b-a-s="none" data-f-bold="true">Prepared By:</td><td colspan="${Math.max(1,Math.floor(dA.length/2))}" data-b-a-s="none" data-f-bold="true">Checked & Agreed:</td><td colspan="5" data-b-a-s="none" data-f-bold="true">Approved By:</td></tr></table></body></html>`;
             let tmpDiv=document.createElement('div'); tmpDiv.innerHTML=h; tmpDiv.style.display='none'; document.body.appendChild(tmpDiv);
             TableToExcel.convert(document.getElementById('exTab'), {name:`Timesheet_${dLb.replace(/ /g,'_')}.xlsx`,sheet:{name:"Timesheet"}}); document.body.removeChild(tmpDiv);
         };
@@ -12305,7 +12532,7 @@
             let yr = fD.getFullYear();
             dailyLeaveRecords.forEach(r=>{
                 let rd=new Date(`${r.month} ${r.day}, ${yr}`); rd.setHours(12,0,0,0);
-                if(rd>=fD && rd<=tD){ let e=allEmployees.find(x=>x.id===r.staffId); if(!e||!isEmploymentVisible(e,rd)||window.isExcludedPosition(e.position))return; if(selectedDailyCompanies.length>0&&!selectedDailyCompanies.includes(e.company))return; let h=r.leaves, t=[], isM=(h.AL>0?1:0)+(h.SL>0?1:0)+(h.SP>0?1:0)+(h.UP>0?1:0)+(h.A>0?1:0)>1; 
+                if(rd>=fD && rd<=tD){ let e=allEmployees.find(x=>x.id===r.staffId); if(!e||!isEmploymentVisible(e,rd)||window.isExcludedPosition(e.position))return; if(selectedDailyCompanies.length>0&&!selectedDailyCompanies.includes(e.company))return; if(!isDailyDepartmentSelected(e))return; let h=r.leaves, t=[], isM=(h.AL>0?1:0)+(h.SL>0?1:0)+(h.SP>0?1:0)+(h.UP>0?1:0)+(h.A>0?1:0)>1; 
                     if(h.AL===0 && h.SL===0 && h.SP===0 && h.UP===0 && h.A===0 && h.Late5m===0 && h.Late3m===0 && h.D===0 && !r.isRawD) return;
                     if(h.AL===0.5)t.push(isM?'AL':'H-AL');else if(h.AL>0)t.push('AL'); if(h.SL===0.5)t.push(isM?'SL':'H-SL');else if(h.SL>0)t.push('SL'); if(h.SP===0.5)t.push(isM?'SP':'H-SP');else if(h.SP>0)t.push('SP'); if(h.UP===0.5)t.push(isM?'UP':'H-UP');else if(h.UP>0)t.push('UP'); if(h.A===0.5)t.push(isM?'A':'H-A');else if(h.A>0)t.push('A'); if(h.Late5m>0)t.push('L(>5m)'); if(h.Late3m>0)t.push("L'(>30m)"); if(h.D===0.5)t.push(isM?'D':'H-D');else if(h.D>0)t.push('D'); if(t.length===0)return; 
                     let cNote = customNotes[`${e.id}_${r.month}_${r.day}_${yr}`] || r.note;
@@ -12326,7 +12553,7 @@
                 let rd=new Date(`${r.month} ${r.day}, ${fD.getFullYear()}`); rd.setHours(12,0,0,0);
                 if(rd>=fD && rd<=tD){
                     let e=allEmployees.find(x=>x.id===r.staffId); if(!e||window.isExcludedPosition(e.position))return;
-                    if(selectedDailyCompanies.length>0 && !selectedDailyCompanies.includes(e.company)) return;
+                    if(!isDailyDepartmentSelected(e)) return; if(selectedDailyCompanies.length>0 && !selectedDailyCompanies.includes(e.company)) return;
                     let u=r.leaves.UP||0, a=r.leaves.A||0, l5=r.leaves.Late5m||0, l3=r.leaves.Late3m||0;
                     if(u>0||a>0||l5>0||l3>0){
                         if(!allRecs[e.id]) allRecs[e.id] = {e:e, u:0, a:0, l5:0, l3:0};
@@ -12372,7 +12599,7 @@
                 let rd=new Date(`${r.month} ${r.day}, ${fD.getFullYear()}`); rd.setHours(12,0,0,0);
                 if(rd>=fD && rd<=tD){
                     let e=allEmployees.find(x=>x.id===r.staffId); if(!e||window.isExcludedPosition(e.position))return;
-                    if(selectedDailyCompanies.length>0 && !selectedDailyCompanies.includes(e.company)) return;
+                    if(!isDailyDepartmentSelected(e)) return; if(selectedDailyCompanies.length>0 && !selectedDailyCompanies.includes(e.company)) return;
                     let s=r.leaves.SL||0, a=r.leaves.AL||0, sp=r.leaves.SP||0;
                     if(s>0||a>0||sp>0){
                         if(!allRecs[e.id]) allRecs[e.id] = {e:e, s:0, a:0, sp:0};
@@ -12443,7 +12670,7 @@
             h+=`</table></body></html>`; let tmpDiv=document.createElement('div'); tmpDiv.innerHTML=h; tmpDiv.style.display='none'; document.body.appendChild(tmpDiv); TableToExcel.convert(document.getElementById('exPaid'), {name:`PaidLeave_${fV}_${tV}.xlsx`,sheet:{name:"Paid Leaves"}}); tmpDiv.remove();
         };
 
-        window.downloadPayrollReport = function() {
+        window.downloadPayrollReport = async function() {
             const fV = document.getElementById('dailyFilterFrom').value, tV = document.getElementById('dailyFilterTo').value; if (!fV || !tV) return;
             let fD = new Date(fV); fD.setHours(0, 0, 0, 0); let tD = new Date(tV); tD.setHours(23, 59, 59, 999); if (fD > tD) { let t = fD; fD = tD; tD = t; }
             
@@ -12453,6 +12680,7 @@
             allEmployees.forEach(e => {
                 if(!isEmploymentVisible(e, fD) || window.isExcludedPosition(e.position)) return;
                 if(selectedDailyCompanies.length > 0 && !selectedDailyCompanies.includes(e.company)) return;
+                if(!isDailyDepartmentSelected(e)) return;
                 allRecs[e.displayId.toUpperCase()] = { e: e, al: 0, sl: 0, sp: 0, up: 0, a: 0, l5: 0, l3: 0, ot: 0, d: 0 };
             });
 
@@ -12461,7 +12689,7 @@
                 let rd = new Date(`${r.month} ${r.day}, ${fD.getFullYear()}`); rd.setHours(12, 0, 0, 0);
                 if (rd >= fD && rd <= tD) {
                     let e = allEmployees.find(x => x.id === r.staffId); if (!e || window.isExcludedPosition(e.position)) return;
-                    if (selectedDailyCompanies.length > 0 && !selectedDailyCompanies.includes(e.company)) return;
+                    if (!isDailyDepartmentSelected(e)) return; if (selectedDailyCompanies.length > 0 && !selectedDailyCompanies.includes(e.company)) return;
                     
                     let l = r.leaves;
                     let displayId = e.displayId.toUpperCase();
@@ -12476,57 +12704,226 @@
                 }
             });
 
-            // Exact custom groups based on user's reference image
-            const blocksDef = [
-                // Group 1
-                [ { id: "ITC-030", bg: "e2efda" }, { id: "ITC-004", bg: "e2efda" }, { id: "ITC-037", bg: "e2efda" }, { id: "ITC-044", bg: "e2efda" } ],
-                // Group 2
-                [ { id: "LPT-001", bg: "8ea9db" }, { id: "LPT-002", bg: "8ea9db" }, { id: "LPT-003", bg: "8ea9db" }, { id: "LPT-004", bg: "8ea9db" }, { id: "LPT-005", bg: "8ea9db" } ],
-                // Group 3
-                [ { id: "ITC-032", bg: "e2efda" }, { id: "ITC-018", bg: "e2efda" }, { id: "ITC-006", bg: "e2efda" }, { id: "ITC-020", bg: "e2efda" }, { id: "ITC-026", bg: "e2efda" }, { id: "ITC-003", bg: "e2efda" }, { id: "ITC-036", bg: "e2efda" }, { id: "ITC-046", bg: "e2efda" } ],
-                // Group 4
-                [ { id: "ITC-010", bg: "f4cccc" }, { id: "ITC-019", bg: "f4cccc" }, { id: "ITC-011", bg: "f4cccc" }, { id: "ITC-014", bg: "f4cccc" }, { id: "ITC-029", bg: "f4cccc" } ],
-                // Group 5
-                [ { id: "ITC-012", bg: "fce4d6" }, { id: "ITC-007", bg: "fce4d6" }, { id: "ITC-008", bg: "fce4d6" }, { id: "ITC-021", bg: "fce4d6" }, { id: "ITC-025", bg: "fce4d6" } ],
-                // Group 6
-                [ { id: "ITC-001", bg: "fff2cc" }, { id: "ITC-016", bg: "fff2cc" }, { id: "ITC-017", bg: "fff2cc" }, { id: "ITC-005", bg: "fff2cc" }, { id: "ITC-009", bg: "fff2cc" }, { id: "ITC-013", bg: "fff2cc" }, { id: "ITC-024", bg: "fff2cc" }, { id: "ITC-028", bg: "fff2cc" }, { id: "ITC-034", bg: "fff2cc" } ],
-                // Group 7
-                [ { id: "LPH-007", bg: "e2efda" }, { id: "LPH-031", bg: "e2efda" }, { id: "LPH-038", bg: "e2efda" }, { id: "LPH-012", bg: "e2efda" }, { id: "LPH-008", bg: "e2efda" }, { id: "LPH-014", bg: "e2efda" }, { id: "LPH-004", bg: "e2efda" }, { id: "LPH-023", bg: "e2efda" }, { id: "LPH-010", bg: "ffe699" }, { id: "LPH-019", bg: "ffe699" }, { id: "LPH-021", bg: "ffe699" }, { id: "LPH-003", bg: "d9e1f2" }, { id: "LPH-009", bg: "d9e1f2" }, { id: "LPH-020", bg: "d9e1f2" } ],
-                // Group 8
-                [ { id: "LPH-006", bg: "d9e1f2" }, { id: "LPH-022", bg: "ffe699" }, { id: "LPH-028", bg: "ffe699" }, { id: "LPH-005", bg: "d9e1f2" }, { id: "LPH-024", bg: "d9e1f2" }, { id: "LPH-025", bg: "d9e1f2" }, { id: "LPH-002", bg: "d9e1f2" }, { id: "LPH-013", bg: "d9e1f2" }, { id: "LPH-015", bg: "d9e1f2" }, { id: "LPH-016", bg: "d9e1f2" }, { id: "LPH-030", bg: "d9e1f2" }, { id: "LPH-026", bg: "d9e1f2" }, { id: "LPH-032", bg: "d9e1f2" }, { id: "LPH-035", bg: "d9e1f2" } ],
-                // Group 9
-                [ { id: "TTC-007", bg: "e2efda" }, { id: "TTC-011", bg: "e2efda" }, { id: "TTC-003", bg: "e2efda" }, { id: "TTC-010", bg: "e2efda" }, { id: "TTC-006", bg: "e2efda" }, { id: "TTC-008", bg: "e2efda" }, { id: "TTC-009", bg: "e2efda" }, { id: "TTC-012", bg: "e2efda" }, { id: "TTC-017", bg: "e2efda" }, { id: "TTC-018", bg: "e2efda" }, { id: "TTC-019", bg: "e2efda" }, { id: "TTC-020", bg: "e2efda" }, { id: "TTC-022", bg: "e2efda" }, { id: "TTC-023", bg: "e2efda" }, { id: "TTC-026", bg: "e2efda" }, { id: "TTC-027", bg: "e2efda" }, { id: "TTC-028", bg: "e2efda" }, { id: "TTC-032", bg: "e2efda" }, { id: "TTC-015", bg: "e2efda" }, { id: "TTC-021", bg: "e2efda" }, { id: "TTC-024", bg: "e2efda" } ],
-                // Group 10
-                [ { id: "TTC-001", bg: "c5e0b4" }, { id: "TTC-004", bg: "c5e0b4" }, { id: "TTC-016", bg: "c5e0b4" }, { id: "TTC-029", bg: "c5e0b4" }, { id: "TTC-002", bg: "c5e0b4" }, { id: "TTC-033", bg: "c5e0b4" } ]
-            ];
+                // Payroll section / staff order now comes from Backend column AJ.
+            // Same AJ number = same section; sections are ordered numerically.
+            // Within each section, higher-level positions are placed first.
+            const normalizePayrollName = value => String(value || '')
+                .trim()
+                .replace(/\s+/g, ' ')
+                .toLowerCase();
 
-            let orderedBlocks = [];
-            
-            blocksDef.forEach(blk => {
-                let rowData = [];
-                blk.forEach(item => {
-                    if (allRecs[item.id]) {
-                        rowData.push({ ...allRecs[item.id], bg: item.bg });
-                        delete allRecs[item.id]; 
+            // AJ supports two-part values such as `1,1`, `1,2`, `1,3`.
+            // The first number is the section; the second number is an optional
+            // explicit position inside that section. A plain `1` means section 1
+            // with no explicit position, so it stays after explicitly positioned
+            // staff and is then ordered by the existing hierarchy rules.
+            const parsePayrollGroup = value => {
+                const raw = String(value ?? '').trim();
+                if (!raw) return null;
+
+                const parts = raw.split(',');
+                const section = Number(String(parts[0] ?? '').trim());
+                if (!Number.isFinite(section) || section <= 0) return null;
+
+                let order = null;
+                if (parts.length > 1) {
+                    const orderRaw = String(parts[1] ?? '').trim();
+                    const parsedOrder = Number(orderRaw);
+                    if (orderRaw !== '' && Number.isFinite(parsedOrder) && parsedOrder > 0) {
+                        order = parsedOrder;
                     }
-                });
-                if (rowData.length > 0) orderedBlocks.push(rowData);
+                }
+
+                return { section, order };
+            };
+
+            // Position hierarchy used only for ordering inside each AJ section.
+            const payrollLevelRank = position => {
+                const p = String(position || '').trim().toLowerCase();
+                if (!p) return 0;
+                if (/\b(ceo|chief executive officer|chairman|president|owner)\b/.test(p)) return 120;
+                if (/\b(managing director|executive director)\b/.test(p)) return 115;
+                if (/\b(general manager|director)\b/.test(p)) return 110;
+                if (/\b(assistant|deputy|vice)\s+(ceo|chief|director|general manager)\b/.test(p)) return 105;
+                if (/\b(cfo|coo|cto|cmo|chro|cio)\b/.test(p)) return 100;
+                if (/\b(head|manager)\b/.test(p)) return 90;
+                if (/\b(supervisor|sup\.?|lead)\b/.test(p)) return 80;
+                if (/\b(assistant manager|assistant supervisor)\b/.test(p)) return 75;
+                if (/\b(senior|sr\.?|principal)\b/.test(p)) return 70;
+                if (/\b(officer|executive|specialist|accountant|engineer|designer|developer)\b/.test(p)) return 60;
+                if (/\b(junior|jr\.?)\b/.test(p)) return 50;
+                return 40;
+            };
+
+            // The Backend sheet is Restricted, so the browser cannot read it directly.
+            // A small Apps Script bridge can read only Staff ID / Name / AJ server-side.
+            // First use AJ already present in the loaded Employee Info data; then let the
+            // bridge override it with the authoritative live Backend AJ values.
+            let payrollGroupById = new Map();
+            let payrollGroupByName = new Map();
+
+            allEmployees.forEach(emp => {
+                const group = parsePayrollGroup(emp.payrollGroup);
+                if (group === null) return;
+                const normalizedId = normalizeId(emp.displayId || emp.id);
+                if (normalizedId && !normalizedId.includes('STAFFID')) payrollGroupById.set(normalizedId, group);
+                if (emp.name) payrollGroupByName.set(normalizePayrollName(emp.name), group);
             });
 
-            let leftovers = Object.values(allRecs);
-            if (leftovers.length > 0) {
-                let groupedLeftovers = {};
-                leftovers.forEach(r => {
-                    let c = r.e.company;
-                    if (!groupedLeftovers[c]) groupedLeftovers[c] = [];
-                    groupedLeftovers[c].push(r);
-                });
-                Object.keys(groupedLeftovers).sort().forEach(comp => {
-                    let rList = groupedLeftovers[comp].sort((a, b) => a.e.name.localeCompare(b.e.name));
-                    let rowData = rList.map(r => ({ ...r, bg: "ffffff" }));
-                    orderedBlocks.push(rowData);
-                });
+            const loadPayrollGroupsFromBridge = () => new Promise((resolve, reject) => {
+                const endpoint = String(typeof PAYROLL_AJ_WEB_APP_URL === 'string' ? PAYROLL_AJ_WEB_APP_URL : '').trim();
+                if (!endpoint) return resolve(false);
+
+                const callbackName = '__payrollAjCb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+                const script = document.createElement('script');
+                let settled = false;
+                const cleanup = () => {
+                    clearTimeout(timer);
+                    script.remove();
+                    try { delete window[callbackName]; } catch (e) { window[callbackName] = undefined; }
+                };
+                const finish = (fn, value) => {
+                    if (settled) return;
+                    settled = true;
+                    cleanup();
+                    fn(value);
+                };
+                const timer = setTimeout(() => finish(reject, new Error('Payroll AJ bridge timed out.')), 15000);
+                window[callbackName] = payload => {
+                    if (!payload || payload.ok !== true || !Array.isArray(payload.rows)) {
+                        return finish(reject, new Error(payload?.error || 'Payroll AJ bridge returned no data.'));
+                    }
+                    payload.rows.forEach(item => {
+                        const group = parsePayrollGroup(item?.aj);
+                        if (group === null) return;
+                        const id = normalizeId(item?.staffId);
+                        const name = normalizePayrollName(item?.name);
+                        if (id && !id.includes('STAFFID')) payrollGroupById.set(id, group);
+                        if (name) payrollGroupByName.set(name, group);
+                    });
+                    finish(resolve, true);
+                };
+                script.onerror = () => finish(reject, new Error('Payroll AJ bridge could not be reached.'));
+                const join = endpoint.includes('?') ? '&' : '?';
+                script.src = endpoint + join + 'action=payrollGroups&callback=' + encodeURIComponent(callbackName) + '&_=' + Date.now();
+                script.async = true;
+                document.head.appendChild(script);
+            });
+
+            let bridgeLoaded = false;
+            try {
+                bridgeLoaded = await loadPayrollGroupsFromBridge();
+            } catch (bridgeErr) {
+                console.warn('Payroll AJ bridge unavailable; using AJ already loaded with Employee Info.', bridgeErr);
             }
+
+            // Existing section-style colors are kept; color selection follows the actual AJ number.
+            const payrollSectionColors = ['e2efda','8ea9db','e2efda','f4cccc','fce4d6','fff2cc','e2efda','d9e1f2','e2efda','c5e0b4'];
+
+            const allPayrollRows = Object.values(allRecs).map(r => {
+                const group = payrollGroupById.get(normalizeId(r.e.displayId))
+                    ?? payrollGroupById.get(normalizeId(r.e.id))
+                    ?? payrollGroupByName.get(normalizePayrollName(r.e.name))
+                    ?? parsePayrollGroup(r.e.payrollGroup);
+                return { ...r, payrollGroup: group === null || group === undefined ? null : group };
+            });
+
+            const matchedAjCount = allPayrollRows.filter(r => r.payrollGroup !== null).length;
+            if (matchedAjCount === 0) {
+                console.error('No Payroll Group values were available from Backend column AJ.', {
+                    bridgeConfigured: !!String(typeof PAYROLL_AJ_WEB_APP_URL === 'string' ? PAYROLL_AJ_WEB_APP_URL : '').trim(),
+                    bridgeLoaded,
+                    employeeCount: allEmployees.length
+                });
+                showAppToast('Unable to load Payroll Group from Backend column AJ. Deploy the Payroll AJ Apps Script bridge and set PAYROLL_AJ_WEB_APP_URL.', 'error');
+                return;
+            }
+
+            const payrollBuckets = new Map();
+            allPayrollRows.forEach(r => {
+                const key = r.payrollGroup === null ? '__UNASSIGNED__' : String(r.payrollGroup.section);
+                if (!payrollBuckets.has(key)) payrollBuckets.set(key, []);
+                payrollBuckets.get(key).push(r);
+            });
+
+            const payrollGroupKeys = [...payrollBuckets.keys()].sort((a, b) => {
+                if (a === '__UNASSIGNED__') return 1;
+                if (b === '__UNASSIGNED__') return -1;
+                return Number(a) - Number(b);
+            });
+
+            // Within each AJ section, a value such as 6,10 means the employee must
+            // occupy the 10th position in Section 6. Explicit positions are absolute
+            // slots, not merely a priority list. Staff without a comma keep the
+            // existing higher-level-first ordering and fill the remaining open slots.
+            const comparePayrollHierarchy = (a, b) => {
+                const levelDiff = payrollLevelRank(b.e.position) - payrollLevelRank(a.e.position);
+                if (levelDiff !== 0) return levelDiff;
+                const positionDiff = String(a.e.position || '').localeCompare(String(b.e.position || ''), undefined, { sensitivity: 'base' });
+                if (positionDiff !== 0) return positionDiff;
+                return String(a.e.name || '').localeCompare(String(b.e.name || ''), undefined, { sensitivity: 'base' });
+            };
+
+            const orderPayrollSectionRows = rows => {
+                const explicitlyPositioned = [];
+                const unpositioned = [];
+
+                rows.forEach((row, originalIndex) => {
+                    const order = row.payrollGroup && Number.isFinite(row.payrollGroup.order)
+                        ? Number(row.payrollGroup.order)
+                        : null;
+                    if (order !== null && order > 0) explicitlyPositioned.push({ row, order, originalIndex });
+                    else unpositioned.push({ row, originalIndex });
+                });
+
+                explicitlyPositioned.sort((a, b) => {
+                    if (a.order !== b.order) return a.order - b.order;
+                    const hierarchy = comparePayrollHierarchy(a.row, b.row);
+                    return hierarchy !== 0 ? hierarchy : a.originalIndex - b.originalIndex;
+                });
+                unpositioned.sort((a, b) => {
+                    const hierarchy = comparePayrollHierarchy(a.row, b.row);
+                    return hierarchy !== 0 ? hierarchy : a.originalIndex - b.originalIndex;
+                });
+
+                const maxExplicitPosition = explicitlyPositioned.reduce((max, item) => Math.max(max, item.order), 0);
+                const slotCount = Math.max(rows.length, maxExplicitPosition);
+                const slots = Array(slotCount).fill(null);
+
+                explicitlyPositioned.forEach(item => {
+                    const targetIndex = Math.max(0, Math.floor(item.order) - 1);
+                    if (targetIndex >= slots.length) slots.length = targetIndex + 1;
+                    if (slots[targetIndex] === null) {
+                        slots[targetIndex] = item.row;
+                    } else {
+                        // Duplicate explicit positions are resolved without dropping anyone:
+                        // keep the first requested slot and move the tie to the next open slot.
+                        let next = targetIndex + 1;
+                        while (next < slots.length && slots[next] !== null) next++;
+                        if (next >= slots.length) slots.length = next + 1;
+                        slots[next] = item.row;
+                    }
+                });
+
+                let unpositionedIndex = 0;
+                for (let i = 0; i < slots.length && unpositionedIndex < unpositioned.length; i++) {
+                    if (slots[i] === null) slots[i] = unpositioned[unpositionedIndex++].row;
+                }
+                while (unpositionedIndex < unpositioned.length) slots.push(unpositioned[unpositionedIndex++].row);
+
+                return slots.filter(Boolean);
+            };
+
+            let orderedBlocks = [];
+            payrollGroupKeys.forEach(groupKey => {
+                const sectionRows = orderPayrollSectionRows(payrollBuckets.get(groupKey).slice());
+
+                const sectionNumber = Number(groupKey);
+                const sectionColor = Number.isFinite(sectionNumber) && sectionNumber > 0
+                    ? (payrollSectionColors[sectionNumber - 1] || 'ffffff')
+                    : 'ffffff';
+                orderedBlocks.push(sectionRows.map(r => ({ ...r, bg: sectionColor })));
+            });
 
             if (orderedBlocks.length === 0) { showAppToast("No payroll data for selected companies.", "error"); return; }
 
