@@ -5580,7 +5580,10 @@
         let selectedStatuses = ['Active']; let selectedDashboardYear = attendanceDataYear; let selectedDashboardMonth = 'All'; let selectedDashboardWarning = 'All'; let searchQuery = ''; let dailySearchQuery = '';
         let reportMode='monthly'; let reportSubtab='warnings'; let reportInitialized=false; let selectedReportCompanies=[]; let reportMetricFocus=null; let reportDetailScrollBeforeEmployee=0; let employeeModalOriginalParent=null; let employeeModalOriginalNextSibling=null; let reportSearchQuery=''; let reportMetricSearchQuery=''; let reportMetricDepartment='All'; let reportMetricCompany='All'; let reportMetricChartLeaveTypes=new Set(['AL','SL','SP','UP']); let reportEmployeeMetricStandalone=false; let reportEmployeeMetricOriginalParent=null; let reportEmployeeMetricOriginalNextSibling=null;
         let currentSortColumn = 'id'; let isSortAscending = true;
-        let leaveHistoryByEmployee = {}; let dailyLeaveRecords = []; let currentDailyGroupedData = {}; 
+        let leaveHistoryByEmployee = {}; let dailyLeaveRecords = []; let currentDailyGroupedData = {};
+        // Raw attendance cells used only by Timesheet Grid export so the exported
+        // daily values match the backend grid cell instead of being synthesized.
+        let timesheetRawCells = new Map(); 
         let currentCalendarDate = new Date(); let selectedCalendarDate = new Date().getDate();
         let activeLeaveFilter = null; 
         let customNotes = {}; let customReasons = {}; let staffWarnings = {};
@@ -6486,7 +6489,7 @@
         }
 
         function processData(info, pull, grids, resig, photos) {
-            allEmployees = []; leaveHistoryByEmployee = {}; dailyLeaveRecords = []; companies.clear(); departments.clear();
+            allEmployees = []; leaveHistoryByEmployee = {}; dailyLeaveRecords = []; timesheetRawCells = new Map(); companies.clear(); departments.clear();
 
             // Detect these columns by their sheet headers instead of assuming fixed letters.
             // This keeps Notice Period working even if Employee Info columns are inserted/reordered.
@@ -6496,6 +6499,7 @@
                 'final working day','resign date','resigned date','resignation date','inactive date'
             ], 33);
             const infoEntityCol = findHeaderColumn(info, ['entity'], 34);
+            const infoTimesheetOrderCol = findHeaderColumn(info, ['order in timesheet'], 37);
 
             info.forEach((row, i) => {
                 if(i<3) return; let rawId=String(row[1]||'').trim(); let id=normalizeId(rawId); if(!id||id.includes('STAFFID')) return;
@@ -6512,6 +6516,8 @@
                     // Employee Info CSV already carries this column, so Payroll Export can
                     // use it without opening the restricted source spreadsheet in the browser.
                     payrollGroup: String(row[35] || '').trim(),
+                    // Backend column AL / header "Order in Timesheet".
+                    timesheetOrder: String(row[infoTimesheetOrderCol] || '').trim(),
                     leaves: { available: {AL:parseFloat(row[8])||0, SL:parseFloat(row[9])||0, SP:parseFloat(row[10])||0}, used: {SL:parseFloat(row[16])||0, AL:parseFloat(row[17])||0, SP:parseFloat(row[19])||0}, remaining: {AL:parseFloat(row[20])||0, SL:parseFloat(row[21])||0, SP:parseFloat(row[22])||0}, unpaid: parseFloat(row[12])||0, absences: parseFloat(row[13])||0 }
                 });
             });
@@ -6677,6 +6683,8 @@
                             let emp=allEmployees.find(e=>e.id===id); if(!emp) return;
                             Object.entries(currDayMap).forEach(([cIdx, day]) => {
                                 let cell=String(row[cIdx]||'').trim(); if(!cell) return;
+                                const rawCellKey = `${id}|${attendanceDataYear}|${monthNames.indexOf(mg.month)}|${parseInt(day)}`;
+                                if (!timesheetRawCells.has(rawCellKey)) timesheetRawCells.set(rawCellKey, cell);
                                 let noteMatch=cell.match(/\(([^)]+)\)/), tNote=noteMatch?noteMatch[1].trim():"";
                                 let cVal=cell.toUpperCase().replace(/\(.*?\)/g,''), al=0,sl=0,sp=0,up=0,a=0,d=0,h=0,l5=0,l3=0,ot=0,pres=false, isRawD=false, isRawH=false;
                                 cVal.split(/[+&,\n]/).forEach(p=>{
@@ -12406,18 +12414,72 @@
             let fD=new Date(fV); fD.setHours(0,0,0,0); let tD=new Date(tV); tD.setHours(23,59,59,999); if(fD>tD){let t=fD;fD=tD;tD=t;}
             let dA=getDates(fD,tD); if(dA.length>31){showAppToast("Max 31 Days allowed.","error");return;}
             let cS=selectedDailyCompanies.length>0&&selectedDailyCompanies.length<companies.size?selectedDailyCompanies.join(', '):'All Companies', dLb=fV===tV?fV:`${fV} to ${tV}`;
-            let rS=allEmployees.filter(e=>isEmploymentVisible(e)&&(selectedDailyCompanies.length===0||selectedDailyCompanies.includes(e.company))&&isDailyDepartmentSelected(e)&&!window.isExcludedPosition(e.position)).sort((a,b)=>{if(a.company!==b.company)return a.company.localeCompare(b.company); return a.name.localeCompare(b.name);}); if(rS.length===0)return;
+            const baseTimesheetCompare = (a,b) => {
+                if(a.company!==b.company) return String(a.company||'').localeCompare(String(b.company||''));
+                return String(a.name||'').localeCompare(String(b.name||''));
+            };
+            const parseTimesheetOrder = value => {
+                const n = Number(String(value ?? '').trim());
+                return Number.isFinite(n) && n > 0 ? n : null;
+            };
+            const baseRows = allEmployees.filter(e=>isEmploymentVisible(e)&&(selectedDailyCompanies.length===0||selectedDailyCompanies.includes(e.company))&&isDailyDepartmentSelected(e)&&!window.isExcludedPosition(e.position)).sort(baseTimesheetCompare);
+            if(baseRows.length===0)return;
+
+            // Mirror the Payroll Report's numbered-slot behavior using Backend column AL.
+            // Staff with an explicit Timesheet order occupy that position; unnumbered
+            // staff fill the remaining positions using the existing company/name order.
+            const positionedRows = [];
+            const unpositionedRows = [];
+            baseRows.forEach((row, originalIndex) => {
+                const order = parseTimesheetOrder(row.timesheetOrder);
+                if(order !== null) positionedRows.push({row, order, originalIndex});
+                else unpositionedRows.push({row, originalIndex});
+            });
+            positionedRows.sort((a,b) => a.order !== b.order ? a.order-b.order : baseTimesheetCompare(a.row,b.row));
+            unpositionedRows.sort((a,b) => baseTimesheetCompare(a.row,b.row));
+            const maxTimesheetOrder = positionedRows.reduce((max,item)=>Math.max(max,item.order),0);
+            const timesheetSlots = Array(Math.max(baseRows.length,maxTimesheetOrder)).fill(null);
+            positionedRows.forEach(item => {
+                const targetIndex = Math.max(0, Math.floor(item.order)-1);
+                if(targetIndex >= timesheetSlots.length) timesheetSlots.length = targetIndex+1;
+                if(timesheetSlots[targetIndex] === null) timesheetSlots[targetIndex] = item.row;
+                else {
+                    let next = targetIndex+1;
+                    while(next < timesheetSlots.length && timesheetSlots[next] !== null) next++;
+                    if(next >= timesheetSlots.length) timesheetSlots.length = next+1;
+                    timesheetSlots[next] = item.row;
+                }
+            });
+            let unpositionedIndex = 0;
+            for(let i=0;i<timesheetSlots.length && unpositionedIndex<unpositionedRows.length;i++){
+                if(timesheetSlots[i]===null) timesheetSlots[i]=unpositionedRows[unpositionedIndex++].row;
+            }
+            while(unpositionedIndex<unpositionedRows.length) timesheetSlots.push(unpositionedRows[unpositionedIndex++].row);
+            const rS = timesheetSlots.filter(Boolean);
+
             let sD=0,sUP=0,sA=0,sL=0,sLp=0,sSL=0,sAL=0,sOT=0,sSP=0, bR=[], cnt=1;
             rS.forEach(e=>{
                 let rO={no:cnt++,id:e.displayId,name:e.name,dys:[],t:{D:0,UP:0,A:0,L5:0,L3:0,SL:0,AL:0,OT:0,SP:0}};
                 dA.forEach(dt=>{
-                    let ms=monthNames[dt.getMonth()].substring(0,3).toLowerCase(), dN=dt.getDate(), rec=dailyLeaveRecords.find(r=>r.staffId===e.id&&r.month.toLowerCase().startsWith(ms)&&r.day===dN), cV=isBeforeEmployeeJoinDate(e,dt)?'':'P';
+                    let ms=monthNames[dt.getMonth()].substring(0,3).toLowerCase(), dN=dt.getDate(), rec=dailyLeaveRecords.find(r=>r.staffId===e.id&&r.month.toLowerCase().startsWith(ms)&&r.day===dN), cV='';
                     if(rec){
                         let l=rec.leaves, t=[], iM=(l.AL>0?1:0)+(l.SL>0?1:0)+(l.SP>0?1:0)+(l.UP>0?1:0)+(l.A>0?1:0)>1;
                         if(l.AL===0.5)t.push(iM?'AL':'H-AL');else if(l.AL>0)t.push('AL'); if(l.SL===0.5)t.push(iM?'SL':'H-SL');else if(l.SL>0)t.push('SL'); if(l.SP===0.5)t.push(iM?'SP':'H-SP');else if(l.SP>0)t.push('SP'); if(l.UP===0.5)t.push(iM?'UP':'H-UP');else if(l.UP>0)t.push('UP'); if(l.A===0.5)t.push(iM?'A':'H-A');else if(l.A>0)t.push('A'); if(l.Late5m>0)t.push('L'); if(l.Late3m>0)t.push("L'"); if(l.OT===0.5)t.push('H-OT');else if(l.OT>0)t.push('OT'); if(l.D===0.5)t.push(iM?'D':'H-D');else if(l.H===0.5)t.push(iM?'H':'H-H');else if(l.H>0)t.push('H');
-                        if(t.length>1)cV=[...new Set(t.map(x=>x.replace('H-','')))].join('/'); else if(t.length===1)cV=t[0]; else cV='P';
+                        if(t.length>1)cV=[...new Set(t.map(x=>x.replace('H-','')))].join('/'); else if(t.length===1)cV=t[0];
                         rO.t.AL+=l.AL;rO.t.SL+=l.SL;rO.t.SP+=l.SP;rO.t.UP+=l.UP;rO.t.A+=l.A;rO.t.L5+=l.Late5m;rO.t.L3+=l.Late3m;rO.t.D+=l.D;rO.t.OT+=l.OT;
-                    } rO.dys.push(cV);
+                    }
+                    if (isBeforeEmployeeJoinDate(e,dt)) {
+                        // Timesheet export only: before an employee's recorded join date,
+                        // mark each day in the selected month as Absent (A).
+                        // This does not alter the live dashboard or backend data.
+                        cV='A';
+                        rO.t.A += 1;
+                    } else {
+                        const rawKey = `${e.id}|${attendanceDataYear}|${dt.getMonth()}|${dN}`;
+                        const rawBackendValue = timesheetRawCells.get(rawKey);
+                        if (rawBackendValue !== undefined) cV = rawBackendValue;
+                    }
+                    rO.dys.push(cV);
                 }); sD+=rO.t.D;sUP+=rO.t.UP;sA+=rO.t.A;sL+=rO.t.L5;sLp+=rO.t.L3;sSL+=rO.t.SL;sAL+=rO.t.AL;sOT+=rO.t.OT;sSP+=rO.t.SP; bR.push(rO);
             });
             let dCStr=Array(dA.length).fill(4).join(',');
