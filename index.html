@@ -12459,7 +12459,7 @@
 
             let sD=0,sUP=0,sA=0,sL=0,sLp=0,sSL=0,sAL=0,sOT=0,sSP=0, bR=[], cnt=1;
             rS.forEach(e=>{
-                let rO={no:cnt++,id:e.displayId,name:e.name,dys:[],t:{D:0,UP:0,A:0,L5:0,L3:0,SL:0,AL:0,OT:0,SP:0}};
+                let rO={no:cnt++,id:e.displayId,name:e.name,department:e.department||'',dys:[],t:{D:0,UP:0,A:0,L5:0,L3:0,SL:0,AL:0,OT:0,SP:0}};
                 dA.forEach(dt=>{
                     let ms=monthNames[dt.getMonth()].substring(0,3).toLowerCase(), dN=dt.getDate(), rec=dailyLeaveRecords.find(r=>r.staffId===e.id&&r.month.toLowerCase().startsWith(ms)&&r.day===dN), cV='';
                     if(rec){
@@ -12483,14 +12483,14 @@
                 }); sD+=rO.t.D;sUP+=rO.t.UP;sA+=rO.t.A;sL+=rO.t.L5;sLp+=rO.t.L3;sSL+=rO.t.SL;sAL+=rO.t.AL;sOT+=rO.t.OT;sSP+=rO.t.SP; bR.push(rO);
             });
             let dCStr=Array(dA.length).fill(4).join(',');
-            let h=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"><style>table{border-collapse:collapse;font-family:'Times New Roman';font-size:11pt;}th,td{border:1px solid #000;padding:5px;vertical-align:middle;}</style></head><body><table id="exTab" data-cols-width="5,12,25,${dCStr},5,5,5,5,5,5,5,5,5,15"><tr><td colspan="7" data-f-sz="14" data-f-bold="true" data-b-a-s="none">Attendant Report (${dLb})</td>${dL('P','Present','ffffff','000000')}${dL('UP','Unpaid Leave','00ffff','000000')}${dL('AL','Annual Leave','c5e0b4','000000')}${dL('SL','Sick Leave','ffff00','000000')}${dL('SP','Special Leave','ccc0da','000000')}${dL('SB','Stand By','b4c6e7','000000')}${dL('L','Late >8:05','bdd7ee','000000')}${dL('OT','Overtime','f4cccc','c00000')}</tr><tr><td colspan="7" data-f-sz="11" data-f-bold="true" data-b-a-s="none">Company: ${cS}</td>${dL('D','Day Off','fce4d6','ff0000')}${dL('H-UP','Half Unpaid','00ffff','000000')}${dL('H-AL','Half AL','c5e0b4','000000')}${dL('H-SL','Half SL','ffff00','000000')}${dL('A','Absent','ff0000','ffffff')}${dL("L'",'Late >8:30','c00000','ffffff')}${dL('H','Holiday','fce4d6','ff0000')}</tr><tr><td colspan="${dA.length+15}" data-b-a-s="none"></td></tr><tr><th rowspan="2" data-f-bold="true" data-fill-color="d9d9d9" data-a-h="center" data-b-a-s="thin">No.</th><th rowspan="2" data-f-bold="true" data-fill-color="d9d9d9" data-a-h="center" data-b-a-s="thin">ID</th><th rowspan="2" data-f-bold="true" data-fill-color="d9d9d9" data-a-h="left" data-b-a-s="thin">Name</th>`;
+            let h=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"><style>table{border-collapse:collapse;font-family:'Times New Roman';font-size:11pt;}th,td{border:1px solid #000;padding:5px;vertical-align:middle;}</style></head><body><table id="exTab" data-cols-width="5,12,25,20,${dCStr},5,5,5,5,5,5,5,5,5,15"><tr><td colspan="8" data-f-sz="14" data-f-bold="true" data-b-a-s="none">Attendant Report (${dLb})</td>${dL('P','Present','ffffff','000000')}${dL('UP','Unpaid Leave','00ffff','000000')}${dL('AL','Annual Leave','c5e0b4','000000')}${dL('SL','Sick Leave','ffff00','000000')}${dL('SP','Special Leave','ccc0da','000000')}${dL('SB','Stand By','b4c6e7','000000')}${dL('L','Late >8:05','bdd7ee','000000')}${dL('OT','Overtime','f4cccc','c00000')}</tr><tr><td colspan="8" data-f-sz="11" data-f-bold="true" data-b-a-s="none">Company: ${cS}</td>${dL('D','Day Off','fce4d6','ff0000')}${dL('H-UP','Half Unpaid','00ffff','000000')}${dL('H-AL','Half AL','c5e0b4','000000')}${dL('H-SL','Half SL','ffff00','000000')}${dL('A','Absent','ff0000','ffffff')}${dL("L'",'Late >8:30','c00000','ffffff')}${dL('H','Holiday','fce4d6','ff0000')}</tr><tr><td colspan="${dA.length+16}" data-b-a-s="none"></td></tr><tr><th rowspan="2" data-f-bold="true" data-fill-color="d9d9d9" data-a-h="center" data-b-a-s="thin">No.</th><th rowspan="2" data-f-bold="true" data-fill-color="d9d9d9" data-a-h="center" data-b-a-s="thin">ID</th><th rowspan="2" data-f-bold="true" data-fill-color="d9d9d9" data-a-h="left" data-b-a-s="thin">Name</th><th rowspan="2" data-f-bold="true" data-fill-color="d9d9d9" data-a-h="left" data-b-a-s="thin">Department</th>`;
             dA.forEach(d=>{h+=`<th data-fill-color="d9d9d9" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${d.getDate()}</th>`;});
             h+=`<th data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${sD}</th><th data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${sUP}</th><th data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${sA}</th><th data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${sL}</th><th data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${sLp}</th><th data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${sSL}</th><th data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${sAL}</th><th data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${sOT}</th><th data-f-color="ff0000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${sSP}</th><th rowspan="2" data-fill-color="ffffff" data-f-bold="true" data-a-h="center" data-b-a-s="thin">Signature</th></tr><tr>`;
             dA.forEach(d=>{h+=`<th data-fill-color="d9d9d9" data-f-bold="true" data-a-h="center" data-b-a-s="thin">${d.toLocaleDateString('en-US',{weekday:'short'}).substring(0,3)}</th>`;});
             h+=`<th data-fill-color="fce4d6" data-f-color="ff0000" data-a-h="center" data-b-a-s="thin">D</th><th data-fill-color="00ffff" data-a-h="center" data-b-a-s="thin">UP</th><th data-fill-color="ff0000" data-f-color="ffffff" data-a-h="center" data-b-a-s="thin">A</th><th data-fill-color="bdd7ee" data-a-h="center" data-b-a-s="thin">L</th><th data-fill-color="c00000" data-f-color="ffffff" data-a-h="center" data-b-a-s="thin">L'</th><th data-fill-color="ffff00" data-a-h="center" data-b-a-s="thin">SL</th><th data-fill-color="c5e0b4" data-a-h="center" data-b-a-s="thin">AL</th><th data-fill-color="f4cccc" data-f-color="c00000" data-a-h="center" data-b-a-s="thin">OT</th><th data-fill-color="ccc0da" data-a-h="center" data-b-a-s="thin">SP</th></tr>`;
             const fT=(v,t)=>v===0?`<td data-t="n" data-a-h="center" data-b-a-s="thin">0</td>`:`<td data-t="n" ${gBg(t)} data-f-bold="true" data-a-h="center" data-b-a-s="thin">${v}</td>`;
-            bR.forEach(r=>{ h+=`<tr><td data-t="n" data-a-h="center" data-b-a-s="thin">${r.no}</td><td data-t="s" data-a-h="center" data-b-a-s="thin">${r.id}</td><td data-t="s" data-a-h="left" data-b-a-s="thin">${r.name}</td>`; r.dys.forEach(v=>{h+=`<td ${gBg(v)} data-f-bold="true" data-a-h="center" data-b-a-s="thin">${v}</td>`;}); h+=fT(r.t.D,'D')+fT(r.t.UP,'UP')+fT(r.t.A,'A')+fT(r.t.L5,'L')+fT(r.t.L3,"L'")+fT(r.t.SL,'SL')+fT(r.t.AL,'AL')+fT(r.t.OT,'OT')+fT(r.t.SP,'SP')+`<td data-b-a-s="thin"></td></tr>`; });
-            h+=`<tr><td colspan="${dA.length+15}" data-b-a-s="none"></td></tr><tr><td colspan="${dA.length+15}" data-b-a-s="none"></td></tr><tr><td colspan="4" data-b-a-s="none" data-f-bold="true">Prepared By:</td><td colspan="${Math.max(1,Math.floor(dA.length/2))}" data-b-a-s="none" data-f-bold="true">Checked & Agreed:</td><td colspan="5" data-b-a-s="none" data-f-bold="true">Approved By:</td></tr></table></body></html>`;
+            bR.forEach(r=>{ h+=`<tr><td data-t="n" data-a-h="center" data-b-a-s="thin">${r.no}</td><td data-t="s" data-a-h="center" data-b-a-s="thin">${r.id}</td><td data-t="s" data-a-h="left" data-b-a-s="thin">${r.name}</td><td data-t="s" data-a-h="left" data-b-a-s="thin">${r.department}</td>`; r.dys.forEach(v=>{h+=`<td ${gBg(v)} data-f-bold="true" data-a-h="center" data-b-a-s="thin">${v}</td>`;}); h+=fT(r.t.D,'D')+fT(r.t.UP,'UP')+fT(r.t.A,'A')+fT(r.t.L5,'L')+fT(r.t.L3,"L'")+fT(r.t.SL,'SL')+fT(r.t.AL,'AL')+fT(r.t.OT,'OT')+fT(r.t.SP,'SP')+`<td data-b-a-s="thin"></td></tr>`; });
+            h+=`<tr><td colspan="${dA.length+16}" data-b-a-s="none"></td></tr><tr><td colspan="${dA.length+16}" data-b-a-s="none"></td></tr><tr><td colspan="4" data-b-a-s="none" data-f-bold="true">Prepared By:</td><td colspan="${Math.max(1,Math.floor(dA.length/2))}" data-b-a-s="none" data-f-bold="true">Checked & Agreed:</td><td colspan="5" data-b-a-s="none" data-f-bold="true">Approved By:</td></tr></table></body></html>`;
             let tmpDiv=document.createElement('div'); tmpDiv.innerHTML=h; tmpDiv.style.display='none'; document.body.appendChild(tmpDiv);
             TableToExcel.convert(document.getElementById('exTab'), {name:`Timesheet_${dLb.replace(/ /g,'_')}.xlsx`,sheet:{name:"Timesheet"}}); document.body.removeChild(tmpDiv);
         };
@@ -12763,6 +12763,41 @@
                             allRecs[displayId].ot += l.OT; allRecs[displayId].d += l.D;
                         }
                     }
+                }
+            });
+
+            // Payroll Report only: count each calendar day before a new employee's
+            // actual join date as Absent (A), even when the attendance source has
+            // no row for those pre-join dates. This fills the missing A values in
+            // the exported payroll summary without changing live attendance data.
+            Object.values(allRecs).forEach(rec => {
+                const emp = rec.e;
+                if (!emp) return;
+
+                const joinDate = Number(emp.sortableJoinDate || 0)
+                    ? new Date(Number(emp.sortableJoinDate))
+                    : new Date(emp.joinDate || '');
+                if (isNaN(joinDate.getTime())) return;
+                joinDate.setHours(0, 0, 0, 0);
+
+                // Only selected export dates are counted. For a normal monthly
+                // export this covers day 1 through the day before joining.
+                const cursor = new Date(fD);
+                cursor.setHours(0, 0, 0, 0);
+                while (cursor <= tD) {
+                    if (cursor < joinDate) {
+                        const ms = monthNames[cursor.getMonth()].substring(0, 3).toLowerCase();
+                        const dayNum = cursor.getDate();
+                        const existing = dailyLeaveRecords.find(r =>
+                            r.staffId === emp.id &&
+                            String(r.month || '').toLowerCase().startsWith(ms) &&
+                            Number(r.day) === dayNum
+                        );
+                        // Count a pre-join day when it has no existing A recorded.
+                        // This prevents double-counting while filling missing A days.
+                        if (!existing || !(Number(existing.leaves?.A) > 0)) rec.a += 1;
+                    }
+                    cursor.setDate(cursor.getDate() + 1);
                 }
             });
 
