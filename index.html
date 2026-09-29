@@ -13527,8 +13527,8 @@
     } else if (forceAfternoonFirstScan || (shiftType === '2X' && lateStartStaff)) {
       morningIn = '';
       lunchOut = '';
-      lunchIn = sorted.find(s => s.mins >= 600 && (forceAfternoonFirstScan ? s.mins <= 786 : true))?.original || '';
-      const afternoonScans = sorted.filter(s => s.mins >= 600);
+      lunchIn = sorted.find(s => s.mins >= 720 && (forceAfternoonFirstScan ? s.mins <= 786 : true))?.original || '';
+      const afternoonScans = sorted.filter(s => s.mins >= 720);
       if (afternoonScans.length >= 2) eveningOut = afternoonScans[afternoonScans.length - 1].original;
       else eveningOut = '';
     } else if (shiftType === '2X') {
