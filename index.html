@@ -5166,7 +5166,17 @@
       <div class="card-icon icon-pending">🏖️</div>
       <div class="card-content">
         <div class="title scan-kpi-title">On Leave</div>
-        <div class="val scan-kpi-value" id="cntLeave">0</div>
+        <div class="val scan-kpi-value hidden" id="cntLeave">0</div>
+        <div class="grid grid-cols-2 gap-2 mt-1">
+          <div class="text-center border-r border-slate-200 pr-2">
+            <div class="text-[8px] font-bold uppercase tracking-wide text-slate-400">Morning</div>
+            <div class="val scan-kpi-value text-center" id="cntLeaveMorning">0</div>
+          </div>
+          <div class="text-center pl-1">
+            <div class="text-[8px] font-bold uppercase tracking-wide text-slate-400">Afternoon</div>
+            <div class="val scan-kpi-value text-center" id="cntLeaveAfternoon">0</div>
+          </div>
+        </div>
         <div class="subline scan-kpi-subline" id="cntLeaveDetail">0 Full • 0 Half</div>
         <div class="subline scan-kpi-subline" id="cntLeaveNowDetail"><strong>Now: 0 staff</strong></div>
       </div>
@@ -5176,11 +5186,15 @@
       <div class="card-icon icon-present">✅</div>
       <div class="card-content">
         <div class="title scan-kpi-title">Present Now</div>
-        <div class="flex items-end gap-2">
-          <div class="val scan-kpi-value" id="cntPresent">0</div>
-          <div id="cntMorningPresentBadge" class="scan-am-badge hidden">
-            <span class="scan-am-badge-label">AM</span>
-            <span class="scan-am-badge-value" id="cntMorningPresentValue">0</span>
+        <div class="val scan-kpi-value hidden" id="cntPresent">0</div>
+        <div class="grid grid-cols-2 gap-2 mt-1">
+          <div class="text-center border-r border-slate-200 pr-2">
+            <div class="text-[8px] font-bold uppercase tracking-wide text-slate-400">Morning</div>
+            <div class="val scan-kpi-value text-center" id="cntPresentMorning">0</div>
+          </div>
+          <div class="text-center pl-1">
+            <div class="text-[8px] font-bold uppercase tracking-wide text-slate-400">Afternoon</div>
+            <div class="val scan-kpi-value text-center" id="cntPresentAfternoon">0</div>
           </div>
         </div>
         <div class="subline scan-kpi-subline" id="cntPresentDetail">Current shift • adjusted for leave</div>
@@ -13513,8 +13527,8 @@
     } else if (forceAfternoonFirstScan || (shiftType === '2X' && lateStartStaff)) {
       morningIn = '';
       lunchOut = '';
-      lunchIn = sorted.find(s => s.mins >= 720 && (forceAfternoonFirstScan ? s.mins <= 786 : true))?.original || '';
-      const afternoonScans = sorted.filter(s => s.mins >= 720);
+      lunchIn = sorted.find(s => s.mins >= 600 && (forceAfternoonFirstScan ? s.mins <= 786 : true))?.original || '';
+      const afternoonScans = sorted.filter(s => s.mins >= 600);
       if (afternoonScans.length >= 2) eveningOut = afternoonScans[afternoonScans.length - 1].original;
       else eveningOut = '';
     } else if (shiftType === '2X') {
@@ -14313,6 +14327,7 @@
     const rows = tbody.getElementsByTagName('tr');
 
     let cntTotal = 0, cntDayOff = 0, cntPresent = 0, cntMorningPresent = 0, cntLeave = 0, cntOnTime = 0, cntNotScanned = 0, cntLate5 = 0, cntLate30 = 0;
+    let cntPresentMorning = 0, cntPresentAfternoon = 0, cntLeaveMorning = 0, cntLeaveAfternoon = 0;
     let cntLeaveFull = 0, cntLeaveHalf = 0, cntLeaveNow = 0, cntDayOffFull = 0, cntDayOffHalf = 0;
     const nowForPresent = new Date();
     const currentMinsForPresent = nowForPresent.getHours() * 60 + nowForPresent.getMinutes();
@@ -14401,6 +14416,48 @@
           else cntDayOffHalf++;
         }
 
+        // SESSION SPLIT COUNTS:
+        // On Leave:
+        // - Full-day leave counts on both Morning and Afternoon.
+        // - H- half-day leave with no Morning In scan = Morning leave.
+        // - H- half-day leave with a Morning In scan = Afternoon leave.
+        //
+        // Present Now:
+        // - P and L both count as present.
+        // - Normal full-day staff count in every session covered by their
+        //   actual daily working schedule.
+        // - H- half-day morning leave => present Afternoon.
+        // - H- half-day afternoon leave => present Morning.
+        //
+        // Daily working time comes from Master_Employee and is already mapped
+        // into each row's shiftStartMins / shiftEndMins for the selected date.
+        const sessionStartMins = Number(row.dataset.shiftStartMins || 480);
+        const sessionEndMins = Number(row.dataset.shiftEndMins || 1020);
+        const scheduleWorksMorning = sessionStartMins < 720 && sessionEndMins > 0;
+        const scheduleWorksAfternoon = sessionStartMins < 1440 && sessionEndMins > 720;
+        const hasMorningScanForSplit = !!(cells[2] && cells[2].querySelector('.scan-time-val'));
+        const halfLeaveMorning = hasHalfLeave && !hasMorningScanForSplit;
+        const halfLeaveAfternoon = hasHalfLeave && hasMorningScanForSplit;
+        const statusIsPresent = primaryCode === 'P' || primaryCode === 'L' || hasAnyScan;
+
+        if (hasFullLeave) {
+          cntLeaveMorning++;
+          cntLeaveAfternoon++;
+        } else if (hasHalfLeave) {
+          if (halfLeaveMorning) cntLeaveMorning++;
+          else if (halfLeaveAfternoon) cntLeaveAfternoon++;
+        }
+
+        if (!hasFullLeave && !hasFullDayOff && !hasHalfDayOff) {
+          if (hasHalfLeave) {
+            if (halfLeaveAfternoon && scheduleWorksMorning) cntPresentMorning++;
+            if (halfLeaveMorning && scheduleWorksAfternoon) cntPresentAfternoon++;
+          } else if (statusIsPresent) {
+            if (scheduleWorksMorning) cntPresentMorning++;
+            if (scheduleWorksAfternoon) cntPresentAfternoon++;
+          }
+        }
+
         // PRESENT NOW:
         // Today -> current workforce based on shift + full/half-day leave.
         // Other dates -> fall back to actual scan presence so historical views remain meaningful.
@@ -14478,6 +14535,10 @@
     if (dayOffDetail) dayOffDetail.textContent = `${cntDayOffFull} Full • ${cntDayOffHalf} Half`;
 
     document.getElementById('cntPresent').innerText = cntPresent;
+    const presentMorningEl = document.getElementById('cntPresentMorning');
+    const presentAfternoonEl = document.getElementById('cntPresentAfternoon');
+    if (presentMorningEl) presentMorningEl.innerText = cntPresentMorning;
+    if (presentAfternoonEl) presentAfternoonEl.innerText = cntPresentAfternoon;
     const presentDetail = document.getElementById('cntPresentDetail');
     const morningBadge = document.getElementById('cntMorningPresentBadge');
     const morningValue = document.getElementById('cntMorningPresentValue');
@@ -14505,6 +14566,10 @@
     }
 
     document.getElementById('cntLeave').innerText = cntLeave;
+    const leaveMorningEl = document.getElementById('cntLeaveMorning');
+    const leaveAfternoonEl = document.getElementById('cntLeaveAfternoon');
+    if (leaveMorningEl) leaveMorningEl.innerText = cntLeaveMorning;
+    if (leaveAfternoonEl) leaveAfternoonEl.innerText = cntLeaveAfternoon;
 
     const leaveDetail = document.getElementById('cntLeaveDetail');
     if (leaveDetail) leaveDetail.textContent = `${cntLeaveFull} Full • ${cntLeaveHalf} Half`;
