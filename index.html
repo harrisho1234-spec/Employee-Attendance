@@ -13527,8 +13527,8 @@
     } else if (forceAfternoonFirstScan || (shiftType === '2X' && lateStartStaff)) {
       morningIn = '';
       lunchOut = '';
-      lunchIn = sorted.find(s => s.mins >= 720 && (forceAfternoonFirstScan ? s.mins <= 786 : true))?.original || '';
-      const afternoonScans = sorted.filter(s => s.mins >= 720);
+      lunchIn = sorted.find(s => s.mins >= 600 && (forceAfternoonFirstScan ? s.mins <= 786 : true))?.original || '';
+      const afternoonScans = sorted.filter(s => s.mins >= 600);
       if (afternoonScans.length >= 2) eveningOut = afternoonScans[afternoonScans.length - 1].original;
       else eveningOut = '';
     } else if (shiftType === '2X') {
@@ -13555,7 +13555,7 @@
       );
 
       if (lunchCandidates.length === 1) {
-        if (lunchCandidates[0].mins < 720) {
+        if (lunchCandidates[0].mins < 600) {
           lunchOut = lunchCandidates[0].original;
         } else {
           lunchIn = lunchCandidates[0].original;
@@ -13924,13 +13924,13 @@
         .sort((a, b) => a - b);
 
       const forceMorningHalfDay = isHalfDayLeave && sortedScanMins.length > 0 && sortedScanMins[0] <= 486; // 8:06 AM
-      const forceAfternoonFirstScan = isHalfDayLeave && sortedScanMins.some(mins => mins >= 720 && mins <= 786); // 1:06 PM
+      const forceAfternoonFirstScan = isHalfDayLeave && sortedScanMins.some(mins => mins >= 600 && mins <= 786); // 1:06 PM
 
       const { morningIn, lunchOut, lunchIn, eveningOut } = organizeScans(
         staff.scans, 
         staff.shiftType, 
         staff.targetMorningMins,
-        forceAfternoonFirstScan || (isPartTime && startMins >= 720),
+        forceAfternoonFirstScan || (isPartTime && startMins >= 600),
         forceMorningHalfDay
       );
 
@@ -13954,7 +13954,7 @@
 
       // Staff whose scheduled work starts at noon or later do not have a
       // Morning In requirement. Their first applicable scan belongs in Lunch In.
-      const lateStartStaff = (staff.shiftType === '2X' && startMins >= 720) || isPartTime;
+      const lateStartStaff = (staff.shiftType === '2X' && startMins >= 600) || isPartTime;
 
       // Missing-scan placeholders are time-aware:
       // before the scheduled scan time => Pending Scan
