@@ -539,6 +539,38 @@
             box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.10);
         }
 
+        #scanView .scan-date-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        #scanView .scan-date-nav-btn {
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            border: 1px solid #d9e2ec;
+            border-radius: 7px;
+            background: #ffffff;
+            color: #475569;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex: 0 0 28px;
+            transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+        }
+
+        #scanView .scan-date-nav-btn:hover {
+            background: #f8fafc;
+            border-color: #bfdbfe;
+            color: #2563eb;
+        }
+
+        #scanView .scan-date-nav-btn i {
+            font-size: 10px;
+        }
+
         #scanView .scan-company-control {
             display:inline-flex;
             align-items:center;
@@ -5116,9 +5148,17 @@
     </div>
 
     <div class="header-controls">
-      <div class="control-item">
+      <div class="control-item scan-date-control">
         <label for="dateSelect">Select Date:</label>
-        <input type="date" id="dateSelect" class="input-style">
+        <div class="scan-date-nav">
+          <button type="button" class="scan-date-nav-btn" onclick="changeScanDate(-1)" title="Previous day" aria-label="Previous day">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <input type="date" id="dateSelect" class="input-style">
+          <button type="button" class="scan-date-nav-btn" onclick="changeScanDate(1)" title="Next day" aria-label="Next day">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
       </div>
 
       <!-- SCAN COMPANY FILTER V2 -->
@@ -5178,7 +5218,6 @@
           </div>
         </div>
         <div class="subline scan-kpi-subline" id="cntLeaveDetail">0 Full • 0 Half</div>
-        <div class="subline scan-kpi-subline" id="cntLeaveNowDetail"><strong>Now: 0 staff</strong></div>
       </div>
     </div>
 
@@ -5194,7 +5233,7 @@
           </div>
           <div class="text-center pl-1">
             <div class="text-[8px] font-bold uppercase tracking-wide text-slate-400">Afternoon</div>
-            <div class="val scan-kpi-value text-center" id="cntPresentAfternoon">0</div>
+            <div class="val scan-kpi-value text-center hidden" id="cntPresentAfternoon">0</div>
           </div>
         </div>
         <div class="subline scan-kpi-subline" id="cntPresentDetail">Current shift • adjusted for leave</div>
@@ -13240,6 +13279,21 @@
   document.getElementById('dateSelect').value = new Date().toISOString().split('T')[0];
   document.getElementById('dateSelect').addEventListener('change', fetchLiveData);
 
+  function changeScanDate(days) {
+    const dateInput = document.getElementById('dateSelect');
+    if (!dateInput) return;
+
+    const currentValue = dateInput.value || new Date().toISOString().split('T')[0];
+    const currentDate = new Date(currentValue + 'T00:00:00');
+    currentDate.setDate(currentDate.getDate() + Number(days || 0));
+
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+    const day = String(currentDate.getDate()).padStart(2, '0');
+    dateInput.value = `${year}-${month}-${day}`;
+    fetchLiveData();
+  }
+
   let currentProcessedStaffList = [];
   let showAllScanStaff = false;
 
@@ -14329,6 +14383,7 @@
     let cntTotal = 0, cntDayOff = 0, cntPresent = 0, cntMorningPresent = 0, cntLeave = 0, cntOnTime = 0, cntNotScanned = 0, cntLate5 = 0, cntLate30 = 0;
     let cntPresentMorning = 0, cntPresentAfternoon = 0, cntLeaveMorning = 0, cntLeaveAfternoon = 0;
     let cntLeaveFull = 0, cntLeaveHalf = 0, cntLeaveNow = 0, cntDayOffFull = 0, cntDayOffHalf = 0;
+    let hasLunchInScan = false;
     const nowForPresent = new Date();
     const currentMinsForPresent = nowForPresent.getHours() * 60 + nowForPresent.getMinutes();
     const selectedScanDate = document.getElementById('dateSelect')?.value || '';
@@ -14398,6 +14453,9 @@
           const cell = cells[idx];
           return !!(cell && cell.querySelector('.scan-time-val'));
         });
+        if (cells[4] && cells[4].querySelector('.scan-time-val')) {
+          hasLunchInScan = true;
+        }
 
         const hasFullLeave = dailyCodes.some(code => fullLeaveCodes.has(code));
         const hasHalfLeave = !hasFullLeave && dailyCodes.some(code => halfLeaveCodes.has(code));
@@ -14510,14 +14568,18 @@
         }
 
         // Summary attendance status is START-OF-SHIFT ONLY.
-        // Normal staff: use Morning In status only.
-        // Staff whose actual shift starts in the afternoon (part-time / late-start /
-        // afternoon half-day return) may use their afternoon first-scan as the shift start.
-        // Lunch Out / normal Lunch In lateness is intentionally NOT counted here.
+        // On Time must match the Morning In column exactly, just like filtering
+        // the Morning In status column for "ON TIME". H- leave, NOT SCANNED,
+        // Pending Scan, and Late must never be included in the On Time KPI.
+        // Other status KPIs keep using the existing shift-start summary status.
         const shiftStartStatus = row.dataset.shiftStartSummaryStatus || primaryStatus;
+        const morningInStatusEl = cells[2] ? cells[2].querySelector('.status-badge') : null;
+        const morningInStatusText = morningInStatusEl
+          ? morningInStatusEl.textContent.toLowerCase().trim()
+          : '';
 
-        if (shiftStartStatus.includes('ON TIME')) cntOnTime++;
-        else if (primaryCode === 'P' && shiftStartStatus.includes('NOT SCANNED')) cntNotScanned++;
+        if (morningInStatusText === 'on time') cntOnTime++;
+        if (primaryCode === 'P' && shiftStartStatus.includes('NOT SCANNED')) cntNotScanned++;
         else if (shiftStartStatus.includes('Late (30+)')) cntLate30++;
         else if (shiftStartStatus.includes('Late')) cntLate5++;
       } else {
@@ -14538,7 +14600,10 @@
     const presentMorningEl = document.getElementById('cntPresentMorning');
     const presentAfternoonEl = document.getElementById('cntPresentAfternoon');
     if (presentMorningEl) presentMorningEl.innerText = cntPresentMorning;
-    if (presentAfternoonEl) presentAfternoonEl.innerText = cntPresentAfternoon;
+    if (presentAfternoonEl) {
+      presentAfternoonEl.innerText = cntPresentAfternoon;
+      presentAfternoonEl.classList.toggle('hidden', !hasLunchInScan);
+    }
     const presentDetail = document.getElementById('cntPresentDetail');
     const morningBadge = document.getElementById('cntMorningPresentBadge');
     const morningValue = document.getElementById('cntMorningPresentValue');
@@ -14574,21 +14639,9 @@
     const leaveDetail = document.getElementById('cntLeaveDetail');
     if (leaveDetail) leaveDetail.textContent = `${cntLeaveFull} Full • ${cntLeaveHalf} Half`;
 
-    const leaveNowDetail = document.getElementById('cntLeaveNowDetail');
-    if (leaveNowDetail) {
-      leaveNowDetail.innerHTML = isTodayForPresent
-        ? `<strong>Now: ${cntLeaveNow} staff</strong>`
-        : `<strong>${cntLeave} staff on selected date</strong>`;
-    }
-
-    // On Time is reconciled to the CURRENT present workforce and only deducts
-    // start-of-shift exceptions. Lunch Out / Lunch In never reduce this KPI.
-    // Example: Present Now 79 and 2 start-shift Late => On Time 77.
-    const reconciledOnTime = isTodayForPresent
-      ? Math.max(0, cntPresent - cntLate5 - cntLate30 - cntNotScanned)
-      : cntOnTime;
-
-    document.getElementById('cntOnTime').innerText = reconciledOnTime;
+    // On Time is based only on the Morning In column's exact "ON TIME" status.
+    // Do not derive it from Present Now, leave codes, Late, or NOT SCANNED.
+    document.getElementById('cntOnTime').innerText = cntOnTime;
     document.getElementById('cntLate5').innerText = cntLate5;
     document.getElementById('cntLate30').innerText = cntLate30;
   }
