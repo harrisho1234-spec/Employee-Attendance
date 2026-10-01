@@ -12687,6 +12687,44 @@
                 }
             });
 
+            // Match Payroll Report behavior: count every calendar day before a
+            // newly joined employee's actual join date as Absent (A), even when
+            // Attendance data has no record for those pre-join dates.
+            allEmployees.forEach(e => {
+                if(!isEmploymentVisible(e, fD) || window.isExcludedPosition(e.position)) return;
+                if(selectedDailyCompanies.length > 0 && !selectedDailyCompanies.includes(e.company)) return;
+                if(!isDailyDepartmentSelected(e)) return;
+
+                const joinDate = Number(e.sortableJoinDate || 0)
+                    ? new Date(Number(e.sortableJoinDate))
+                    : new Date(e.joinDate || '');
+                if (isNaN(joinDate.getTime())) return;
+                joinDate.setHours(0, 0, 0, 0);
+
+                const cursor = new Date(fD);
+                cursor.setHours(0, 0, 0, 0);
+                let preJoinAbsent = 0;
+
+                while (cursor <= tD) {
+                    if (cursor < joinDate) {
+                        const ms = monthNames[cursor.getMonth()].substring(0, 3).toLowerCase();
+                        const dayNum = cursor.getDate();
+                        const existing = dailyLeaveRecords.find(r =>
+                            r.staffId === e.id &&
+                            String(r.month || '').toLowerCase().startsWith(ms) &&
+                            Number(r.day) === dayNum
+                        );
+                        if (!existing || !(Number(existing.leaves?.A) > 0)) preJoinAbsent += 1;
+                    }
+                    cursor.setDate(cursor.getDate() + 1);
+                }
+
+                if (preJoinAbsent > 0) {
+                    if (!allRecs[e.id]) allRecs[e.id] = {e:e, u:0, a:0, l5:0, l3:0};
+                    allRecs[e.id].a += preJoinAbsent;
+                }
+            });
+
             Object.values(allRecs).forEach(r => {
                 eD.push(r); tU+=r.u; tA+=r.a; tL5+=r.l5; tL3+=r.l3; 
                 if(!cC[r.e.company]) { cC[r.e.company] = 0; actGrp[r.e.company] = 0; }
@@ -14804,6 +14842,34 @@ if ('serviceWorker' in navigator) {
     );
 
 }
+
+
+    /* Global panel backdrop behavior: clicking the blurred/outside area
+       behaves like the panel's existing X/close button. Panels that already
+       define their own backdrop click handler are left unchanged. */
+    document.addEventListener('click', function (event) {
+        const panel = event.target && event.target.closest
+            ? event.target.closest('.fixed.inset-0')
+            : null;
+        if (!panel || event.target !== panel) return;
+        if (panel.getAttribute('onclick')) return;
+
+        const closeButton = panel.querySelector('button[onclick*="close"]');
+        if (closeButton) {
+            closeButton.click();
+            return;
+        }
+
+        const fallbackCloseMap = {
+            employeeModal: 'closeModal',
+            deptModal: 'closeDeptModal',
+            dailyCompanyModal: 'closeDailyCompanyModal',
+            orgNodeEditModal: 'closeOrgNodeModal',
+            noteEditModal: 'closeNoteEdit'
+        };
+        const fnName = fallbackCloseMap[panel.id];
+        if (fnName && typeof window[fnName] === 'function') window[fnName]();
+    });
 </script> 
 </body>
 </html>
