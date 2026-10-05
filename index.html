@@ -11126,6 +11126,42 @@
             return {data,companySummary,staffRows,leaveWatch,lateWatch,warningRows,performanceRows,overview};
         }
 
+        // Ensure numeric-looking cells are written to Excel as true Number cells.
+        // Text/labels such as Emp-ID values with letters remain unchanged.
+        function prepareTableToExcelNumericCells(table){
+            if(!table) return;
+            table.querySelectorAll('td').forEach(td=>{
+                if(td.getAttribute('data-t') === 's') return;
+                const raw = String(td.textContent || '').trim();
+                if(!raw) return;
+                if(/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(raw)){
+                    td.setAttribute('data-t','n');
+                    td.textContent = String(Number(raw));
+                }
+            });
+        }
+
+        function normalizeWorkbookNumericCells(wb){
+            if(!wb || !wb.SheetNames || !wb.Sheets) return;
+            wb.SheetNames.forEach(name=>{
+                const ws=wb.Sheets[name];
+                if(!ws || !ws['!ref']) return;
+                const range=XLSX.utils.decode_range(ws['!ref']);
+                for(let r=range.s.r;r<=range.e.r;r++){
+                    for(let c=range.s.c;c<=range.e.c;c++){
+                        const addr=XLSX.utils.encode_cell({r,c});
+                        const cell=ws[addr];
+                        if(!cell || cell.t !== 's' || typeof cell.v !== 'string') continue;
+                        const raw=cell.v.trim();
+                        if(/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(raw)){
+                            cell.v=Number(raw);
+                            cell.t='n';
+                        }
+                    }
+                }
+            });
+        }
+
         function reportExcelStyleSheet(ws, headerRow=1){
             if(!ws||!ws['!ref']) return;
             const range=XLSX.utils.decode_range(ws['!ref']);
@@ -11163,6 +11199,7 @@
                 reportExcelAddSheet(wb,'Most Late',full.lateWatch,[24,14,12,20,12]);
                 reportExcelAddSheet(wb,'Warnings FIC',full.warningRows,[24,14,12,20,18,18,18,20,42]);
                 reportExcelAddSheet(wb,'Attendance Performance',full.performanceRows,[24,14,12,20,12,9,9,10,10,8,32]);
+                normalizeWorkbookNumericCells(wb);
 
                 const safe=full.data.period.label.replace(/[^0-9A-Za-z_-]+/g,'_');
                 XLSX.writeFile(wb,`Attendance_Full_Report_${safe}.xlsx`);
@@ -12555,6 +12592,7 @@
             bR.forEach(r=>{ h+=`<tr><td data-t="n" data-a-h="center" data-b-a-s="thin">${r.no}</td><td data-t="s" data-a-h="center" data-b-a-s="thin">${r.id}</td><td data-t="s" data-a-h="left" data-b-a-s="thin">${r.name}</td><td data-t="s" data-a-h="left" data-b-a-s="thin">${r.department}</td>`; r.dys.forEach(v=>{h+=`<td ${gBg(v)} data-f-bold="true" data-a-h="center" data-b-a-s="thin">${v}</td>`;}); h+=fT(r.t.D,'D')+fT(r.t.UP,'UP')+fT(r.t.A,'A')+fT(r.t.L5,'L')+fT(r.t.L3,"L'")+fT(r.t.SL,'SL')+fT(r.t.AL,'AL')+fT(r.t.OT,'OT')+fT(r.t.SP,'SP')+`<td data-b-a-s="thin"></td></tr>`; });
             h+=`<tr><td colspan="${dA.length+16}" data-b-a-s="none"></td></tr><tr><td colspan="${dA.length+16}" data-b-a-s="none"></td></tr><tr><td colspan="4" data-b-a-s="none" data-f-bold="true">Prepared By:</td><td colspan="${Math.max(1,Math.floor(dA.length/2))}" data-b-a-s="none" data-f-bold="true">Checked & Agreed:</td><td colspan="5" data-b-a-s="none" data-f-bold="true">Approved By:</td></tr></table></body></html>`;
             let tmpDiv=document.createElement('div'); tmpDiv.innerHTML=h; tmpDiv.style.display='none'; document.body.appendChild(tmpDiv);
+            prepareTableToExcelNumericCells(document.getElementById('exTab'));
             TableToExcel.convert(document.getElementById('exTab'), {name:`Timesheet_${dLb.replace(/ /g,'_')}.xlsx`,sheet:{name:"Timesheet"}}); document.body.removeChild(tmpDiv);
         };
 
@@ -12592,10 +12630,17 @@
             cN = selectedCalendarCompanies.length > 0 ? [...selectedCalendarCompanies].sort() : companyDisplayOrder(companies);
             if(cN.length === 0){showAppToast("No companies to export.");return;}
             
-            // Group LPH and LPL together
+            // Group LPH and LPL together. TTC-Service belongs under TTC in the
+            // Calendar export, including its Entity section.
+            const calendarExportCompanyName = (company) =>
+                String(company || '').trim().toUpperCase() === 'TTC-SERVICE' ? 'TTC' : company;
+            const calendarExportEntityName = (employee) =>
+                String(employee?.company || '').trim().toUpperCase() === 'TTC-SERVICE' ? 'TTC' : employee?.entity;
+
             let reportGroups = {};
             cN.forEach(c => {
-                let gName = (c === 'LPH' || c === 'LPL') ? 'LPH & LPL' : c;
+                const normalizedCompany = calendarExportCompanyName(c);
+                let gName = (normalizedCompany === 'LPH' || normalizedCompany === 'LPL') ? 'LPH & LPL' : normalizedCompany;
                 if(!reportGroups[gName]) reportGroups[gName] = [];
                 reportGroups[gName].push(c);
             });
@@ -12606,7 +12651,12 @@
 
             Object.keys(reportGroups).sort().forEach(gName => {
                 let groupComps = reportGroups[gName];
-                let compEntities = [...new Set(allEmployees.filter(e => groupComps.includes(e.company) && isEmploymentVisible(e) && !window.isExcludedPosition(e.position)).map(e => e.entity))].sort();
+                let compEntities = [...new Set(allEmployees
+                    .filter(e => groupComps.includes(e.company) && isEmploymentVisible(e) && !window.isExcludedPosition(e.position))
+                    .filter(e => !(gName === 'HQ' && String(e.entity || '').trim().toUpperCase() === 'TTC-SERVICE'))
+                    .map(e => calendarExportEntityName(e)))]
+                    .filter(Boolean)
+                    .sort();
 
                 if (compEntities.length === 0) return; // Skip if group has no active valid entities
 
@@ -12621,7 +12671,10 @@
                     let cnt = 1;
                     let recs = [];
                     groupComps.forEach(comp => {
-                        if(gD[comp]) recs = recs.concat(gD[comp].filter(i => i.emp.entity === ent));
+                        if(gD[comp]) recs = recs.concat(gD[comp].filter(i =>
+                            !(gName === 'HQ' && String(i.emp?.entity || '').trim().toUpperCase() === 'TTC-SERVICE')
+                            && calendarExportEntityName(i.emp) === ent
+                        ));
                     });
                     
                     if (recs.length > 0) {
@@ -12647,6 +12700,7 @@
             h+=`</table></body></html>`;
             
             let tmpDiv=document.createElement('div'); tmpDiv.innerHTML=h; tmpDiv.style.display='none'; document.body.appendChild(tmpDiv);
+            prepareTableToExcelNumericCells(document.getElementById('exCal'));
             TableToExcel.convert(document.getElementById('exCal'), {name:`Daily_Report_${dS.replace(/\//g,'_')}.xlsx`,sheet:{name:"Report"}}); document.body.removeChild(tmpDiv);
         };
 
@@ -12749,7 +12803,7 @@
             h+=`<tr><td colspan="10" data-b-a-s="none"></td></tr><tr><td colspan="2" data-fill-color="ffff00" data-b-a-s="none">Note:</td><td colspan="8" data-b-a-s="none"></td></tr>`;
             Object.keys(cC).sort().forEach(c => { h+=`<tr><td data-b-a-s="none" data-f-color="c00000">${c}</td><td data-b-a-s="none" data-f-color="c00000">${cC[c].toString().padStart(2, '0')} (staffs)</td><td colspan="8" data-b-a-s="none"></td></tr>`; });
 
-            h+=`</table></body></html>`; let tmpDiv=document.createElement('div'); tmpDiv.innerHTML=h; tmpDiv.style.display='none'; document.body.appendChild(tmpDiv); TableToExcel.convert(document.getElementById('exDed'), {name:`Deduction_${fV}_${tV}.xlsx`,sheet:{name:"Deductions"}}); tmpDiv.remove();
+            h+=`</table></body></html>`; let tmpDiv=document.createElement('div'); tmpDiv.innerHTML=h; tmpDiv.style.display='none'; document.body.appendChild(tmpDiv); prepareTableToExcelNumericCells(document.getElementById('exDed')); TableToExcel.convert(document.getElementById('exDed'), {name:`Deduction_${fV}_${tV}.xlsx`,sheet:{name:"Deductions"}}); tmpDiv.remove();
         };
 
         window.downloadDailyLeaveReport=function(){
@@ -12791,7 +12845,7 @@
             });
 
             h+=`<tr><td colspan="11" data-b-a-s="none"></td></tr><tr><td colspan="2" data-fill-color="ffff00" data-b-a-s="none">Note:</td><td colspan="9" data-b-a-s="none"></td></tr><tr><td colspan="11" data-b-a-s="none" data-f-color="c00000">SL=Sick Leave</td></tr><tr><td colspan="11" data-b-a-s="none" data-f-color="c00000">AL=Annual Leave</td></tr><tr><td colspan="11" data-b-a-s="none" data-f-color="c00000">SP=Special Leave</td></tr>`;
-            h+=`</table></body></html>`; let tmpDiv=document.createElement('div'); tmpDiv.innerHTML=h; tmpDiv.style.display='none'; document.body.appendChild(tmpDiv); TableToExcel.convert(document.getElementById('exPaid'), {name:`PaidLeave_${fV}_${tV}.xlsx`,sheet:{name:"Paid Leaves"}}); tmpDiv.remove();
+            h+=`</table></body></html>`; let tmpDiv=document.createElement('div'); tmpDiv.innerHTML=h; tmpDiv.style.display='none'; document.body.appendChild(tmpDiv); prepareTableToExcelNumericCells(document.getElementById('exPaid')); TableToExcel.convert(document.getElementById('exPaid'), {name:`PaidLeave_${fV}_${tV}.xlsx`,sheet:{name:"Paid Leaves"}}); tmpDiv.remove();
         };
 
         window.downloadPayrollReport = async function() {
@@ -13253,6 +13307,10 @@
                 let table1 = document.getElementById("masterTable");
                 let table2 = document.getElementById("unpaidTable");
                 let table3 = document.getElementById("otTable");
+
+                prepareTableToExcelNumericCells(table1);
+                prepareTableToExcelNumericCells(table2);
+                prepareTableToExcelNumericCells(table3);
 
                 let book = TableToExcel.tableToBook(table1, {sheet: {name: "Master Sheet"}});
                 TableToExcel.tableToSheet(book, table2, {sheet: {name: "Unpaid"}});
