@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Attendance Dashboard</title>
-    <meta name="app-build" content="2026-09-21-auto-refresh-wake-recovery-v1">
+    <meta name="app-build" content="2026-10-06-scan-not-scanned-kpi-v1">
     <!-- Photo mapping: Staff ID primary, Name/File Name fallback -->
         <!-- PWA -->
     <meta name="theme-color" content="#2563eb">
@@ -763,7 +763,7 @@
         #scanView .icon-late5 { background: #ffedd5; color: #c2410c; }
         #scanView .icon-late30 { background: #fee2e2; color: #b91c1c; }
         #scanView .icon-pending { background: #f1f5f9; color: #475569; }
-        #scanView .icon-notscanned { background: #f8fafc; color: #64748b; }
+        #scanView .icon-notscanned { background: #fef2f2; color: #dc2626; }
 
         /* Group the scan-status metrics in one visual frame. */
         #scanView .scan-status-frame {
@@ -789,7 +789,7 @@
         /* Scan Activity KPI row: keep all summary cards on one desktop row. */
         @media (min-width: 901px) {
             #scanView .summary-bar {
-                grid-template-columns: repeat(9, minmax(0, 1fr)) !important;
+                grid-template-columns: repeat(8, minmax(0, 1fr)) !important;
                 gap: 8px !important;
                 align-items: stretch;
             }
@@ -5241,6 +5241,15 @@
     </div>
 
     <div class="scan-status-frame">
+      <div class="card scan-summary-clickable" onclick="openScanStatusPanel('notScanned')">
+        <div class="card-icon icon-notscanned">👁️</div>
+        <div class="card-content">
+          <div class="title scan-kpi-title">Not Scanned</div>
+          <div class="val scan-kpi-value" id="cntNotScanned">0</div>
+          <div class="subline scan-kpi-subline">First required check-in • schedule-aware</div>
+        </div>
+      </div>
+
       <div class="card">
         <div class="card-icon icon-ontime">🕒</div>
         <div class="card-content">
@@ -14698,6 +14707,9 @@
 
     // On Time is based only on the Morning In column's exact "ON TIME" status.
     // Do not derive it from Present Now, leave codes, Late, or NOT SCANNED.
+    const notScannedEl = document.getElementById('cntNotScanned');
+    if (notScannedEl) notScannedEl.innerText = cntNotScanned;
+
     document.getElementById('cntOnTime').innerText = cntOnTime;
     document.getElementById('cntLate5').innerText = cntLate5;
     document.getElementById('cntLate30').innerText = cntLate30;
@@ -14719,9 +14731,10 @@
       if (status === 'dayOff') return codes.some(c => dayOffCodes.has(c));
       if (status === 'leave') return codes.some(c => leaveCodes.has(c));
       const primaryStatus = row.dataset.primaryStatus || morning;
+      const shiftStartStatus = row.dataset.shiftStartSummaryStatus || primaryStatus;
       const primaryCode = codes[0] || '';
-      if (status === 'pending') return primaryCode === 'P' && primaryStatus.includes('Pending Scan');
-      if (status === 'notScanned') return primaryCode === 'P' && primaryStatus.includes('NOT SCANNED');
+      if (status === 'pending') return primaryCode === 'P' && shiftStartStatus.includes('Pending Scan');
+      if (status === 'notScanned') return primaryCode === 'P' && shiftStartStatus.includes('NOT SCANNED');
       if (status === 'late30') return primaryStatus.includes('Late (30+)');
       if (status === 'late') return primaryStatus.includes('Late') && !primaryStatus.includes('Late (30+)');
       return false;
@@ -14806,7 +14819,7 @@
    PWA SERVICE WORKER
    ========================================================== */
 
-console.log('Attendance build: 2026-09-21-auto-refresh-wake-recovery-v1');
+console.log('Attendance build: 2026-10-06-scan-not-scanned-kpi-v1');
 
 if ('serviceWorker' in navigator) {
 
