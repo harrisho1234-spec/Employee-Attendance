@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {requireHrPrincipal,approveHrOperation} from './hr-authorization.js';
+const users=new Set(['hr@example.org']);
+const user={verified:true,anonymous:false,email:'HR@example.org',emailVerified:true,uid:'uid1'};
+test('rejects anonymous identity',()=>assert.throws(()=>requireHrPrincipal({...user,anonymous:true},users),/UNAUTHENTICATED/));
+test('rejects unverified identity',()=>assert.throws(()=>requireHrPrincipal({...user,verified:false},users),/UNAUTHENTICATED/));
+test('rejects unapproved verified identity',()=>assert.throws(()=>requireHrPrincipal({...user,email:'other@example.org'},users),/PERMISSION_DENIED/));
+test('allows verified approved HR only',()=>assert.equal(requireHrPrincipal(user,users).email,'hr@example.org'));
+test('rejects unknown operations',()=>assert.throws(()=>approveHrOperation(user,users,'changeQuota'),/INVALID_OPERATION/));

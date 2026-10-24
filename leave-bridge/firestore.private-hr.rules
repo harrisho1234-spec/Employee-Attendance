@@ -1,0 +1,32 @@
+// PROPOSED RULES — DO NOT DEPLOY BEFORE REVIEWING ALL EXISTING APP PATHS.
+// Merge carefully with deployed Firestore rules. This file is not auto-deployed.
+// No public/anonymous user can read private HR records.
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function verifiedHuman() {
+      return signedIn()
+        && request.auth.token.firebase.sign_in_provider != 'anonymous'
+        && request.auth.token.email_verified == true
+        && request.auth.token.email is string;
+    }
+    function superAdmin() {
+      return verifiedHuman()
+        && request.auth.token.email == 'harris.ho1234@gmail.com';
+    }
+    // HR allowlist uses Firebase custom claims set via trusted Admin SDK only.
+    // Never trust a user-editable document or client-provided "role".
+    function hr() {
+      return verifiedHuman()
+        && (superAdmin() || request.auth.token.hr_access == true);
+    }
+    match /artifacts/{appId}/privateHrLeave/{document=**} {
+      allow read: if hr();
+      // Private syncing and override writes must go through trusted backend
+      // using Firebase Admin SDK and validated staff-date authorization.
+      allow write: if false;
+    }
+    // Existing app rules from deployed console must be preserved separately.
+  }
+}
