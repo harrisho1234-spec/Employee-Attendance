@@ -4,6 +4,7 @@ import {initializeFirebaseAdmin} from './hr-runtime.js';
 import {createBridgeSource} from './bridge-source-client.js';
 import {createPrivateSheetSource} from './private-sheet-source.js';
 import {firestoreOverrideStorage} from './firestore-override-storage.js';
+import {sheetOverrideStorage} from './sheet-override-storage.js';
 import {firebaseAdminVerifier} from './firebase-admin-verifier.js';
 import {createPrivateHrOperations,parseApprovedEmails} from './private-hr-operations.js';
 import {createHrGateway} from './hr-gateway.js';
@@ -27,9 +28,10 @@ export async function createGatewayServer({env, googleAuth, initializeFirebase=i
       getIdTokenClient:audience=>googleAuth.getIdTokenClient(audience),
       fetchImpl
     });
+  const sheetClient=env.HR_PRIVATE_SHEET_ID?google.sheets({version:'v4',auth:googleAuth}):null;
   const operations=createPrivateHrOperations({
     readSource:source,
-    storage:firestoreOverrideStorage(db,env.FIREBASE_APP_ID),
+    storage:sheetClient?sheetOverrideStorage({sheets:sheetClient,spreadsheetId:env.HR_PRIVATE_SHEET_ID}):firestoreOverrideStorage(db,env.FIREBASE_APP_ID),
     verifyIdToken:firebaseAdminVerifier(auth),
     approvedEmails:allowlist
   });
@@ -38,7 +40,7 @@ export async function createGatewayServer({env, googleAuth, initializeFirebase=i
 
 if(process.env.NODE_ENV!=='test' && process.argv[1]?.endsWith('gateway-main.js')) {
   try {
-    const handler=await createGatewayServer({env:process.env,googleAuth:new google.auth.GoogleAuth({scopes:['https://www.googleapis.com/auth/spreadsheets.readonly']})});
+    const handler=await createGatewayServer({env:process.env,googleAuth:new google.auth.GoogleAuth({scopes:['https://www.googleapis.com/auth/spreadsheets']})});
     http.createServer(handler).listen(Number(process.env.PORT||8080),'0.0.0.0',
       ()=>console.log('HR gateway initialized'));
   } catch(error) {
