@@ -52,7 +52,15 @@ export function createPrivateHrApi(operations) {
      // Only allowlisted stage and numeric error metadata. NEVER log error objects/messages, tokens or records.
      const upstreamStatus=Number(error?.cause?.code||error?.cause?.response?.status);
      const safeStatus=[400,401,403,404,429,500,502,503,504].includes(upstreamStatus)?upstreamStatus:'unknown';
-     console.error('PRIVATE_HR_FAILURE',stage,'upstream_http',safeStatus);
+     const firebaseCode=String(error?.cause?.code||'');
+     const safeFirebaseCodes=new Set([
+       'auth/insufficient-permission','auth/argument-error','auth/id-token-expired',
+       'auth/id-token-revoked','auth/invalid-id-token','auth/project-not-found',
+       'auth/invalid-credential','auth/internal-error','auth/user-disabled',
+       'app/invalid-credential','app/network-error'
+     ]);
+     console.error('PRIVATE_HR_FAILURE',stage,'upstream_http',safeStatus,
+       'firebase_code',safeFirebaseCodes.has(firebaseCode)?firebaseCode:'unknown');
    }
    reply(status,{error:status===503?'service_unavailable':code.toLowerCase()});
    return true;
