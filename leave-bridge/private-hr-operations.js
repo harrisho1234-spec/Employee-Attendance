@@ -43,6 +43,7 @@ export function createPrivateHrOperations({readSource,storage,verifyIdToken,appr
    const actor=await authorized(authorization);
    const key=validateKey(staffId,date);
    if(!validField(field)||typeof value!=='string'||value.length>2000) throw new Error('INVALID_FIELD');
+   if(!await readSource(staffId,date)) throw new Error('INVALID_KEY');
    await storage.updateField(key,field,{present:true,value},actor.uid);
    return {ok:true};
   },
@@ -50,6 +51,7 @@ export function createPrivateHrOperations({readSource,storage,verifyIdToken,appr
    const actor=await authorized(authorization);
    const key=validateKey(staffId,date);
    if(!validField(field)) throw new Error('INVALID_FIELD');
+   if(!await readSource(staffId,date)) throw new Error('INVALID_KEY');
    await storage.deleteField(key,field,actor.uid);
    return {ok:true};
   }
