@@ -16,6 +16,9 @@ document.body.appendChild(root);
 const state=root.querySelector('#hrState'),toggle=root.querySelector('#hrToggle');
 let approved=false, busy=false, previousToken=0;
 let rows=new Map();
+const cache=new Map();
+const CACHE_MS=2*60*1000;
+let refreshQueued=false;
 const escapeText=x=>String(x??'');
 function keyInfo(raw) {
  const m=/^([A-Za-z0-9_-]{1,48})_([A-Za-z]+)_(\d{1,2})_(20\d{2})$/.exec(raw||'');
@@ -55,14 +58,38 @@ async function refresh() {
  const next=new Map();
  for(const el of noteEls) {const info=keyInfo(el.dataset.hrNote);if(info){const row=next.get(info.key)||{...info};row.note=el;next.set(info.key,row);}}
  for(const el of reasonEls){const info=keyInfo(el.dataset.hrReason);if(info){const row=next.get(info.key)||{...info};row.reason=el;next.set(info.key,row);}}
- rows=next;busy=true;const generation=++previousToken;
- try{
-  for(const row of [...rows.values()].slice(0,100)){
-    if(!approved||generation!==previousToken)break;
-    try{row.entry=await read(row.staffId,row.date);if(approved&&generation===previousToken)renderCell(row.note,row.reason,row.entry);}
-    catch(e){state.textContent=e.message;break;}
-  }
- }finally{busy=false;}
+ rows=next;
+ busy=true;const generation=++previousToken;
+ try {
+   const pending=[];
+   for(const row of rows.values()) {
+     const cached=cache.get(row.key);
+     if(cached && Date.now()-cached.time<CACHE_MS) {
+       row.entry=cached.entry;renderCell(row.note,row.reason,row.entry);
+     } else pending.push(row);
+   }
+   let cursor=0;
+   const worker=async()=>{
+     while(cursor<pending.length && approved && generation===previousToken) {
+       const row=pending[cursor++];
+       try {
+         const entry=await read(row.staffId,row.date);
+         if(!approved||generation!==previousToken)break;
+         cache.set(row.key,{entry,time:Date.now()});
+         row.entry=entry;renderCell(row.note,row.reason,entry);
+       } catch(e) {
+         state.textContent=e.message;
+         break;
+       }
+     }
+   };
+   await Promise.all(Array.from({length:Math.min(4,pending.length)},worker));
+ } finally {busy=false;}
+}
+function scheduleRefresh(){
+ if(refreshQueued||!approved)return;
+ refreshQueued=true;
+ queueMicrotask(()=>{refreshQueued=false;refresh();});
 }
 const dialog=document.createElement('dialog');
 dialog.style.cssText='border:1px solid #cbd5e1;border-radius:12px;padding:22px;max-width:420px;width:calc(100% - 32px);box-shadow:0 10px 60px #0004';
@@ -83,7 +110,10 @@ async function edit(action){if(!editing)return;
  if(action==='override')body.value=dialog.querySelector('#hrEditValue').value;
  try{
   await request('/internal/hr/'+action,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  row.entry=await read(row.staffId,row.date);renderCell(row.note,row.reason,row.entry);dialog.close();
+  cache.delete(row.key);
+  row.entry=await read(row.staffId,row.date);
+  cache.set(row.key,{entry:row.entry,time:Date.now()});
+  renderCell(row.note,row.reason,row.entry);dialog.close();
  }catch(e){dialog.querySelector('#hrEditStatus').textContent=e.message;}
 }
 dialog.querySelector('#hrSave').onclick=()=>edit('override');
@@ -102,7 +132,7 @@ toggle.onclick=async()=>{
 };
 onAuthStateChanged(auth,async user=>{
  approved=false;window.hrLeaveEnabled=false;previousToken++;
- rows.clear();if(typeof window.renderDailyAttendance==='function')window.renderDailyAttendance();toggle.textContent=user?'Sign out of HR':'Sign in to HR';
+ rows.clear();cache.clear();if(dialog.open)dialog.close();if(typeof window.renderDailyAttendance==='function')window.renderDailyAttendance();toggle.textContent=user?'Sign out of HR':'Sign in to HR';
  state.textContent=user?'Checking HR permission…':'Private HR synchronization: off';
  if(!user||user.isAnonymous)return;
  try{await request('/internal/hr/entry?staffId=INVALIDHRPERMISSIONCHECK&date=2026-01-01');
@@ -110,6 +140,6 @@ onAuthStateChanged(auth,async user=>{
  catch(e){state.textContent=e.message;}
 });
 // Update private overlay only, never the public attendance store.
-const observer=new MutationObserver(()=>{if(approved&&!busy)queueMicrotask(refresh);});
+const observer=new MutationObserver(mutations=>{if(approved && mutations.some(m=>m.addedNodes.length||m.removedNodes.length))scheduleRefresh();});
 observer.observe(document.body,{subtree:true,childList:true});
-setInterval(()=>{if(approved)refresh();},5*60*1000);
+setInterval(()=>{if(approved){cache.clear();scheduleRefresh();}},5*60*1000);
