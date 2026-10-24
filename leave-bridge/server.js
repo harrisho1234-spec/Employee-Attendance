@@ -10,7 +10,7 @@ const SHEETS = [
 ];
 const TAB = 'Leave Requests Log';
 const validDay = value => /^20\d{2}-\d{2}-\d{2}$/.test(value) &&
-  !Number.isNaN(Date.parse(value + 'T00:00:00Z'));
+  new Date(value + 'T00:00:00Z').toISOString().slice(0,10) === value;
 function parseDays(raw) {
   const text = String(raw || '').trim();
   const swap = text.match(/^Off:\s*(\d{4}-\d{2}-\d{2})\s*\|\s*Work:\s*(\d{4}-\d{2}-\d{2})/i);
@@ -34,6 +34,8 @@ export function normalizeRow(row, tracker, index) {
   const reason = String(row[11] || '').trim();
   const status = String(row[13] || '').trim();
   if (!staffId || staffId === 'UNKNOWN' || status.toLowerCase() !== 'synced') return [];
+  // A day-off swap requires dedicated off/work semantics; do not render as leave.
+  if (String(row[7] || '').trim() === 'D' || /^Off:\\s*/i.test(dateText)) return [];
   const noteTime = /morning/i.test(period) ? 'Morning' :
     /afternoon/i.test(period) ? 'Afternoon' :
     /half\s*day/i.test(period) ? 'Half Day' : 'Full Day';
