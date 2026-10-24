@@ -1,0 +1,47 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Private HR Leave — Attendance</title>
+<style>body{font:15px system-ui,Arial;background:#f1f5f9;color:#0f172a;margin:0}main{max-width:650px;margin:35px auto;padding:20px}section{background:white;border-radius:14px;box-shadow:0 2px 12px #0001;padding:24px;margin:15px 0}label{display:block;margin:13px 0 5px;font-weight:600}input,textarea,select{box-sizing:border-box;width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:8px;font:inherit}textarea{min-height:90px}button{padding:11px 15px;border:0;border-radius:8px;background:#1d4ed8;color:white;cursor:pointer;margin:12px 8px 0 0}button.secondary{background:#475569}button:disabled{opacity:.4;cursor:not-allowed}.muted{color:#64748b}.data{background:#f8fafc;border-radius:8px;padding:12px;white-space:pre-wrap;overflow-wrap:anywhere}#msg{white-space:pre-wrap}a{color:#1d4ed8}</style></head><body><main><a href="./index.html">← Attendance Dashboard</a><h1>Private HR Leave</h1><p class="muted">Authorized HR personnel only. Leave reasons are never saved to the public attendance collection.</p>
+<section><p id="status">Checking secure connection…</p><button id="login" hidden>Sign in with Google</button><button id="logout" class="secondary" hidden>Sign out</button></section>
+<section id="work" hidden><label>Staff ID</label><input id="staff" autocomplete="off" placeholder="LPH-023"><label>Date</label><input id="day" type="date"><button id="find">Find record</button><div id="record" hidden><p>Note/Time <small id="noteFlag"></small></p><div class="data" id="note"></div><p>Reason <small id="reasonFlag"></small></p><div class="data" id="reason"></div><label>Field</label><select id="field"><option value="noteTime">Note/Time</option><option value="reason">Reason</option></select><label>Manual override</label><textarea id="value" maxlength="2000"></textarea><button id="save">Save override</button><button id="reset" class="secondary">Reset to Sheet</button></div><p id="msg" role="status"></p></section>
+</main><script type="module">
+import {initializeApp} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+import {getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+const $=id=>document.getElementById(id);
+const config={apiKey:'AIzaSyB4fUTVdVt9cjKjIzj63a0KJ3bEaIXRzWY',authDomain:'daily-attendance-structure.firebaseapp.com',projectId:'daily-attendance-structure',appId:'1:321384539910:web:c81475cd6d4d8cedcea087',messagingSenderId:'321384539910'};
+const app=initializeApp(config,'attendance-private-hr');
+const auth=getAuth(app);let record=null;
+// Deployment uses a separate JavaScript config file. Do not add bearer tokens to config.
+const endpoint=(window.HR_LEAVE_GATEWAY_URL||'').replace(/\/$/,'');
+function ready(){return /^https:\/\/[-a-z0-9.]+\.run\.app$/i.test(endpoint)}
+async function api(path,opts={}){
+  const user=auth.currentUser;if(!user||user.isAnonymous)throw Error('Google HR sign-in required');
+  if(!ready())throw Error('HR gateway not configured');
+  const token=await user.getIdToken();
+  const response=await fetch(endpoint+path,{...opts,cache:'no-store',credentials:'omit',
+    headers:{'X-Firebase-Id-Token':token,...opts.headers}});
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok)throw Error(response.status===403?'HR access not approved':data.error||'HR service unavailable');
+  return data;
+}
+function failure(e){$('msg').textContent=e.message||String(e)}
+function render(r){record=r;$('record').hidden=!r;if(!r){$('msg').textContent='No tracker record for this staff/date';return;}
+  $('msg').textContent='';$('note').textContent=r.noteTime||'(empty)';$('reason').textContent=r.reason||'(empty)';
+  $('noteFlag').textContent=r.noteTimeSource||'';$('reasonFlag').textContent=r.reasonSource||'';
+  $('value').value=r.noteTime||'';}
+onAuthStateChanged(auth,user=>{const active=!!user&&!user.isAnonymous;$('login').hidden=active;$('logout').hidden=!active;
+ $('work').hidden=!active||!ready();$('status').textContent=!ready()?'Secure HR gateway deployment pending':active?'Signed in: '+(user.email||'Google account'):'Sign in with an approved HR Google account';});
+$('login').onclick=()=>signInWithPopup(auth,new GoogleAuthProvider()).catch(failure);
+$('logout').onclick=()=>signOut(auth).then(()=>render(null)).catch(failure);
+$('find').onclick=async()=>{try{const staffId=$('staff').value.trim(),date=$('day').value;
+if(!/^[A-Za-z0-9_-]{1,48}$/.test(staffId)||!/^20\d{2}-\d{2}-\d{2}$/.test(date))throw Error('Enter Staff ID and date');
+const result=await api('/internal/hr/entry?'+new URLSearchParams({staffId,date}));render(result.entry);}catch(e){render(null);failure(e)}};
+$('field').onchange=()=>{if(record)$('value').value=$('field').value==='reason'?(record.reason||''):(record.noteTime||'')};
+async function update(action){if(!record)return;
+const field=$('field').value;if(action==='reset'&&!confirm('Reset this field to the synchronized tracker value?'))return;
+try{const body={staffId:$('staff').value.trim(),date:$('day').value,field};
+if(action==='override')body.value=$('value').value;
+await api('/internal/hr/'+action,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+const result=await api('/internal/hr/entry?'+new URLSearchParams({staffId:body.staffId,date:body.date}));render(result.entry);
+$('msg').textContent=action==='reset'?'Field restored from sheet':'Manual override saved';
+}catch(e){failure(e)}}
+$('save').onclick=()=>update('override');$('reset').onclick=()=>update('reset');
+</script><script src="./hr-leave-config.js"></script></body></html>
