@@ -41,7 +41,7 @@ try{const body={staffId:$('staff').value.trim(),date:$('day').value,field};
 if(action==='override')body.value=$('value').value;
 await api('/internal/hr/'+action,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
 const result=await api('/internal/hr/entry?'+new URLSearchParams({staffId:body.staffId,date:body.date}));render(result.entry);
-$('msg').textContent=action==='reset'?'Field restored from sheet':'Manual override saved';
+$('msg').textContent=action==='reset'?'Reset saved. Source display may refresh on the next hourly tracker sync':'Manual override saved';
 }catch(e){failure(e)}}
 $('save').onclick=()=>update('override');$('reset').onclick=()=>update('reset');
 </script><script src="./hr-leave-config.js"></script></body></html>
