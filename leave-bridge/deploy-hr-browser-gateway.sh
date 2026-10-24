@@ -28,6 +28,6 @@ gcloud run deploy "$SERVICE" \
   --project="$PROJECT" --region="$REGION" --source="$workdir" \
   --service-account="$RUNTIME" \
   --allow-unauthenticated --ingress=all \
-  --set-env-vars="ENABLE_HR_GATEWAY=true,HR_PRIVATE_SHEET_ID=$SHEET,FIREBASE_PROJECT_ID=$FIREBASE,FIREBASE_APP_ID=$APP_ID,HR_APPROVED_EMAILS=$HR_EMAILS,HR_ALLOWED_ORIGIN=$ORIGIN" \
+  --set-env-vars="^|^ENABLE_HR_GATEWAY=true|HR_PRIVATE_SHEET_ID=$SHEET|FIREBASE_PROJECT_ID=$FIREBASE|FIREBASE_APP_ID=$APP_ID|HR_APPROVED_EMAILS=$HR_EMAILS|HR_ALLOWED_ORIGIN=$ORIGIN" \
   --min-instances=0
 echo "DEPLOYED browser gateway. Keep hr-leave-config.js empty until security smoke tests pass."
