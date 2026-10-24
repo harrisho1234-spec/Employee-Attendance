@@ -165,6 +165,6 @@ const attendanceObserver=new MutationObserver(mutations=>{
  if(!authorized)return;
  if(mutations.some(m=>[...m.addedNodes].some(n=>n.nodeType===1 && (n.matches?.('[data-hr-note],[data-hr-reason],tr')||n.querySelector?.('[data-hr-note],[data-hr-reason]')))))schedule();
 });
-const attendanceTable=document.querySelector('#dailyAttendanceTableBody');
+const attendanceTable=document.querySelector('#dailyTableBody');
 if(attendanceTable)attendanceObserver.observe(attendanceTable,{childList:true,subtree:true});
 setInterval(()=>{if(authorized){entries.clear();schedule();}},5*60*1000);
