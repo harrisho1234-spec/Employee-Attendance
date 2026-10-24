@@ -6,7 +6,7 @@ test('gateway refuses to start without explicit enablement',async()=>{
  await assert.rejects(createGatewayServer({env:{}}),/Gateway disabled/);
 });
 test('gateway rejects incomplete configuration without initializing credentials',async()=>{
- await assert.rejects(createGatewayServer({env:{ENABLE_HR_GATEWAY:'true'},googleAuth:{}}),/Missing gateway configuration/);
+ await assert.rejects(createGatewayServer({env:{ENABLE_HR_GATEWAY:'true'},googleAuth:{}}),/HR source not configured/);
 });
 test('gateway rejects mismatched Firebase project',async()=>{
  const env={
