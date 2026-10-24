@@ -1,0 +1,35 @@
+<!DOCTYPE html><html><head><base target="_top"><style>
+body{font-family:Arial,sans-serif;color:#172334;padding:16px;font-size:13px}h2{font-size:17px}
+label{display:block;margin:12px 0 4px;font-weight:600}input,select,textarea{box-sizing:border-box;width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:6px}textarea{min-height:70px}
+button{border:0;border-radius:6px;background:#1d4ed8;color:white;padding:10px;cursor:pointer;margin:10px 5px 0 0}button.secondary{background:#475569}
+#msg{white-space:pre-wrap;margin:12px 0;color:#334155}.value{background:#f1f5f9;padding:9px;border-radius:6px;white-space:pre-wrap;word-break:break-word}
+small{color:#64748b}</style></head><body><h2>Private HR Leave</h2>
+<small>Accessible only from the restricted HR spreadsheet. No public dashboard data is written.</small>
+<label>Staff ID</label><input id="id" autocomplete="off">
+<label>Date</label><input id="date" type="date"><button onclick="lookup()">Find record</button>
+<div id="details" hidden><p><b>Note/Time</b> <small id="noteFlag"></small></p><div class="value" id="noteValue"></div>
+<p><b>Reason</b> <small id="reasonFlag"></small></p><div class="value" id="reasonValue"></div>
+<label>Field</label><select id="field" onchange="setValue()"><option value="note">Note/Time</option><option value="reason">Reason</option></select>
+<label>New manual value</label><textarea id="value"></textarea>
+<button onclick="change('override')">Save manual override</button>
+<button class="secondary" onclick="change('reset')">Reset to Sheet</button>
+<p><small id="source"></small></p></div><p id="msg" aria-live="polite"></p>
+<script>
+let current=null;
+const el=id=>document.getElementById(id);
+function error(e){el('msg').textContent='Error: '+(e?.message||String(e));}
+function lookup(){el('msg').textContent='Loading…';el('details').hidden=true;
+google.script.run.withSuccessHandler(r=>{current=r;if(!r.found){el('msg').textContent='No synchronized record found';return;}
+el('details').hidden=false;el('msg').textContent='';el('noteValue').textContent=r.note||'(empty)';
+el('reasonValue').textContent=r.reason||'(empty)';el('noteFlag').textContent=r.overriddenNote?'Manual override':'Tracker';
+el('reasonFlag').textContent=r.overriddenReason?'Manual override':'Tracker';
+el('source').textContent='Tracker: '+r.tracker+' | Synced: '+r.syncedAt;setValue();
+}).withFailureHandler(error).hrWorkbenchCurrent(el('id').value,el('date').value);}
+function setValue(){if(current) el('value').value=el('field').value==='note'?current.note:current.reason;}
+function change(action){if(!current)return;let field=el('field').value;
+if(action==='reset'&&!confirm('Reset '+field+' to the tracker value on the next sync?'))return;
+el('msg').textContent='Saving…';
+google.script.run.withSuccessHandler(r=>{el('msg').textContent=r.message;
+if(action==='override') lookup();}).withFailureHandler(error)
+.hrWorkbenchChange(current.staffId,current.date,field,action,el('value').value);}
+</script></body></html>
