@@ -1,5 +1,6 @@
 import http from 'node:http';
 import { google } from 'googleapis';
+import {initializeHrRuntime,initializeFirebaseAdmin} from './hr-runtime.js';
 
 const TZ = 'Asia/Phnom_Penh';
 const PORT = Number(process.env.PORT || '8080');
@@ -36,7 +37,7 @@ export function normalizeRow(row, tracker, index) {
   const status = String(row[13] || '').trim();
   if (!staffId || staffId === 'UNKNOWN' || status.toLowerCase() !== 'synced') return [];
   // A day-off swap requires dedicated off/work semantics; do not render as leave.
-  if (String(row[7] || '').trim() === 'D' || /^Off:\\s*/i.test(dateText)) return [];
+  if (String(row[7] || '').trim() === 'D' || /^Off:\s*/i.test(dateText)) return [];
   const noteTime = /morning/i.test(period) ? 'Morning' :
     /afternoon/i.test(period) ? 'Afternoon' :
     /half\s*day/i.test(period) ? 'Half Day' : 'Full Day';
@@ -70,7 +71,7 @@ export async function readLeaveSnapshot(sheetsClient, from, to) {
   }
   return mergeRecords(entries.filter(v => v.date >= from && v.date <= to));
 }
-export function createHandler(readSnapshot) {
+export function createHandler(readSnapshot, hrApi = null) {
   return async (request, response) => {
     response.setHeader('Cache-Control', 'no-store');
     response.setHeader('X-Content-Type-Options', 'nosniff');
@@ -78,6 +79,10 @@ export function createHandler(readSnapshot) {
     const url = new URL(request.url, 'http://localhost');
     if (request.method === 'GET' && url.pathname === '/healthz') {
       response.writeHead(200); response.end(JSON.stringify({status:'ok'})); return;
+    }
+    if (url.pathname.startsWith('/internal/hr/')) {
+      if (hrApi && await hrApi(request,response)) return;
+      response.writeHead(404); response.end(JSON.stringify({error:'not found'})); return;
     }
     if (request.method !== 'GET' || url.pathname !== '/internal/leave-snapshot') {
       response.writeHead(404); response.end(JSON.stringify({error:'not found'})); return;
@@ -99,6 +104,16 @@ if (process.env.NODE_ENV !== 'test') {
     scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly']
   });
   const sheetsClient = google.sheets({version:'v4',auth});
-  http.createServer(createHandler((from,to) => readLeaveSnapshot(sheetsClient,from,to)))
+  const source=async(from,to)=>readLeaveSnapshot(sheetsClient,from,to);
+  // During staged rollout the feature is OFF; no private HTTP routes are exposed.
+  const hrApi=await initializeHrRuntime({
+    env:process.env,
+    initializeFirebase:initializeFirebaseAdmin,
+    readSource:async(staffId,date)=>{
+      const records=await source(date,date);
+      return records.find(r=>r.staffId===staffId && r.date===date) || null;
+    }
+  });
+  http.createServer(createHandler(source,hrApi))
     .listen(PORT, '0.0.0.0', () => console.log('Private leave bridge listening'));
 }
