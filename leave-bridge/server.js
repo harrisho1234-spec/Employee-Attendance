@@ -10,6 +10,7 @@ const SHEETS = [
 ];
 const TAB = 'Leave Requests Log';
 const validDay = value => /^20\d{2}-\d{2}-\d{2}$/.test(value) &&
+  !Number.isNaN(Date.parse(value + 'T00:00:00Z')) &&
   new Date(value + 'T00:00:00Z').toISOString().slice(0,10) === value;
 function parseDays(raw) {
   const text = String(raw || '').trim();
