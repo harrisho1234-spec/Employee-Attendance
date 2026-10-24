@@ -30,7 +30,7 @@ async function request(path,opts={}) {
  if(!user||user.isAnonymous)throw Error('HR sign-in required');
  const token=await user.getIdToken();
  const res=await fetch(ENDPOINT+path,{...opts,cache:'no-store',credentials:'omit',headers:{'X-Firebase-Id-Token':token,...opts.headers}});
- if(res.status===403){approved=false;window.hrLeaveEnabled=false;throw Error('This Google account is not approved for HR leave access');}
+ if(res.status===403){approved=false;window.hrLeaveEnabled=false;if(typeof window.renderDailyAttendance==='function')window.renderDailyAttendance();throw Error('This Google account is not approved for HR leave access');}
  if(!res.ok)throw Error(res.status===503?'Private HR service unavailable':'HR request failed ('+res.status+')');
  return res.json();
 }
@@ -102,7 +102,7 @@ toggle.onclick=async()=>{
 };
 onAuthStateChanged(auth,async user=>{
  approved=false;window.hrLeaveEnabled=false;previousToken++;
- rows.clear();toggle.textContent=user?'Sign out of HR':'Sign in to HR';
+ rows.clear();if(typeof window.renderDailyAttendance==='function')window.renderDailyAttendance();toggle.textContent=user?'Sign out of HR':'Sign in to HR';
  state.textContent=user?'Checking HR permission…':'Private HR synchronization: off';
  if(!user||user.isAnonymous)return;
  try{await request('/internal/hr/entry?staffId=INVALIDHRPERMISSIONCHECK&date=2026-01-01');
