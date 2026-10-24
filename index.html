@@ -11917,13 +11917,13 @@
                     
                     let nStr = i.notes.map(n => {
                         let disp = n.text ? `${n.prefix}${n.text}` : `${n.prefix}Add Note`; let isPlaceholder = !n.text;
-                        return `<div class="flex items-center h-[34px] mb-1"><span class="bg-slate-50 px-2.5 py-1.5 rounded-md border inline-flex items-center gap-1.5 group text-[11px] shadow-sm hover:border-blue-300 hover:bg-blue-50 cursor-text transition-all w-max max-w-full" onclick="openNoteEdit(event, '${n.id}', '${(n.text||'').replace(/'/g, "\\'")}')"><i class="fa-regular fa-clock text-slate-400 shrink-0"></i> <span class="truncate ${isPlaceholder?'text-slate-400 italic':'text-slate-800 font-semibold'}">${disp}</span> <i class="fa-solid fa-pencil text-slate-300 group-hover:text-blue-600 text-[10px] ml-1 shrink-0"></i></span></div>`;
+                        return `<div class="flex items-center h-[34px] mb-1"><span class="bg-slate-50 px-2.5 py-1.5 rounded-md border inline-flex items-center gap-1.5 group text-[11px] shadow-sm hover:border-blue-300 hover:bg-blue-50 cursor-text transition-all w-max max-w-full" data-hr-note="${n.id}" onclick="if(window.hrLeaveEnabled)return;openNoteEdit(event, '${n.id}', '${(n.text||'').replace(/'/g, "\\'")}')"><i class="fa-regular fa-clock text-slate-400 shrink-0"></i> <span class="truncate ${isPlaceholder?'text-slate-400 italic':'text-slate-800 font-semibold'}">${disp}</span> <i class="fa-solid fa-pencil text-slate-300 group-hover:text-blue-600 text-[10px] ml-1 shrink-0"></i></span></div>`;
                     }).join('');
 
                     let reasonInputs = i.dKeys.map(k => {
                         let cr = customReasons[k] || ''; 
                         let pfx = fD.getTime()!==tD.getTime() ? `<span class="text-[9px] text-slate-400 w-10 shrink-0 text-right pr-1.5">${k.split('_')[1].substring(0,3)} ${k.split('_')[2]}:</span>` : '';
-                        return `<div class="flex items-center w-full h-[34px] mb-1">${pfx}<input type="text" class="w-full bg-slate-50 border border-slate-200 rounded p-1.5 text-[11px] text-slate-700 focus:border-blue-500 focus:ring-1 outline-none transition-all placeholder:italic" placeholder="Reason..." value="${cr.replace(/"/g, '&quot;')}" onclick="event.stopPropagation()" onblur="saveReason('${k}', this.value)"></div>`;
+                        return `<div class="flex items-center w-full h-[34px] mb-1">${pfx}<input type="text" class="w-full bg-slate-50 border border-slate-200 rounded p-1.5 text-[11px] text-slate-700 focus:border-blue-500 focus:ring-1 outline-none transition-all placeholder:italic" placeholder="Reason..." data-hr-reason="${k}" value="${cr.replace(/"/g, '&quot;')}" onclick="event.stopPropagation()" onblur="if(!window.hrLeaveEnabled)saveReason('${k}', this.value)"></div>`;
                     }).join('');
 
                     let tr=document.createElement('tr'); tr.className="hover:bg-blue-50/50 border-b transition-colors";
@@ -14903,5 +14903,7 @@ if ('serviceWorker' in navigator) {
         if (fnName && typeof window[fnName] === 'function') window[fnName]();
     });
 </script> 
+<!-- Authorized HR leave values appear only after Google sign-in; never written to the public attendance store. -->
+<script type="module" src="./hr-leave-daily.js"></script>
 </body>
 </html>
