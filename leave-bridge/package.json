@@ -8,6 +8,6 @@
     "test": "NODE_ENV=test node --test"
   },
   "dependencies": {
-    "googleapis": "^144.0.0"
+    "googleapis": "188.0.0"
   }
 }
