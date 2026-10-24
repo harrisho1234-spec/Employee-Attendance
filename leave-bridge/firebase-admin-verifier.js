@@ -5,7 +5,7 @@
 export function firebaseAdminVerifier(adminAuth) {
   if(!adminAuth || typeof adminAuth.verifyIdToken!=='function')throw new Error('Firebase Admin Auth required');
   return async (token,checkRevoked=true) => {
-    if(typeof token!=='string'||token.length>8192)throw new Error('UNAUTHENTICATED');
+    if(typeof token!=='string'||token.length===0||token.length>8192)throw new Error('UNAUTHENTICATED');
     return adminAuth.verifyIdToken(token,checkRevoked);
   };
 }
