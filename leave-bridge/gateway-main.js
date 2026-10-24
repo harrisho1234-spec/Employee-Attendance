@@ -1,5 +1,5 @@
 import http from 'node:http';
-import {GoogleAuth} from 'google-auth-library';
+import {google} from 'googleapis';
 import {initializeFirebaseAdmin} from './hr-runtime.js';
 import {createBridgeSource} from './bridge-source-client.js';
 import {firestoreOverrideStorage} from './firestore-override-storage.js';
@@ -31,7 +31,7 @@ export async function createGatewayServer({env, googleAuth, initializeFirebase=i
 
 if(process.env.NODE_ENV!=='test' && process.argv[1]?.endsWith('gateway-main.js')) {
   try {
-    const handler=await createGatewayServer({env:process.env,googleAuth:new GoogleAuth()});
+    const handler=await createGatewayServer({env:process.env,googleAuth:new google.auth.GoogleAuth()});
     http.createServer(handler).listen(Number(process.env.PORT||8080),'0.0.0.0',
       ()=>console.log('HR gateway initialized'));
   } catch(error) {
