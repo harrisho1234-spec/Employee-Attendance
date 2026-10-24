@@ -8,12 +8,15 @@ import {getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut} f
 const app=initializeApp({apiKey:'AIzaSyB4fUTVdVt9cjKjIzj63a0KJ3bEaIXRzWY',authDomain:'daily-attendance-structure.firebaseapp.com',projectId:'daily-attendance-structure',appId:'1:321384539910:web:c81475cd6d4d8cedcea087'},'attendance-private-hr');
 const auth=getAuth(app), endpoint='https://leave-hr-browser-gateway-916969515475.asia-southeast1.run.app';
 const entries=new Map(), TTL=120000;
+// New leave dates only; historical attendance stays exactly as recorded.
+const FIRST_AUTO_LEAVE_DATE='2026-10-25';
 let authorized=false, loading=false, generation=0, queued=false;
 function parseKey(key) {
  const m=/^([A-Za-z0-9_-]{1,48})_([A-Za-z]+)_(\d{1,2})_(20\d{2})$/.exec(key||'');
  if(!m)return null;
  const mon=['january','february','march','april','may','june','july','august','september','october','november','december'].indexOf(m[2].toLowerCase());
- return mon<0?null:{staffId:m[1],date:m[4]+'-'+String(mon+1).padStart(2,'0')+'-'+m[3].padStart(2,'0')};
+ const date=m[4]+'-'+String(mon+1).padStart(2,'0')+'-'+m[3].padStart(2,'0');
+ return mon<0||date<FIRST_AUTO_LEAVE_DATE?null:{staffId:m[1],date};
 }
 async function api(path,options={}) {
  const user=auth.currentUser;
@@ -55,9 +58,9 @@ function renderCells(){
  for(const [key,els] of findFields()){
   const entry=getEntry(key);if(!entry)continue;
   const note=els.note?.querySelector('span.truncate');
-  if(note){note.textContent=entry.noteTime?.value||'—';note.title='Private HR: '+(entry.noteTime?.origin||'sheet');}
+  if(note && (!note.dataset.hrOriginalText || note.dataset.hrOriginalText==='Add Note')){note.textContent=entry.noteTime?.value||'—';note.title='Private HR: '+(entry.noteTime?.origin||'sheet');}
   if(els.reason){
-   if(document.activeElement!==els.reason)els.reason.value=entry.reason?.value||'';
+   if(document.activeElement!==els.reason && !els.reason.dataset.hrOriginalValue)els.reason.value=entry.reason?.value||'';
    els.reason.title='Private HR: '+(entry.reason?.origin||'sheet');
    if(!els.reason.nextElementSibling?.classList.contains('hr-reset-reason')){
     const reset=document.createElement('button');
