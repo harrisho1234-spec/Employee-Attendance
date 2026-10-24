@@ -19,11 +19,17 @@ export function createBridgeSource({url, getIdTokenClient, fetchImpl=fetch}) {
     // Google Auth generates a short-lived service ID token for the target audience.
     const client = await getIdTokenClient(audience);
     const headers = await client.getRequestHeaders(origin);
+    const idToken = typeof headers.get === 'function'
+      ? headers.get('authorization')
+      : (headers.Authorization || headers.authorization);
+    if (typeof idToken !== 'string' || !idToken.startsWith('Bearer ')) {
+      throw new Error('BRIDGE_CREDENTIALS_UNAVAILABLE');
+    }
     const requestUrl = new URL('/internal/leave-snapshot',origin);
     requestUrl.searchParams.set('from',date);
     requestUrl.searchParams.set('to',date);
     const response = await fetchImpl(requestUrl.toString(),{
-      method:'GET',headers:{Authorization:headers.Authorization || headers.authorization},
+      method:'GET',headers:{Authorization:idToken},
       redirect:'error',cache:'no-store',signal:AbortSignal.timeout(15000)
     });
     if (!response.ok) throw new Error('BRIDGE_UNAVAILABLE');
