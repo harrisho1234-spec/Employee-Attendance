@@ -75,11 +75,39 @@ function hrWorkbenchChange(staffId, day, field, action, value) {
     const syncTab=book.getSheetByName(HR_WORKBENCH.syncTab);
     const records=hrWorkbenchRows_(syncTab,9);
     const matched=records.findIndex(r=>r[0]===key.id&&r[1]===key.day);
-    if (matched>=0 && action==='override') {
-      syncTab.getRange(matched+2,field==='note'?3:4).setValue(String(value??''));
+    if (matched>=0) {
+      if (action==='override') {
+        syncTab.getRange(matched+2,field==='note'?3:4).setValue(String(value??''));
+      } else {
+        // Restore the authoritative tracker field immediately, not the stale
+        // materialized output value. Other manual field overrides remain intact.
+        const sourceId={
+          'lpl-lph':'1uBjsdHfsnOJxs0Y6xUlmEPRnim8KMLPiqX_OClHLz2M',
+          'itc-lpt':'1C9VjWbYWo3edKDc-37-Q0zElLR0CfZirVAQDr46ztB0',
+          'ttc':'1971ecyEfSde-1OWM2jsFgOE0wHdZ7p-1tpQLYHxbPPo'
+        };
+        const tracker=src[4], sourceRow=Number(src[5]);
+        if (!sourceId[tracker] || !Number.isSafeInteger(sourceRow) || sourceRow<2)
+          throw Error('Cannot resolve source row; leave reset queued for next sync');
+        const trackerTab=SpreadsheetApp.openById(sourceId[tracker]).getSheetByName('Leave Requests Log');
+        if (!trackerTab) throw Error('Tracker unavailable; leave reset queued for next sync');
+        const raw=trackerTab.getRange(sourceRow,1,1,14).getDisplayValues()[0];
+        const rowId=String(raw[2]||'').trim(), dateText=String(raw[1]||'');
+        const dates=dateText.match(/20\\d{2}-\\d{2}-\\d{2}/g)||[];
+        if (rowId!==key.id || !dates.length || key.day<dates[0] || key.day>dates[dates.length-1] ||
+            String(raw[13]||'').toLowerCase()!=='synced' || String(raw[7]||'').trim()==='D')
+          throw Error('Source record changed. Reset flag saved; run private sync to reconcile');
+        const period=String(raw[6]||'');
+        const sourceNote=/morning/i.test(period)?'Morning':/afternoon/i.test(period)?'Afternoon':
+          /half\\s*day/i.test(period)?'Half Day':'Full Day';
+        const sourceReason=String(raw[11]||'').trim();
+        const restored=field==='note'?sourceNote:
+          /^(N\\/A|Direct Shortcut)$/i.test(sourceReason)?'':sourceReason;
+        syncTab.getRange(matched+2,field==='note'?3:4).setValue(restored);
+      }
     }
-    return {saved:true,requiresSync:action==='reset',
-      message:action==='reset'?'Reset recorded. Run the hourly sync to restore the tracker value.':'Override saved. Hourly sync will preserve it.'};
+    return {saved:true,requiresSync:false,
+      message:action==='reset'?'Reset to tracker value. Click Find record to refresh.':'Override saved. Hourly sync will preserve it.'};
   } finally {lock.releaseLock();}
 }
 
