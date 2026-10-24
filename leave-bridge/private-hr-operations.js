@@ -28,15 +28,17 @@ export async function authenticateHr(authHeader,verifyIdToken,approvedEmails) {
  */
 export function createPrivateHrOperations({readSource,storage,verifyIdToken,approvedEmails}) {
  async function authorized(token) {
-   return authenticateHr(token,verifyIdToken,approvedEmails);
+   try { return await authenticateHr(token,verifyIdToken,approvedEmails); }
+   catch(e) { if(['UNAUTHENTICATED','PERMISSION_DENIED'].includes(e?.message)) throw e;
+     const error=new Error('HR_DIAGNOSTIC_AUTH');error.cause=e;throw error; }
  }
  return {
   async read({authorization,staffId,date}) {
    await authorized(authorization);
    const key=validateKey(staffId,date);
-   const source=await readSource(staffId,date);
+   let source;try {source=await readSource(staffId,date);}catch(e){const error=new Error('HR_DIAGNOSTIC_SOURCE');error.cause=e;throw error;}
    if(!source) return null;
-   const manual=await storage.get(key)||{};
+   let manual;try{manual=await storage.get(key)||{};}catch(e){const error=new Error('HR_DIAGNOSTIC_OVERRIDES');error.cause=e;throw error;}
    return resolveAttendanceRow(source,manual);
   },
   async update({authorization,staffId,date,field,value}) {
