@@ -27,3 +27,18 @@ test('rejects invalid staff identifiers before external call',async()=>{
  const source=createBridgeSource({url,getIdTokenClient:async()=>{throw Error('SHOULD_NOT_CALL')}});
  await assert.rejects(source('../other','2026-10-24'),/INVALID_KEY/);
 });
+
+test('Google Auth Headers object is supported without exposing token',async()=>{
+ let seen;
+ const source=createBridgeSource({
+   url,
+   getIdTokenClient:async()=>({getRequestHeaders:async()=>new Headers({authorization:'Bearer signed-id-token'})}),
+   fetchImpl:async(_url,options)=>{seen=options.headers.Authorization;return {ok:true,json:async()=>({records:[]})};}
+ });
+ await source('ITC-001','2026-10-24');
+ assert.equal(seen,'Bearer signed-id-token');
+});
+test('missing Google service identity token fails closed',async()=>{
+ const source=createBridgeSource({url,getIdTokenClient:async()=>({getRequestHeaders:async()=>({})}),fetchImpl:async()=>{throw new Error('should not fetch')}});
+ await assert.rejects(source('ITC-001','2026-10-24'),/BRIDGE_CREDENTIALS_UNAVAILABLE/);
+});
