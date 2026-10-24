@@ -24,9 +24,9 @@ async function api(path,opts={}){
 }
 function failure(e){$('msg').textContent=e.message||String(e)}
 function render(r){record=r;$('record').hidden=!r;if(!r){$('msg').textContent='No tracker record for this staff/date';return;}
-  $('msg').textContent='';$('note').textContent=r.noteTime||'(empty)';$('reason').textContent=r.reason||'(empty)';
-  $('noteFlag').textContent=r.noteTimeSource||'';$('reasonFlag').textContent=r.reasonSource||'';
-  $('value').value=r.noteTime||'';}
+  $('msg').textContent='';$('note').textContent=r.noteTime?.value||'(empty)';$('reason').textContent=r.reason?.value||'(empty)';
+  $('noteFlag').textContent=r.noteTime?.origin||'';$('reasonFlag').textContent=r.reason?.origin||'';
+  $('value').value=r.noteTime?.value||'';}
 onAuthStateChanged(auth,user=>{const active=!!user&&!user.isAnonymous;$('login').hidden=active;$('logout').hidden=!active;
  $('work').hidden=!active||!ready();$('status').textContent=!ready()?'Secure HR gateway deployment pending':active?'Signed in: '+(user.email||'Google account'):'Sign in with an approved HR Google account';});
 $('login').onclick=()=>signInWithPopup(auth,new GoogleAuthProvider()).catch(failure);
@@ -34,7 +34,7 @@ $('logout').onclick=()=>signOut(auth).then(()=>render(null)).catch(failure);
 $('find').onclick=async()=>{try{const staffId=$('staff').value.trim(),date=$('day').value;
 if(!/^[A-Za-z0-9_-]{1,48}$/.test(staffId)||!/^20\d{2}-\d{2}-\d{2}$/.test(date))throw Error('Enter Staff ID and date');
 const result=await api('/internal/hr/entry?'+new URLSearchParams({staffId,date}));render(result.entry);}catch(e){render(null);failure(e)}};
-$('field').onchange=()=>{if(record)$('value').value=$('field').value==='reason'?(record.reason||''):(record.noteTime||'')};
+$('field').onchange=()=>{if(record)$('value').value=$('field').value==='reason'?(record.reason?.value||''):(record.noteTime?.value||'')};
 async function update(action){if(!record)return;
 const field=$('field').value;if(action==='reset'&&!confirm('Reset this field to the synchronized tracker value?'))return;
 try{const body={staffId:$('staff').value.trim(),date:$('day').value,field};
