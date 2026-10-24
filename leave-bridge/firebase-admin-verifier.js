@@ -17,6 +17,11 @@ export function firebaseAdminVerifier(adminAuth) {
           await adminAuth.verifyIdToken(token,false);
           const wrapped=new Error('HR_DIAGNOSTIC_REVOCATION_CHECK');
           wrapped.cause=e;
+          // Only stable, allowlisted metadata is safe to log; never log SDK error messages or objects.
+          const message=String(e?.message||'').toLowerCase();
+          const hints=[['permission','permission'],['credential','credential'],['quota','quota'],['timeout','timeout'],['network','network'],['project','project'],['identitytoolkit','identitytoolkit']];
+          const hint=hints.find(([term])=>message.includes(term))?.[1]||'unspecified';
+          console.error('HR_REVOCATION_DETAIL','hint',hint);
           throw wrapped;
         } catch (probeError) {
           if(probeError?.message==='HR_DIAGNOSTIC_REVOCATION_CHECK') throw probeError;
