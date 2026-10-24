@@ -30,6 +30,7 @@ export function createPrivateHrOperations({readSource,storage,verifyIdToken,appr
  async function authorized(token) {
    try { return await authenticateHr(token,verifyIdToken,approvedEmails); }
    catch(e) { if(['UNAUTHENTICATED','PERMISSION_DENIED'].includes(e?.message)) throw e;
+     if(['HR_DIAGNOSTIC_REVOCATION_CHECK','HR_DIAGNOSTIC_TOKEN_VERIFICATION'].includes(e?.message)) throw e;
      const error=new Error('HR_DIAGNOSTIC_AUTH');error.cause=e;throw error; }
  }
  return {
