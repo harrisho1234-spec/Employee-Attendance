@@ -11,7 +11,7 @@ test('private sheet source returns matching staff and date only', async()=>{
   const entry=await read('LPH-023','2026-08-30');
   assert.equal(entry.noteTime,'Full Day');
   assert.equal(entry.reason,'Sensitive reason');
-  assert.equal(calls[0].range,\"'HR Leave Sync'!A2:I\");
+  assert.equal(calls[0].range,"'HR Leave Sync'!A2:I");
   assert.equal(await read('LPH-999','2026-08-30'),null);
 });
 test('private sheet source rejects invalid keys before making sheet calls',async()=>{
