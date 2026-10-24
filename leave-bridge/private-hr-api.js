@@ -48,7 +48,7 @@ export function createPrivateHrApi(operations) {
    const status=code==='UNAUTHENTICATED'?401:code==='PERMISSION_DENIED'?403:
     ['INVALID_KEY','INVALID_FIELD'].includes(code)?400:503;
    if(status===503) {
-     const stage=['HR_DIAGNOSTIC_AUTH','HR_DIAGNOSTIC_SOURCE','HR_DIAGNOSTIC_OVERRIDES'].includes(code)?code:'HR_DIAGNOSTIC_OTHER';
+     const stage=['HR_DIAGNOSTIC_AUTH','HR_DIAGNOSTIC_SOURCE','HR_DIAGNOSTIC_OVERRIDES','HR_DIAGNOSTIC_REVOCATION_CHECK','HR_DIAGNOSTIC_TOKEN_VERIFICATION'].includes(code)?code:'HR_DIAGNOSTIC_OTHER';
      // Only allowlisted stage and numeric error metadata. NEVER log error objects/messages, tokens or records.
      const upstreamStatus=Number(error?.cause?.code||error?.cause?.response?.status);
      const safeStatus=[400,401,403,404,429,500,502,503,504].includes(upstreamStatus)?upstreamStatus:'unknown';
