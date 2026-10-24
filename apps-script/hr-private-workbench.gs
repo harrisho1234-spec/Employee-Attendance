@@ -93,16 +93,16 @@ function hrWorkbenchChange(staffId, day, field, action, value) {
         if (!trackerTab) throw Error('Tracker unavailable; leave reset queued for next sync');
         const raw=trackerTab.getRange(sourceRow,1,1,14).getDisplayValues()[0];
         const rowId=String(raw[2]||'').trim(), dateText=String(raw[1]||'');
-        const dates=dateText.match(/20\\d{2}-\\d{2}-\\d{2}/g)||[];
+        const dates=dateText.match(/20\d{2}-\d{2}-\d{2}/g)||[];
         if (rowId!==key.id || !dates.length || key.day<dates[0] || key.day>dates[dates.length-1] ||
             String(raw[13]||'').toLowerCase()!=='synced' || String(raw[7]||'').trim()==='D')
           throw Error('Source record changed. Reset flag saved; run private sync to reconcile');
         const period=String(raw[6]||'');
         const sourceNote=/morning/i.test(period)?'Morning':/afternoon/i.test(period)?'Afternoon':
-          /half\\s*day/i.test(period)?'Half Day':'Full Day';
+          /half\s*day/i.test(period)?'Half Day':'Full Day';
         const sourceReason=String(raw[11]||'').trim();
         const restored=field==='note'?sourceNote:
-          /^(N\\/A|Direct Shortcut)$/i.test(sourceReason)?'':sourceReason;
+          /^(N\/A|Direct Shortcut)$/i.test(sourceReason)?'':sourceReason;
         syncTab.getRange(matched+2,field==='note'?3:4).setValue(restored);
       }
     }
