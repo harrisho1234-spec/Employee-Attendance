@@ -160,5 +160,11 @@ onAuthStateChanged(auth,async user=>{
  }catch(e){setStatus(e.message);}
 });
 const boot=setInterval(()=>{installStatus();if(installNativeEditing())clearInterval(boot);},500);
-new MutationObserver(mutations=>{if(mutations.some(m=>m.addedNodes.length||m.removedNodes.length)){installStatus();installNativeEditing();schedule();}}).observe(document.body,{subtree:true,childList:true});
+// Observe attendance row replacements only; private UI insertions must not trigger full rescans.
+const attendanceObserver=new MutationObserver(mutations=>{
+ if(!authorized)return;
+ if(mutations.some(m=>[...m.addedNodes].some(n=>n.nodeType===1 && (n.matches?.('[data-hr-note],[data-hr-reason],tr')||n.querySelector?.('[data-hr-note],[data-hr-reason]')))))schedule();
+});
+const attendanceTable=document.querySelector('#dailyAttendanceTableBody');
+if(attendanceTable)attendanceObserver.observe(attendanceTable,{childList:true,subtree:true});
 setInterval(()=>{if(authorized){entries.clear();schedule();}},5*60*1000);
