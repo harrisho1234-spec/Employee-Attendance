@@ -9,7 +9,7 @@ SHEET=1npvICjymicRohQ6G16Ys3Rm9kp7f3XwREIXsnpBz8tM
 FIREBASE=daily-attendance-structure
 APP_ID=1:321384539910:web:c81475cd6d4d8cedcea087
 ORIGIN=https://harrisho1234-spec.github.io
-HR_EMAILS=harris.ho1234@gmail.com
+HR_EMAILS=harris.ho1234@gmail.com,lpthrassistant@gmail.com,limperialhome6@gmail.com,pisal.mol02@gmail.com
 cd "$(dirname "$0")"
 npm test
 if [[ "${CONFIRM_BROWSER_GATEWAY_DEPLOYMENT:-}" != "yes" ]]; then
