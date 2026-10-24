@@ -8,6 +8,7 @@ import {getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut} f
 const app=initializeApp({apiKey:'AIzaSyB4fUTVdVt9cjKjIzj63a0KJ3bEaIXRzWY',authDomain:'daily-attendance-structure.firebaseapp.com',projectId:'daily-attendance-structure',appId:'1:321384539910:web:c81475cd6d4d8cedcea087'},'attendance-private-hr');
 const auth=getAuth(app), endpoint='https://leave-hr-browser-gateway-916969515475.asia-southeast1.run.app';
 const entries=new Map(), TTL=120000;
+const initialManualCells=new WeakMap();
 // New leave dates only; historical attendance stays exactly as recorded.
 const FIRST_AUTO_LEAVE_DATE='2026-10-25';
 let authorized=false, loading=false, generation=0, queued=false;
@@ -58,9 +59,11 @@ function renderCells(){
  for(const [key,els] of findFields()){
   const entry=getEntry(key);if(!entry)continue;
   const note=els.note?.querySelector('span.truncate');
-  if(note && (!note.dataset.hrOriginalText || note.dataset.hrOriginalText==='Add Note')){note.textContent=entry.noteTime?.value||'—';note.title='Private HR: '+(entry.noteTime?.origin||'sheet');}
+  if(note && !initialManualCells.has(note))initialManualCells.set(note,!note.textContent.includes('Add Note'));
+  if(note && !initialManualCells.get(note)){note.textContent=entry.noteTime?.value||'—';note.title='Private HR: '+(entry.noteTime?.origin||'sheet');}
   if(els.reason){
-   if(document.activeElement!==els.reason && !els.reason.dataset.hrOriginalValue)els.reason.value=entry.reason?.value||'';
+   if(!initialManualCells.has(els.reason))initialManualCells.set(els.reason,Boolean(els.reason.value.trim()));
+   if(document.activeElement!==els.reason && !initialManualCells.get(els.reason))els.reason.value=entry.reason?.value||'';
    els.reason.title='Private HR: '+(entry.reason?.origin||'sheet');
    if(!els.reason.nextElementSibling?.classList.contains('hr-reset-reason')){
     const reset=document.createElement('button');
