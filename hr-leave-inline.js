@@ -121,6 +121,7 @@ function installNativeEditing(){
  window.__privateHrInlineInstalled=true;
  const originalReason=window.saveReason;
  window.saveReason=function(key,value){
+  if(authorized&&!entries.has(key)){alert('Please allow HR synchronization to finish before editing.');return;}
   if(authorized&&getEntry(key)){
    write(key,'reason',value).catch(err=>{alert(err.message);renderCells();});
    return;
@@ -138,6 +139,7 @@ function installNativeEditing(){
  const originalNoteSave=window.saveNoteEdit;
  window.saveNoteEdit=function(){
   const key=document.getElementById('editNoteId')?.value;
+  if(authorized&&!entries.has(key)){alert('Please allow HR synchronization to finish before editing.');return;}
   if(authorized&&getEntry(key)){
    const val=document.getElementById('editNoteText')?.value?.trim()||'';
    write(key,'noteTime',val).then(()=>window.closeNoteEdit()).catch(e=>alert(e.message));
