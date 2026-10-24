@@ -96,7 +96,7 @@ let statusButton;
 function setStatus(text){if(statusButton)statusButton.textContent=text;}
 function installStatus(){
  if(statusButton)return;
- const refresh=[...document.querySelectorAll('button')].find(b=>/^\s*Refresh\s*$/.test(b.textContent));
+ const refresh=document.querySelector('#dailyView button[title="Refresh Daily Attendance"]');
  if(!refresh)return;
  statusButton=document.createElement('button');statusButton.type='button';
  statusButton.className=refresh.className;
