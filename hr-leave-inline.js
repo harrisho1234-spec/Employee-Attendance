@@ -82,7 +82,7 @@ async function synchronize(){
    const key=keys[next++];
    try{await fetchEntry(key);if(generation===run)renderCells();}catch(e){setStatus(e.message);return;}
   }}
-  await Promise.all(Array.from({length:Math.min(4,keys.length)},worker));
+  await Promise.all(Array.from({length:Math.min(2,keys.length)},worker));
  }finally{loading=false;}
 }
 function schedule(){if(queued||!authorized)return;queued=true;queueMicrotask(()=>{queued=false;synchronize();renderCells();});}
@@ -160,11 +160,15 @@ onAuthStateChanged(auth,async user=>{
  }catch(e){setStatus(e.message);}
 });
 const boot=setInterval(()=>{installStatus();if(installNativeEditing())clearInterval(boot);},500);
-// Observe attendance row replacements only; private UI insertions must not trigger full rescans.
-const attendanceObserver=new MutationObserver(mutations=>{
- if(!authorized)return;
- if(mutations.some(m=>[...m.addedNodes].some(n=>n.nodeType===1 && (n.matches?.('[data-hr-note],[data-hr-reason],tr')||n.querySelector?.('[data-hr-note],[data-hr-reason]')))))schedule();
-});
-const attendanceTable=document.querySelector('#dailyTableBody');
-if(attendanceTable)attendanceObserver.observe(attendanceTable,{childList:true,subtree:true});
-setInterval(()=>{if(authorized){entries.clear();schedule();}},5*60*1000);
+// Poll only while the Daily Attendance view is visible. No MutationObserver:
+ // it caused render/observer feedback loops in the installed Windows app.
+ let lastRowSignature='';
+ setInterval(()=>{
+  if(!authorized || document.hidden)return;
+  const view=document.getElementById('dailyView');
+  if(!view || view.classList.contains('hidden'))return;
+  const keys=[...document.querySelectorAll('#dailyTableBody [data-hr-note],#dailyTableBody [data-hr-reason]')].map(el=>el.getAttribute('data-hr-note')||el.getAttribute('data-hr-reason'));
+  const signature=keys.join('|');
+  if(signature!==lastRowSignature){lastRowSignature=signature;schedule();}
+ },10000);
+ setInterval(()=>{if(authorized){entries.clear();schedule();}},5*60*1000);
