@@ -1,9 +1,11 @@
-const CACHE_NAME = 'attendance-app-v70';
+const CACHE_NAME = 'attendance-app-v71';
 
 const APP_FILES = [
   './',
   './index.html',
   './manifest.json',
+  './leave-sync-config.js',
+  './leave-sync.js',
   './icons/icon-192.png',
   './icons/icon-512.png'
 ];

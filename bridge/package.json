@@ -1,0 +1,8 @@
+{
+  "name": "attendance-private-leave-bridge",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": { "start": "node server.mjs", "test": "node --test ../tests/*.test.mjs" },
+  "dependencies": { "google-auth-library": "^10.5.0" }
+}
