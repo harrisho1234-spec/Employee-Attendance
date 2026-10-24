@@ -33,3 +33,12 @@ test('only supports explicit routes and never sets public CORS headers',async()=
  assert.equal(response.code,404);
  assert.equal(headers['Access-Control-Allow-Origin'],undefined);
 });
+
+test('day-off swaps are quarantined rather than misreported as full-day leave',()=>{
+ const row=['2026-10-24 10:00:00','Off: 2026-10-25 | Work: 2026-10-26','TTC-001','','','','Day-Off Swap','D','','','','Day off','','Synced'];
+ assert.deepEqual(normalizeRow(row,'ttc',0),[]);
+});
+test('invalid calendar day does not become another day',()=>{
+ const row=['2026-10-24 10:00:00','2026-02-30','TTC-001','','','','Full Day','SL','','','','Private','','Synced'];
+ assert.deepEqual(normalizeRow(row,'ttc',0),[]);
+});
