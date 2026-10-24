@@ -1,5 +1,7 @@
 # Employee Attendance Dashboard PWA
 
+Private Telegram leave metadata synchronization is available; follow [the setup guide](docs/private-leave-sync.md) to configure the authenticated bridge before enabling it. Attendance calculations are unchanged.
+
 This repository contains the complete Employee Attendance Dashboard configured as an installable Progressive Web App (PWA).
 
 ## 📁 Repository Structure

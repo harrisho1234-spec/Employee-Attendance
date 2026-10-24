@@ -4715,6 +4715,12 @@
                 </div>
             </div>
 
+            <div class="bg-white border rounded-lg p-3 mb-3 flex flex-wrap gap-3 items-center" aria-label="Private leave synchronization">
+                <div id="leaveGoogleSignIn"></div>
+                <button type="button" onclick="leaveSync.refresh()" class="border rounded px-3 py-1 text-xs">Sync leave details</button>
+                <button type="button" onclick="leaveSync.signOut()" class="border rounded px-3 py-1 text-xs">Disconnect</button>
+                <span id="leaveSyncStatus" role="status" class="text-xs text-slate-600">Private leave sync needs setup.</span>
+            </div>
             <div id="dailySummaryContainer"></div>
             <div class="hidden md:block bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                 <div class="overflow-x-auto w-full">
@@ -5596,6 +5602,8 @@
         </div>
     </div>
 
+    <script src="leave-sync-config.js"></script>
+    <script src="leave-sync.js"></script>
     <!-- Edit Note Modal -->
     <div id="noteEditModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-[80] flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
         <div class="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden transform scale-95 transition-transform duration-300">
@@ -5746,9 +5754,7 @@
         };
 
         window.saveReason = function(key, val) {
-            val = val.trim();
-            if (val) customReasons[key] = val; else delete customReasons[key];
-            saveCustomNotes();
+            return leaveSync.save(key, 'reason', val);
         };
         
         window.openNoteEdit = function(e, id, currentText) {
@@ -5773,14 +5779,10 @@
             setTimeout(() => md.classList.add('hidden'), 300);
         };
         
-        window.saveNoteEdit = function() {
+        window.saveNoteEdit = async function() {
             const id = document.getElementById('editNoteId').value;
-            const text = document.getElementById('editNoteText').value.trim();
-            if(id) {
-                if (text) customNotes[id] = text; else delete customNotes[id];
-                saveCustomNotes(); renderDailyAttendance(); 
-            }
-            closeNoteEdit();
+            const text = document.getElementById('editNoteText').value;
+            if (id && await leaveSync.save(id, 'note', text)) closeNoteEdit();
         };
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -11829,6 +11831,7 @@
         }
 
         function renderDailyAttendance() {
+            leaveSync.ensure();
             const tb=document.getElementById('dailyTableBody'), mc=document.getElementById('dailyMobileCards'), nd=document.getElementById('dailyNoDataMessage'), fI=document.getElementById('dailyFilterFrom'), tI=document.getElementById('dailyFilterTo');
             if(!tb||!nd||!fI||!tI||!fI.value||!tI.value)return; tb.innerHTML=''; if(mc)mc.innerHTML='';
             let fD=new Date(fI.value), tD=new Date(tI.value); fD.setHours(0,0,0,0); tD.setHours(23,59,59,999); if(fD>tD){let t=fD;fD=tD;tD=t;}
@@ -11856,7 +11859,7 @@
                     let l=r.leaves, a=agg[e.id]; a.leaves.AL+=l.AL; a.leaves.SL+=l.SL; a.leaves.SP+=l.SP; a.leaves.UP+=l.UP; a.leaves.A+=l.A; a.leaves.Late5m+=l.Late5m; a.leaves.Late3m+=l.Late3m; a.leaves.OT+=l.OT; a.leaves.D+=l.D; a.leaves.H+=l.H;
                     
                     let key = `${e.id}_${r.month}_${r.day}_${yr}`;
-                    let tNote = customNotes[key] || r.note;
+                    let tNote = leaveSync.value(key, 'note', customNotes, r.note);
                     
                     // Determine leave types for this specific day to show in the Note prefix
                     let tArr = [];
@@ -11915,15 +11918,12 @@
                     t.push(window.getLeaveBadge(h.H, 'Hol', 'H-Hol', 'bg-rose-100 text-rose-800 border-rose-300'));
                     t = t.filter(Boolean);
                     
-                    let nStr = i.notes.map(n => {
-                        let disp = n.text ? `${n.prefix}${n.text}` : `${n.prefix}Add Note`; let isPlaceholder = !n.text;
-                        return `<div class="flex items-center h-[34px] mb-1"><span class="bg-slate-50 px-2.5 py-1.5 rounded-md border inline-flex items-center gap-1.5 group text-[11px] shadow-sm hover:border-blue-300 hover:bg-blue-50 cursor-text transition-all w-max max-w-full" onclick="openNoteEdit(event, '${n.id}', '${(n.text||'').replace(/'/g, "\\'")}')"><i class="fa-regular fa-clock text-slate-400 shrink-0"></i> <span class="truncate ${isPlaceholder?'text-slate-400 italic':'text-slate-800 font-semibold'}">${disp}</span> <i class="fa-solid fa-pencil text-slate-300 group-hover:text-blue-600 text-[10px] ml-1 shrink-0"></i></span></div>`;
-                    }).join('');
-
+                    let nStr = i.notes.map(n => leaveSync.noteHtml(n)).join('');
                     let reasonInputs = i.dKeys.map(k => {
-                        let cr = customReasons[k] || ''; 
-                        let pfx = fD.getTime()!==tD.getTime() ? `<span class="text-[9px] text-slate-400 w-10 shrink-0 text-right pr-1.5">${k.split('_')[1].substring(0,3)} ${k.split('_')[2]}:</span>` : '';
-                        return `<div class="flex items-center w-full h-[34px] mb-1">${pfx}<input type="text" class="w-full bg-slate-50 border border-slate-200 rounded p-1.5 text-[11px] text-slate-700 focus:border-blue-500 focus:ring-1 outline-none transition-all placeholder:italic" placeholder="Reason..." value="${cr.replace(/"/g, '&quot;')}" onclick="event.stopPropagation()" onblur="saveReason('${k}', this.value)"></div>`;
+                        const reason = leaveSync.value(k, 'reason', customReasons, '');
+                        const parts = k.split('_');
+                        const prefix = fD.getTime() !== tD.getTime() ? `<span class="text-xs text-slate-400">${parts[1].substring(0,3)} ${parts[2]}:</span>` : '';
+                        return leaveSync.reasonHtml(k, reason, prefix);
                     }).join('');
 
                     let tr=document.createElement('tr'); tr.className="hover:bg-blue-50/50 border-b transition-colors";
@@ -12150,6 +12150,7 @@
         window.closeDeptModal=function(){const md=document.getElementById('deptModal'),co=document.getElementById('deptModalContent'); md.classList.add('opacity-0');co.classList.add('scale-95'); document.body.classList.remove('modal-open'); setTimeout(()=>md.classList.add('hidden'),300);};
         
         window.openDailyCompanyModal=function(c){
+            document.getElementById('dailyCompanyModal').dataset.company = c;
             const md=document.getElementById('dailyCompanyModal'),co=document.getElementById('dailyCompanyModalContent'),bd=document.getElementById('dailyCompanyModalBody'); 
             document.getElementById('dailyCompanyModalTitle').innerHTML=`${getCompanyLogo(c)} ${c} <span class="bg-slate-100 px-2 rounded-full border text-[10px]">Daily</span>`; 
             
@@ -12173,18 +12174,8 @@
                 t.push(window.getLeaveBadge(h.H, 'Hol', 'H-Hol', 'bg-rose-100 text-rose-800 border-rose-300', 'px-2 py-0.5 text-[10px]'));
                 t = t.filter(Boolean);
                 
-                let nStr = i.notes.map(n => { 
-                    let disp = n.text ? `${n.prefix}${n.text}` : `${n.prefix}Add Note`; 
-                    let isPlaceholder = !n.text; 
-                    return `<div class="bg-slate-50 px-3 py-2 rounded-lg border flex items-center justify-between group hover:border-blue-300 hover:bg-blue-50 cursor-text transition-all shadow-sm w-full mt-2" onclick="openNoteEdit(event, '${n.id}', '${(n.text||'').replace(/'/g, "\\'")}')">
-                                <div class="flex items-center gap-2 overflow-hidden">
-                                    <i class="fa-regular fa-clock text-slate-400 shrink-0"></i> 
-                                    <span class="truncate text-xs ${isPlaceholder?'text-slate-400 italic':'text-slate-800 font-semibold'}">${disp}</span>
-                                </div> 
-                                <i class="fa-solid fa-pencil text-slate-300 group-hover:text-blue-600 text-xs shrink-0 pl-2"></i>
-                            </div>`; 
-                }).join('');
-                
+                let nStr = i.notes.map(n => leaveSync.noteHtml(n)).join('');
+
                 let cd=document.createElement('div'); 
                 cd.className="bg-white rounded-xl shadow-sm border p-4 sm:p-5 cursor-pointer hover:border-blue-400 hover:shadow-md transition-all relative flex gap-3 sm:gap-4 items-start"; 
                 cd.onclick=()=>{closeDailyCompanyModal();setTimeout(()=>openModal(e),300);}; 
