@@ -4710,6 +4710,7 @@
                             <button onclick="downloadDailyLeaveReport(this)" class="text-left px-4 py-3 text-sm font-medium text-slate-700 hover:bg-blue-50 border-b flex items-center"><i class="fa-solid fa-calendar-check text-blue-500 w-5 text-center mr-2"></i> Paid Leaves</button>
                             <button onclick="downloadPayrollReport(this)" class="text-left px-4 py-3 text-sm font-medium text-slate-700 hover:bg-purple-50 border-b flex items-center"><i class="fa-solid fa-file-invoice-dollar text-purple-500 w-5 text-center mr-2"></i> Payroll Report</button>
                             <button onclick="downloadDailyTimesheetExcel(this)" class="text-left px-4 py-3 text-sm font-medium text-slate-700 hover:bg-emerald-50 border-b flex items-center"><i class="fa-solid fa-border-all text-emerald-500 w-5 text-center mr-2"></i> Timesheet Grid (Excel)</button>
+                            <button onclick="downloadDailyLeaveBalancesYTD(this)" class="text-left px-4 py-3 text-sm font-medium text-slate-700 hover:bg-emerald-50 border-b flex items-center"><i class="fa-solid fa-scale-balanced text-teal-600 w-5 text-center mr-2"></i> Leave Balances (YTD)</button>
                         </div>
                     </div>
                 </div>
@@ -12603,6 +12604,78 @@
             let tmpDiv=document.createElement('div'); tmpDiv.innerHTML=h; tmpDiv.style.display='none'; document.body.appendChild(tmpDiv);
             prepareTableToExcelNumericCells(document.getElementById('exTab'));
             TableToExcel.convert(document.getElementById('exTab'), {name:`Timesheet_${dLb.replace(/ /g,'_')}.xlsx`,sheet:{name:"Timesheet"}}); document.body.removeChild(tmpDiv);
+        };
+
+        window.downloadDailyLeaveBalancesYTD = function() {
+            const exportYear = new Date().getFullYear();
+            const today = new Date();
+            today.setHours(23, 59, 59, 999);
+
+            // Keep this new export scoped to the existing Daily Attendance filters.
+            // Leave balances and YTD usage are already loaded on each employee record.
+            const selectedStaff = allEmployees.filter(e => {
+                if (!e || e.status !== 'Active' || window.isExcludedPosition(e.position)) return false;
+                if (isBeforeEmployeeJoinDate(e, today)) return false;
+                if (selectedDailyCompanies.length > 0 && !selectedDailyCompanies.includes(e.company)) return false;
+                if (!isDailyDepartmentSelected(e)) return false;
+                return true;
+            });
+
+            if (selectedStaff.length === 0) {
+                showAppToast('No staff match the selected Company and Department filters.', 'error');
+                return;
+            }
+
+            selectedStaff.sort((a, b) => {
+                const companyCompare = String(a.company || '').localeCompare(String(b.company || ''));
+                if (companyCompare) return companyCompare;
+                const departmentCompare = String(a.department || '').localeCompare(String(b.department || ''));
+                if (departmentCompare) return departmentCompare;
+                return String(a.name || '').localeCompare(String(b.name || ''));
+            });
+
+            const escapeCell = value => String(value ?? '').replace(/[&<>"']/g, ch => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            })[ch]);
+            const numericValue = value => {
+                const n = Number(value);
+                return Number.isFinite(n) ? n : 0;
+            };
+            const numberCell = value => `<td data-t="n" data-a-h="center" data-b-a-s="thin">${numericValue(value)}</td>`;
+            const textCell = value => `<td data-t="s" data-a-h="left" data-b-a-s="thin">${escapeCell(value)}</td>`;
+
+            let html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"><style>table{border-collapse:collapse;font-family:Arial,sans-serif;font-size:10pt;}th,td{border:1px solid #000;padding:5px;vertical-align:middle;}th{text-align:center;}</style></head><body><table id="exLeaveBalancesYTD" data-cols-width="5,12,28,24,14,8,8,8,8,8,8,8,8,8"><tr><td colspan="14" data-f-sz="14" data-f-color="c00000" data-f-bold="true" data-a-h="center" data-b-a-s="none">Leave Balances (YTD ${exportYear})</td></tr><tr><th rowspan="2" data-fill-color="d9d9d9" data-f-bold="true" data-a-h="center" data-b-a-s="thin">No.</th><th rowspan="2" data-fill-color="d9d9d9" data-f-bold="true" data-a-h="center" data-b-a-s="thin">Emp-ID</th><th rowspan="2" data-fill-color="d9d9d9" data-f-bold="true" data-a-h="left" data-b-a-s="thin">Emp-Name</th><th rowspan="2" data-fill-color="d9d9d9" data-f-bold="true" data-a-h="left" data-b-a-s="thin">Department</th><th rowspan="2" data-fill-color="d9d9d9" data-f-bold="true" data-a-h="center" data-b-a-s="thin">Company</th><th colspan="3" data-fill-color="ffc000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">Available</th><th colspan="3" data-fill-color="ffc000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">Used</th><th colspan="3" data-fill-color="ffc000" data-f-bold="true" data-a-h="center" data-b-a-s="thin">Remaining</th></tr><tr><th data-fill-color="c6e0b4" data-f-bold="true" data-a-h="center" data-b-a-s="thin">AL</th><th data-fill-color="ffff00" data-f-bold="true" data-a-h="center" data-b-a-s="thin">SL</th><th data-fill-color="d9b3e6" data-f-bold="true" data-a-h="center" data-b-a-s="thin">SP</th><th data-fill-color="c6e0b4" data-f-bold="true" data-a-h="center" data-b-a-s="thin">AL</th><th data-fill-color="ffff00" data-f-bold="true" data-a-h="center" data-b-a-s="thin">SL</th><th data-fill-color="d9b3e6" data-f-bold="true" data-a-h="center" data-b-a-s="thin">SP</th><th data-fill-color="c6e0b4" data-f-bold="true" data-a-h="center" data-b-a-s="thin">AL</th><th data-fill-color="ffff00" data-f-bold="true" data-a-h="center" data-b-a-s="thin">SL</th><th data-fill-color="d9b3e6" data-f-bold="true" data-a-h="center" data-b-a-s="thin">SP</th></tr>`;
+
+            selectedStaff.forEach((e, index) => {
+                const leave = e.leaves || {};
+                const available = leave.available || {};
+                const used = leave.used || {};
+                const remaining = leave.remaining || {};
+                const values = [
+                    available.AL, available.SL, available.SP,
+                    used.AL, used.SL, used.SP,
+                    remaining.AL, remaining.SL, remaining.SP
+                ];
+                const rowFill = index % 2 === 0 ? 'ffffff' : 'f8fafc';
+                html += `<tr><td data-t="n" data-fill-color="${rowFill}" data-a-h="center" data-b-a-s="thin">${index + 1}</td>${textCell(e.displayId || e.id)}${textCell(e.name)}${textCell(e.department)}${textCell(e.company)}`;
+                values.forEach((value, i) => {
+                    html += `<td data-t="n" data-fill-color="${rowFill}" data-a-h="center" data-b-a-s="thin">${numericValue(value)}</td>`;
+                });
+                html += '</tr>';
+            });
+
+            html += '</table></body></html>';
+            const tmpDiv = document.createElement('div');
+            tmpDiv.innerHTML = html;
+            tmpDiv.style.display = 'none';
+            document.body.appendChild(tmpDiv);
+            const table = document.getElementById('exLeaveBalancesYTD');
+            prepareTableToExcelNumericCells(table);
+            TableToExcel.convert(table, {
+                name: `Leave_Balances_YTD_${exportYear}.xlsx`,
+                sheet: { name: 'Leave Balances YTD' }
+            });
+            tmpDiv.remove();
         };
 
         window.downloadCalendarDailyReport=function(){
