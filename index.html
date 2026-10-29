@@ -12614,7 +12614,14 @@
             // Keep this new export scoped to the existing Daily Attendance filters.
             // Leave balances and YTD usage are already loaded on each employee record.
             const selectedStaff = allEmployees.filter(e => {
-                if (!e || e.status !== 'Active' || window.isExcludedPosition(e.position)) return false;
+                // Include active staff and resigned staff only while their recorded
+                // Last Working Day (Backend column AH) has not passed. Terminated
+                // and Walked Out staff remain excluded.
+                const isActiveOrStillInNotice = e && (
+                    e.status === 'Active' ||
+                    (e.status === 'Resigned' && isResignedNoticePeriodStaff(e, today))
+                );
+                if (!isActiveOrStillInNotice || window.isExcludedPosition(e.position)) return false;
                 if (isBeforeEmployeeJoinDate(e, today)) return false;
                 if (selectedDailyCompanies.length > 0 && !selectedDailyCompanies.includes(e.company)) return false;
                 if (!isDailyDepartmentSelected(e)) return false;
