@@ -12531,7 +12531,7 @@
                 recDate.setHours(0,0,0,0);
                 return recDate >= new Date(fD.getFullYear(), fD.getMonth(), fD.getDate()) && recDate <= new Date(tD.getFullYear(), tD.getMonth(), tD.getDate());
             });
-            const baseRows = allEmployees.filter(e=>(isEmploymentVisible(e)||(e.status==='Resigned'&&hasTimesheetAttendanceInRange(e)))&&(selectedDailyCompanies.length===0||selectedDailyCompanies.includes(e.company))&&isDailyDepartmentSelected(e)&&!window.isExcludedPosition(e.position)).sort(baseTimesheetCompare);
+            const baseRows = allEmployees.filter(e=>!isBeforeEmployeeJoinDate(e,tD)&&(isEmploymentVisible(e)||(e.status==='Resigned'&&hasTimesheetAttendanceInRange(e)))&&(selectedDailyCompanies.length===0||selectedDailyCompanies.includes(e.company))&&isDailyDepartmentSelected(e)&&!window.isExcludedPosition(e.position)).sort(baseTimesheetCompare);
             if(baseRows.length===0)return;
 
             // Mirror the Payroll Report's numbered-slot behavior using Backend column AL.
@@ -12720,7 +12720,7 @@
             let yr = fD.getFullYear();
             dailyLeaveRecords.forEach(r=>{
                 let rd=new Date(`${r.month} ${r.day}, ${yr}`); rd.setHours(12,0,0,0);
-                if(rd>=fD && rd<=tD){ let e=allEmployees.find(x=>x.id===r.staffId); if(!e||!isEmploymentVisible(e,rd)||window.isExcludedPosition(e.position))return; if(selectedDailyCompanies.length>0&&!selectedDailyCompanies.includes(e.company))return; if(!isDailyDepartmentSelected(e))return; let h=r.leaves, t=[], isM=(h.AL>0?1:0)+(h.SL>0?1:0)+(h.SP>0?1:0)+(h.UP>0?1:0)+(h.A>0?1:0)>1; 
+                if(rd>=fD && rd<=tD){ let e=allEmployees.find(x=>x.id===r.staffId); if(!e||isBeforeEmployeeJoinDate(e,tD)||!isEmploymentVisible(e,rd)||window.isExcludedPosition(e.position))return; if(selectedDailyCompanies.length>0&&!selectedDailyCompanies.includes(e.company))return; if(!isDailyDepartmentSelected(e))return; let h=r.leaves, t=[], isM=(h.AL>0?1:0)+(h.SL>0?1:0)+(h.SP>0?1:0)+(h.UP>0?1:0)+(h.A>0?1:0)>1; 
                     if(h.AL===0 && h.SL===0 && h.SP===0 && h.UP===0 && h.A===0 && h.Late5m===0 && h.Late3m===0 && h.D===0 && !r.isRawD) return;
                     if(h.AL===0.5)t.push(isM?'AL':'H-AL');else if(h.AL>0)t.push('AL'); if(h.SL===0.5)t.push(isM?'SL':'H-SL');else if(h.SL>0)t.push('SL'); if(h.SP===0.5)t.push(isM?'SP':'H-SP');else if(h.SP>0)t.push('SP'); if(h.UP===0.5)t.push(isM?'UP':'H-UP');else if(h.UP>0)t.push('UP'); if(h.A===0.5)t.push(isM?'A':'H-A');else if(h.A>0)t.push('A'); if(h.Late5m>0)t.push('L(>5m)'); if(h.Late3m>0)t.push("L'(>30m)"); if(h.D===0.5)t.push(isM?'D':'H-D');else if(h.D>0)t.push('D'); if(t.length===0)return; 
                     let cNote = customNotes[`${e.id}_${r.month}_${r.day}_${yr}`] || r.note;
@@ -12740,7 +12740,7 @@
             dailyLeaveRecords.forEach(r => {
                 let rd=new Date(`${r.month} ${r.day}, ${fD.getFullYear()}`); rd.setHours(12,0,0,0);
                 if(rd>=fD && rd<=tD){
-                    let e=allEmployees.find(x=>x.id===r.staffId); if(!e||window.isExcludedPosition(e.position))return;
+                    let e=allEmployees.find(x=>x.id===r.staffId); if(!e||isBeforeEmployeeJoinDate(e,tD)||window.isExcludedPosition(e.position))return;
                     if(!isDailyDepartmentSelected(e)) return; if(selectedDailyCompanies.length>0 && !selectedDailyCompanies.includes(e.company)) return;
                     let u=r.leaves.UP||0, a=r.leaves.A||0, l5=r.leaves.Late5m||0, l3=r.leaves.Late3m||0;
                     if(u>0||a>0||l5>0||l3>0){
@@ -12754,7 +12754,7 @@
             // newly joined employee's actual join date as Absent (A), even when
             // Attendance data has no record for those pre-join dates.
             allEmployees.forEach(e => {
-                if(!isEmploymentVisible(e, fD) || window.isExcludedPosition(e.position)) return;
+                if(isBeforeEmployeeJoinDate(e,tD) || !isEmploymentVisible(e, fD) || window.isExcludedPosition(e.position)) return;
                 if(selectedDailyCompanies.length > 0 && !selectedDailyCompanies.includes(e.company)) return;
                 if(!isDailyDepartmentSelected(e)) return;
 
@@ -12824,7 +12824,7 @@
             dailyLeaveRecords.forEach(r => {
                 let rd=new Date(`${r.month} ${r.day}, ${fD.getFullYear()}`); rd.setHours(12,0,0,0);
                 if(rd>=fD && rd<=tD){
-                    let e=allEmployees.find(x=>x.id===r.staffId); if(!e||window.isExcludedPosition(e.position))return;
+                    let e=allEmployees.find(x=>x.id===r.staffId); if(!e||isBeforeEmployeeJoinDate(e,tD)||window.isExcludedPosition(e.position))return;
                     if(!isDailyDepartmentSelected(e)) return; if(selectedDailyCompanies.length>0 && !selectedDailyCompanies.includes(e.company)) return;
                     let s=r.leaves.SL||0, a=r.leaves.AL||0, sp=r.leaves.SP||0;
                     if(s>0||a>0||sp>0){
@@ -12865,7 +12865,7 @@
             
             // Loop to populate ALL active employees for exact ID matching
             allEmployees.forEach(e => {
-                if(!isEmploymentVisible(e, fD) || window.isExcludedPosition(e.position)) return;
+                if(isBeforeEmployeeJoinDate(e,tD) || !isEmploymentVisible(e, fD) || window.isExcludedPosition(e.position)) return;
                 if(selectedDailyCompanies.length > 0 && !selectedDailyCompanies.includes(e.company)) return;
                 if(!isDailyDepartmentSelected(e)) return;
                 allRecs[e.displayId.toUpperCase()] = { e: e, al: 0, sl: 0, sp: 0, up: 0, a: 0, l5: 0, l3: 0, ot: 0, d: 0 };
