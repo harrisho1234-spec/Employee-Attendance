@@ -12,6 +12,7 @@ const initialManualCells=new WeakMap();
 // New leave dates only; historical attendance stays exactly as recorded.
 const FIRST_AUTO_LEAVE_DATE='2026-10-25';
 let authorized=false, loading=false, generation=0, queued=false;
+let matchedCount=0, checkedCount=0;
 function parseKey(key) {
  const m=/^([A-Za-z0-9_-]{1,48})_([A-Za-z]+)_(\d{1,2})_(20\d{2})$/.exec(key||'');
  if(!m)return null;
@@ -32,6 +33,9 @@ async function fetchEntry(key) {
  const identity=parseKey(key);if(!identity)return null;
  const value=(await api('/internal/hr/entry?'+new URLSearchParams(identity))).entry;
  entries.set(key,{entry:value,loaded:Date.now()});
+ checkedCount++;
+ if(value)matchedCount++;
+ setStatus('HR connected • '+matchedCount+' matched / '+checkedCount+' checked');
  return value;
 }
 async function write(key,field,value,reset=false){
@@ -89,7 +93,7 @@ async function synchronize(){
    try{await fetchEntry(key);if(generation===run)renderCells();}catch(e){setStatus(e.message);return;}
   }}
   await Promise.all(Array.from({length:Math.min(2,keys.length)},worker));
- }finally{loading=false;}
+ }finally{loading=false;if(authorized)setStatus('HR connected • '+matchedCount+' matched / '+checkedCount+' checked');}
 }
 function schedule(){if(queued||!authorized)return;queued=true;queueMicrotask(()=>{queued=false;synchronize();renderCells();});}
 let statusButton;
@@ -156,13 +160,13 @@ function installNativeEditing(){
  installResetNote();return true;
 }
 onAuthStateChanged(auth,async user=>{
- generation++;authorized=false;entries.clear();
+ generation++;authorized=false;entries.clear();matchedCount=0;checkedCount=0;
  installStatus();installNativeEditing();
  if(!user||user.isAnonymous){setStatus('Connect HR');return;}
  setStatus('Checking HR access…');
  try{
   await api('/internal/hr/entry?staffId=PERMISSIONCHECK&date=2026-01-01');
-  authorized=true;setStatus('HR Sync connected');schedule();
+  authorized=true;setStatus('HR connected • checking records…');schedule();
  }catch(e){setStatus(e.message);}
 });
 const boot=setInterval(()=>{installStatus();if(installNativeEditing())clearInterval(boot);},500);
