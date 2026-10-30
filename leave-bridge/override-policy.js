@@ -15,6 +15,8 @@ export function resolveAttendanceRow(sourceRow, manual) {
   return {
     staffId: sourceRow.staffId,
     date: sourceRow.date,
+    // Private validation metadata only; never an attendance-code update.
+    leaveType: String(sourceRow.leaveType ?? ''),
     noteTime: resolvedAttendanceField(sourceRow.noteTime, manual?.noteTime),
     reason: resolvedAttendanceField(sourceRow.reason, manual?.reason),
     // Do not change any attendance code, leave quota, or scanned time.
