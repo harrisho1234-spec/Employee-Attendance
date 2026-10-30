@@ -28,3 +28,10 @@ test('reset to sheet clears only requested override',()=>{
  assert.equal(manual.reason.value,'Corrected');
 });
 test('invalid reset is rejected',()=>assert.throws(()=>resetFieldToSheet({},'staffId')));
+
+test('source leave type survives private resolution without copying attendance code or mutating source',()=>{
+ const src={...source,leaveType:'SL',attendanceCode:'H-UP'};
+ const row=resolveAttendanceRow(src,{reason:{present:true,value:''}});
+ assert.equal(row.leaveType,'SL');assert.equal(row.reason.value,'');assert.equal(row.reason.origin,'manual');
+ assert.equal(row.attendanceCode,undefined);assert.equal(src.attendanceCode,'H-UP');
+});
