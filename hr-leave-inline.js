@@ -16,7 +16,7 @@ let matchedCount=0, checkedCount=0;
 function parseKey(key) {
  const m=/^([A-Za-z0-9_-]{1,48})_([A-Za-z]+)_(\d{1,2})_(20\d{2})$/.exec(key||'');
  if(!m)return null;
- const mon=['january','february','march','april','may','june','july','august','september','october','november','december'].indexOf(m[2].toLowerCase());
+ const mon=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'].indexOf(m[2].toLowerCase().slice(0,3));
  const date=m[4]+'-'+String(mon+1).padStart(2,'0')+'-'+m[3].padStart(2,'0');
  return mon<0||date<FIRST_AUTO_LEAVE_DATE?null:{staffId:m[1],date};
 }
@@ -106,6 +106,7 @@ function installStatus(){
  statusButton.className=refresh.className;
  statusButton.style.cssText='background:#e2e8f0;color:#334155';
  refresh.insertAdjacentElement('afterend',statusButton);
+ refresh.addEventListener('click',()=>{if(authorized){entries.clear();matchedCount=0;checkedCount=0;setTimeout(schedule,350);}}, {passive:true});
  statusButton.addEventListener('click',async()=>{
   if(authorized){await signOut(auth);return;}
   try{await signInWithPopup(auth,new GoogleAuthProvider());}catch(e){setStatus('HR sign-in unavailable');}
@@ -180,5 +181,6 @@ const boot=setInterval(()=>{installStatus();if(installNativeEditing())clearInter
   const keys=[...document.querySelectorAll('#dailyTableBody [data-hr-note],#dailyTableBody [data-hr-reason]')].map(el=>el.getAttribute('data-hr-note')||el.getAttribute('data-hr-reason'));
   const signature=keys.join('|');
   if(signature!==lastRowSignature){lastRowSignature=signature;schedule();}
+  else renderCells();
  },10000);
  setInterval(()=>{if(authorized){entries.clear();schedule();}},5*60*1000);
