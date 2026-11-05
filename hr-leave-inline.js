@@ -10,7 +10,7 @@ const auth=getAuth(app), endpoint='https://leave-hr-browser-gateway-916969515475
 const entries=new Map(), TTL=120000;
 const originals=new Map(), privateKeys=new Set(), resetFields=new Set();
 const FIRST_AUTO_LEAVE_DATE='2026-10-25';
-let authorized=false, loading=false, generation=0, queued=false, syncError='';
+let authorized=false, loading=false, generation=0, queued=false, syncError='', rerun=false;
 let statusButton;
 function parseKey(key) {
  const m=/^([A-Za-z0-9_-]{1,48})_([A-Za-z]+)_(\d{1,2})_(20\d{2})$/.exec(key||'');
@@ -24,7 +24,7 @@ function parseKey(key) {
 }
 function findFields() {
  const map=new Map();
- document.querySelectorAll('[data-hr-note],[data-hr-reason]').forEach(el=>{
+ document.querySelectorAll('#dailyView [data-hr-note],#dailyView [data-hr-reason]').forEach(el=>{
   const key=el.getAttribute('data-hr-note')||el.getAttribute('data-hr-reason');
   if(!parseKey(key))return;
   const item=map.get(key)||{notes:[],reasons:[]};
@@ -92,7 +92,8 @@ function renderCells(){
  // Drop detached DOM references, retaining no obsolete private controls in memory.
  for(const el of originals.keys())if(!el.isConnected)originals.delete(el);
  let checked=0,matched=0,reasons=0,warnings=0;
- for(const [key,els] of findFields()){
+ const fields=findFields();
+ for(const [key,els] of fields){
   if(entries.has(key))checked++;
   const entry=getEntry(key);
   if(!entry){
@@ -124,7 +125,11 @@ function renderCells(){
   }
   if(hasReason)reasons++;if(hasWarning)warnings++;
  }
- setStatus(syncError||`HR connected • ${matched} matched / ${checked} checked • ${reasons} reasons displayed • ${warnings} type warnings`);
+ const pending=[...fields.keys()].filter(key=>!entries.has(key)||Date.now()-entries.get(key).loaded>TTL).length;
+ const summary=`${matched} matched / ${checked} checked • ${reasons} reasons displayed • ${warnings} type warnings`;
+ setStatus(syncError ? `${syncError} • displayed details may be out of date` :
+  !fields.size ? 'HR connected • no eligible attendance rows in this view' :
+  pending ? `HR connected • checking ${pending} records… • ${summary}` : `HR connected • ${summary}`);
 }
 async function write(key,field,value,reset=false){
  const identity=parseKey(key);if(!identity||!authorized)throw Error('HR authentication required');
@@ -135,7 +140,9 @@ async function write(key,field,value,reset=false){
  entries.delete(key);await fetchEntry(key,run);renderCells();
 }
 async function synchronize(){
- if(!authorized||loading)return;loading=true;const run=generation;syncError='';
+ if(!authorized)return;
+ if(loading){rerun=true;return;}
+ loading=true;rerun=false;const run=generation;syncError='';
  try{
   const keys=[...findFields().keys()].filter(k=>!entries.has(k)||Date.now()-entries.get(k).loaded>TTL);
   let next=0;
@@ -144,7 +151,15 @@ async function synchronize(){
    catch(e){if(run===generation){syncError=e.message;setStatus(syncError);}else if(!authorized)setStatus('HR access unavailable');return;}
   }}
   await Promise.all(Array.from({length:Math.min(2,keys.length)},worker));
- }finally{loading=false;if(authorized){renderCells();if(run!==generation)schedule();}}
+ }finally{loading=false;if(authorized){renderCells();if(rerun||run!==generation)schedule();}}
+}
+function refreshFromSheet(){
+ if(!authorized)return;
+ generation++;syncError='';
+ // Keep the last displayed values and their counts together until replacement
+ // data arrives. Invalidating freshness must not erase the display's source.
+ for(const cached of entries.values())cached.loaded=0;
+ renderCells();schedule();
 }
 function schedule(){if(queued||!authorized)return;queued=true;queueMicrotask(()=>{queued=false;synchronize();renderCells();});}
 function setStatus(text){if(statusButton)statusButton.textContent=text;}
@@ -153,7 +168,7 @@ function installStatus(){
  const refresh=document.querySelector('#dailyView button[title="Refresh Daily Attendance"]');if(!refresh)return;
  statusButton=document.createElement('button');statusButton.type='button';statusButton.className=refresh.className;statusButton.style.cssText='background:#e2e8f0;color:#334155';
  refresh.insertAdjacentElement('afterend',statusButton);
- refresh.addEventListener('click',()=>{if(authorized){generation++;entries.clear();syncError='';setTimeout(schedule,350);}}, {passive:true});
+ refresh.addEventListener('click',refreshFromSheet, {passive:true});
  statusButton.addEventListener('click',async()=>{if(authorized){revoke();setStatus('Connect HR');await signOut(auth);return;}try{await signInWithPopup(auth,new GoogleAuthProvider());}catch(e){setStatus('HR sign-in unavailable');}});
  setStatus('Connect HR');
 }
@@ -201,6 +216,13 @@ onAuthStateChanged(auth,async user=>{
  catch(e){if(run===generation)setStatus(e.message);}
 });
 const boot=setInterval(()=>{installStatus();if(installNativeEditing())clearInterval(boot);},500);
+// React to attendance rows being replaced, including a slow Refresh or date
+// change. Ignore our own text/badge edits to avoid an observer feedback loop.
+const rowObserver=new MutationObserver(mutations=>{
+ const isFieldTree=node=>node.nodeType===1&&(node.matches('[data-hr-note],[data-hr-reason]')||node.querySelector('[data-hr-note],[data-hr-reason]'));
+ if(mutations.some(m=>m.target.closest?.('#dailyView')&&[...m.addedNodes,...m.removedNodes].some(isFieldTree)))schedule();
+});
+rowObserver.observe(document.body,{subtree:true,childList:true});
 setInterval(()=>{
  if(!authorized||document.hidden)return;
  const view=document.getElementById('dailyView');if(!view||view.classList.contains('hidden'))return;
