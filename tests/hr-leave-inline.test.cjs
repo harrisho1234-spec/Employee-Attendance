@@ -14,7 +14,7 @@ function setup({manual=false}={}){
  w.alert=()=>{};w.confirm=()=>true;w.closeNoteEdit=()=>{};
  w.saveReason=(...args)=>publicWrites.push(args);w.saveNoteEdit=()=>publicWrites.push('note');w.openNoteEdit=()=>{};
  w.fetch=async(url,opts)=>{calls.push({url,opts});return {ok:true,status:200,json:async()=>({entry})};};
- w.eval(source+'\nwindow.harness={parseKey,findFields,fetchEntry,renderCells,revoke,synchronize,write,leaveWarning,installNativeEditing,installStatus,activate(){authorized=true;},entry(key){return getEntry(key);}};');
+ w.eval(source+'\nwindow.harness={parseKey,findFields,fetchEntry,renderCells,revoke,synchronize,refreshFromSheet,write,leaveWarning,installNativeEditing,installStatus,activate(){authorized=true;},entry(key){return getEntry(key);}};');
  const h=w.harness;h.activate();h.installNativeEditing();h.installStatus();
  return {w,h,calls,publicWrites,setEntry(value){entry=value;},close:()=>w.close()};
 }
@@ -80,5 +80,45 @@ test('half-day equivalent type does not warn; unchanged blur does not create ove
  const t=setup();try{
   assert.equal(t.h.leaveWarning({leaveType:'SL'},'H-SL'),'');assert.equal(t.h.leaveWarning({},'H-UP'),'');
   await t.h.synchronize();t.w.saveReason(key,'Synthetic private reason');assert.equal(t.calls.length,1);assert.deepEqual(t.publicWrites,[]);
+ }finally{t.close();}
+});
+
+const settle=()=>new Promise(resolve=>setImmediate(resolve));
+test('refresh keeps imported values and counts together while replacement is pending',async()=>{
+ const t=setup();try{
+  await t.h.synchronize();
+  let release;t.w.fetch=()=>new Promise(resolve=>{release=resolve;});
+  t.h.refreshFromSheet();await settle();
+  const status=t.w.document.querySelector('#dailyView > button + button');
+  assert.match(status.textContent,/checking 1 records/);
+  assert.match(status.textContent,/1 matched \/ 1 checked/);
+  assert.equal(t.w.document.querySelector('[data-hr-reason]').value,'Synthetic private reason');
+  release({ok:true,status:200,json:async()=>({entry:null})});await settle();await settle();
+  assert.match(status.textContent,/0 matched \/ 1 checked/);
+  assert.equal(t.w.document.querySelector('[data-hr-reason]').value,'');
+  assert.equal(t.w.document.querySelectorAll('.hr-leave-warning').length,0);
+ }finally{t.close();}
+});
+test('rows arriving during a request are checked immediately after it completes',async()=>{
+ const t=setup();try{
+  let release;t.w.fetch=()=>new Promise(resolve=>{release=resolve;});
+  const pending=t.h.synchronize();await settle();
+  const nextKey='TEST-032_Nov_4_2026';
+  t.w.document.getElementById('dailyTableBody').innerHTML=row().replaceAll(key,nextKey);
+  t.w.document.getElementById('dailyMobileCards').innerHTML='';await settle();
+  t.w.fetch=async url=>{t.calls.push({url});return {ok:true,status:200,json:async()=>({entry:{staffId:'TEST-032',date:'2026-11-04',reason:{value:'New row reason',origin:'sheet'},noteTime:{value:'Morning',origin:'sheet'}}})};};
+  release({ok:true,status:200,json:async()=>({entry:null})});await pending;await settle();await settle();
+  assert.equal(t.w.document.querySelector('[data-hr-reason]').value,'New row reason');
+  assert.equal(t.calls.length,1);
+  await settle();assert.equal(t.calls.length,1,'overlay mutations must not cause another request');
+  assert.match(t.w.document.querySelector('#dailyView > button + button').textContent,/1 matched \/ 1 checked/);
+ }finally{t.close();}
+});
+test('failed refresh keeps values but clearly marks them as potentially stale',async()=>{
+ const t=setup();try{
+  await t.h.synchronize();t.w.fetch=async()=>({ok:false,status:503});
+  t.h.refreshFromSheet();await settle();await settle();
+  assert.equal(t.w.document.querySelector('[data-hr-reason]').value,'Synthetic private reason');
+  assert.match(t.w.document.querySelector('#dailyView > button + button').textContent,/503.*out of date/);
  }finally{t.close();}
 });
