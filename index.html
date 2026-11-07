@@ -11918,13 +11918,13 @@
                     
                     let nStr = i.notes.map(n => {
                         let disp = n.text ? `${n.prefix}${n.text}` : `${n.prefix}Add Note`; let isPlaceholder = !n.text;
-                        return `<div class="flex items-center h-[34px] mb-1"><span class="bg-slate-50 px-2.5 py-1.5 rounded-md border inline-flex items-center gap-1.5 group text-[11px] shadow-sm hover:border-blue-300 hover:bg-blue-50 cursor-text transition-all w-max max-w-full" data-hr-note="${n.id}" data-hr-manual="${Object.prototype.hasOwnProperty.call(customNotes,n.id)}" data-hr-types="${['AL','SL','SP','UP','A','D','OT','H'].filter(type=>n.rawObj.leaves[type]>0).map(type=>(n.rawObj.leaves[type]===0.5?'H-':'')+type).join(',')}" onclick="openNoteEdit(event, '${n.id}', '${(n.text||'').replace(/'/g, "\\'")}')"><i class="fa-regular fa-clock text-slate-400 shrink-0"></i> <span class="truncate ${isPlaceholder?'text-slate-400 italic':'text-slate-800 font-semibold'}">${disp}</span> <i class="fa-solid fa-pencil text-slate-300 group-hover:text-blue-600 text-[10px] ml-1 shrink-0"></i></span></div>`;
+                        return `<div class="flex items-center h-[34px] mb-1"><span class="bg-slate-50 px-2.5 py-1.5 rounded-md border inline-flex items-center gap-1.5 group text-[11px] shadow-sm hover:border-blue-300 hover:bg-blue-50 cursor-text transition-all w-max max-w-full" data-hr-note="${n.id}" onclick="openNoteEdit(event, '${n.id}', '${(n.text||'').replace(/'/g, "\\'")}')"><i class="fa-regular fa-clock text-slate-400 shrink-0"></i> <span class="truncate ${isPlaceholder?'text-slate-400 italic':'text-slate-800 font-semibold'}">${disp}</span> <i class="fa-solid fa-pencil text-slate-300 group-hover:text-blue-600 text-[10px] ml-1 shrink-0"></i></span></div>`;
                     }).join('');
 
                     let reasonInputs = i.dKeys.map(k => {
                         let cr = customReasons[k] || ''; 
                         let pfx = fD.getTime()!==tD.getTime() ? `<span class="text-[9px] text-slate-400 w-10 shrink-0 text-right pr-1.5">${k.split('_')[1].substring(0,3)} ${k.split('_')[2]}:</span>` : '';
-                        return `<div class="flex items-center w-full h-[34px] mb-1">${pfx}<input type="text" class="w-full bg-slate-50 border border-slate-200 rounded p-1.5 text-[11px] text-slate-700 focus:border-blue-500 focus:ring-1 outline-none transition-all placeholder:italic" placeholder="Reason..." data-hr-reason="${k}" data-hr-manual="${Object.prototype.hasOwnProperty.call(customReasons,k)}" value="${cr.replace(/"/g, '&quot;')}" onclick="event.stopPropagation()" onblur="saveReason('${k}', this.value)"></div>`;
+                        return `<div class="flex items-center w-full h-[34px] mb-1">${pfx}<input type="text" class="w-full bg-slate-50 border border-slate-200 rounded p-1.5 text-[11px] text-slate-700 focus:border-blue-500 focus:ring-1 outline-none transition-all placeholder:italic" placeholder="Reason..." data-hr-reason="${k}" value="${cr.replace(/"/g, '&quot;')}" onclick="event.stopPropagation()" onblur="saveReason('${k}', this.value)"></div>`;
                     }).join('');
 
                     let tr=document.createElement('tr'); tr.className="hover:bg-blue-50/50 border-b transition-colors";
@@ -12946,7 +12946,7 @@
             eD.forEach(r=>{ 
                 let b=bgC[r.e.company] || 'ffffff'; 
                 let fColor = (r.e.status === 'Resigned' || r.e.status === 'Terminated') ? 'data-f-color="c00000"' : '';
-                h+=`<tr><td data-fill-color="${b}" data-a-h="center" data-b-a-s="thin" ${fColor}>${cnt++}</td><td data-fill-color="${b}" data-a-h="center" data-b-a-s="thin" ${fColor}>${r.e.displayId}</td><td data-fill-color="${b}" data-a-h="left" data-b-a-s="thin" ${fColor}>${r.e.name}</td><td data-fill-color="${b}" data-a-h="center" data-b-a-s="thin" ${fColor}>${r.e.department}</td><td data-fill-color="${b}" data-a-h="center" data-b-a-s="thin" ${fColor}>${r.e.company}</td><td data-b-a-s="thin" data-f-color="c00000" data-a-h="center">${r.s||''}</td><td data-b-a-s="thin" data-f-color="c00000" data-a-h="center">${r.sRem||''}</td><td data-b-a-s="thin" data-f-color="c00000" data-a-h="center">${r.a||''}</td><td data-b-a-s="thin" data-f-color="c00000" data-a-h="center">${r.aRem||''}</td><td data-b-a-s="thin" data-f-color="c00000" data-a-h="center">${r.sp||''}</td><td data-b-a-s="thin" data-f-color="c00000" data-a-h="center">${r.spRem||''}</td></tr>`;
+                h+=`<tr><td data-fill-color="${b}" data-a-h="center" data-b-a-s="thin" ${fColor}>${cnt++}</td><td data-fill-color="${b}" data-a-h="center" data-b-a-s="thin" ${fColor}>${r.e.displayId}</td><td data-fill-color="${b}" data-a-h="left" data-b-a-s="thin" ${fColor}>${r.e.name}</td><td data-fill-color="${b}" data-a-h="center" data-b-a-s="thin" ${fColor}>${r.e.department}</td><td data-fill-color="${b}" data-a-h="center" data-b-a-s="thin" ${fColor}>${r.e.company}</td><td data-b-a-s="thin" data-f-color="c00000" data-a-h="center">${r.s||0}</td><td data-b-a-s="thin" data-f-color="c00000" data-a-h="center">${r.sRem||0}</td><td data-b-a-s="thin" data-f-color="c00000" data-a-h="center">${r.a||0}</td><td data-b-a-s="thin" data-f-color="c00000" data-a-h="center">${r.aRem||0}</td><td data-b-a-s="thin" data-f-color="c00000" data-a-h="center">${r.sp||0}</td><td data-b-a-s="thin" data-f-color="c00000" data-a-h="center">${r.spRem||0}</td></tr>`;
             });
 
             h+=`<tr><td colspan="11" data-b-a-s="none"></td></tr><tr><td colspan="2" data-fill-color="ffff00" data-b-a-s="none">Note:</td><td colspan="9" data-b-a-s="none"></td></tr><tr><td colspan="11" data-b-a-s="none" data-f-color="c00000">SL=Sick Leave</td></tr><tr><td colspan="11" data-b-a-s="none" data-f-color="c00000">AL=Annual Leave</td></tr><tr><td colspan="11" data-b-a-s="none" data-f-color="c00000">SP=Special Leave</td></tr>`;
@@ -15000,6 +15000,6 @@ if ('serviceWorker' in navigator) {
     });
 </script> 
 
-<script type="module" src="./hr-leave-inline.js?v=20261105-refresh-v3"></script>
+<script type="module" src="./hr-leave-inline.js?v=20261024-connect-fix"></script>
 </body>
 </html>
