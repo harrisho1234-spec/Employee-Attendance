@@ -6752,22 +6752,24 @@
                                 let cVal=cell.toUpperCase().replace(/\(.*?\)/g,''), al=0,sl=0,sp=0,up=0,a=0,d=0,h=0,l5=0,l3=0,ot=0,pres=false, isRawD=false, isRawH=false;
                                 cVal.split(/[+&,\n]/).forEach(p=>{
                                     if(p.includes('/')) {
-                                        p.split('/').forEach(sp=>{
+                                        p.split('/').forEach(segment=>{
                                             // Preserve lateness when it is combined with a half-day code,
                                             // e.g. L/H-UP or L'/H-AL. Previously the slash branch
                                             // only parsed leave codes and silently dropped L / L'.
-                                            const rawPart = String(sp || '').trim().toUpperCase();
+                                            const rawPart = String(segment || '').trim().toUpperCase();
                                             if(rawPart === 'L') { l5 += 1; return; }
                                             if(rawPart === "L'") { l3 += 1; return; }
                                             if(rawPart === 'P' || rawPart === 'PRESENT') { pres = true; return; }
 
                                             let cs=rawPart.replace(/[^A-Z]/g,'').replace(/^H(?=(?:AL|SL|SP|UP|A|D|DAYOFF|OT|HOLIDAY)$)/,'');
+                                            if(cs==='HALFDAYOFF')cs='D';
+                                            if(cs==='HH'||cs==='HHOL'||cs==='HALFHOLIDAY')cs='H';
                                             if(cs==='AL')al+=0.5;else if(cs==='SL')sl+=0.5;else if(cs==='SP')sp+=0.5;else if(cs==='UP')up+=0.5;else if(cs==='A')a+=0.5;else if(cs==='D'||cs==='DAYOFF'){d+=0.5;isRawD=true;}else if(cs==='OT')ot+=0.5;else if(cs==='H'||cs==='HOLIDAY'){h+=0.5;isRawH=true;}
                                         }); return;
                                     }
                                     let tp=p.trim(); if(tp==="P"||tp==="PRESENT")pres=true;else if(tp==="L")l5+=1;else if(tp==="L'")l3+=1;
                                     else {
-                                        let cp=tp.replace(/[^A-Z]/g,''); if(cp==='AL')al+=1;else if(cp==='HAL')al+=0.5;else if(cp==='SL')sl+=1;else if(cp==='HSL')sl+=0.5;else if(cp==='SP')sp+=1;else if(cp==='HSP')sp+=0.5;else if(cp==='UP')up+=1;else if(cp==='HUP')up+=0.5;else if(cp==='A')a+=1;else if(cp==='HA')a+=0.5;else if(cp==='D'||cp==='DAYOFF'){d+=1;isRawD=true;}else if(cp==='HD'||cp==='HALFDAYOFF'){d+=0.5;isRawD=true;}else if(cp==='OT')ot+=1;else if(cp==='HOT')ot+=0.5;else if(cp==='H'||cp==='HOLIDAY'){h+=1;isRawH=true;}else if(cp==='HH'||cp==='HALFHOLIDAY'){h+=0.5;isRawH=true;}
+                                        let cp=tp.replace(/[^A-Z]/g,''); if(cp==='AL')al+=1;else if(cp==='HAL')al+=0.5;else if(cp==='SL')sl+=1;else if(cp==='HSL')sl+=0.5;else if(cp==='SP')sp+=1;else if(cp==='HSP')sp+=0.5;else if(cp==='UP')up+=1;else if(cp==='HUP')up+=0.5;else if(cp==='A')a+=1;else if(cp==='HA')a+=0.5;else if(cp==='D'||cp==='DAYOFF'){d+=1;isRawD=true;}else if(cp==='HD'||cp==='HDAYOFF'||cp==='HALFDAYOFF'){d+=0.5;isRawD=true;}else if(cp==='OT')ot+=1;else if(cp==='HOT')ot+=0.5;else if(cp==='H'||cp==='HOLIDAY'){h+=1;isRawH=true;}else if(cp==='HH'||cp==='HHOL'||cp==='HHOLIDAY'||cp==='HALFHOLIDAY'){h+=0.5;isRawH=true;}
                                     }
                                 });
                                 const recordDate = new Date(attendanceDataYear, monthNames.indexOf(mg.month), parseInt(day));
